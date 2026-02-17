@@ -187,6 +187,8 @@ model Product {
   slug        String    @unique
   description String?   @db.Text
   categoryId  String
+  shopierId   String?   @unique
+  metadata    Json?
   basePrice   Decimal   @db.Decimal(10, 2)
   images      String[]  @default([])
   isActive    Boolean   @default(true)

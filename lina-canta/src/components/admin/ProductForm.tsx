@@ -4,58 +4,103 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ImageEditor from "./ImageEditor";
+import { updateProduct } from "@/app/admin/urunler/actions";
 
 interface ProductFormProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialData?: any;
     title: string;
+    categories?: { id: string; name: string }[];
 }
 
 interface Variant {
-    id: number;
+    id: number | string;
     color: string;
     size: string;
     stock: number | null;
     price: number | null;
     image?: string;
+    sku?: string;
 }
 
-const CATEGORIES = ["Çantalar", "Gözlükler", "Cüzdanlar", "Aksesuarlar", "Ayakkabılar", "Takılar"];
-
-export default function ProductForm({ initialData, title }: ProductFormProps) {
+export default function ProductForm({ initialData, title, categories = [] }: ProductFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
     // State for images
-    const [images, setImages] = useState<string[]>(initialData?.img ? [initialData.img] : []);
+    const [images, setImages] = useState<string[]>(initialData?.images || []);
     const [editingImageIndex, setEditingImageIndex] = useState<number | null>(null);
 
+    // Helper to parse SKU for attributes if missing
+    const parseSkuForAttributes = (sku: string) => {
+        const parts = sku.split('-');
+        if (parts.length > 1) {
+            // Simple heuristic: check common color names in parts
+            const commonColors = ["Siyah", "Beyaz", "Kırmızı", "Mavi", "Yeşil", "Pembe", "Altın", "Gümüş", "Gri", "Bej", "Lacivert", "Bordo", "Kahverengi", "Turuncu", "Sarı", "Mor"];
+            const foundColor = commonColors.find(c => sku.toLowerCase().includes(c.toLowerCase()));
+
+            // Simple heuristic for sizes
+            const commonSizes = ["Small", "Medium", "Large", "XL", "XXL", "Standart", "Nano", "Mini"];
+            const foundSize = commonSizes.find(s => sku.toLowerCase().includes(s.toLowerCase()));
+
+            return { color: foundColor || "", size: foundSize || "" };
+        }
+        return { color: "", size: "" };
+    };
+
     // State for variants
-    const [variants, setVariants] = useState<Variant[]>([
-        { id: 1, color: "", size: "", stock: null, price: null }
-    ]);
+    const [variants, setVariants] = useState<Variant[]>(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        initialData?.variants?.map((v: any) => {
+            // Try to find attributes first
+            let color = v.attributes?.find((a: any) => a.attributeValue.attribute.name === "Renk")?.attributeValue.value || "";
+            let size = v.attributes?.find((a: any) => a.attributeValue.attribute.name === "Beden")?.attributeValue.value || "";
+
+            // If attributes are missing, try to parse from SKU
+            if (!color && !size && v.sku) {
+                const parsed = parseSkuForAttributes(v.sku);
+                if (!color) color = parsed.color;
+                if (!size) size = parsed.size;
+            }
+
+            // Should also check if "Renk" is part of the value (e.g. "Siyah Renk") and normalize
+            if (color && color.toLowerCase().endsWith(" renk")) {
+                color = color.substring(0, color.length - 5).trim(); // Remove " Renk" suffix
+                // Capitalize first letter
+                color = color.charAt(0).toUpperCase() + color.slice(1);
+            }
+
+            return {
+                id: v.id,
+                color,
+                size,
+                stock: v.stock,
+                price: Number(v.price),
+                sku: v.sku,
+                image: v.image
+            };
+        }) || [{ id: 1, color: "", size: "", stock: null, price: null }]
+    );
 
     // State for selecting image for a specific variant
-    const [selectingForVariant, setSelectingForVariant] = useState<number | null>(null);
+    const [selectingForVariant, setSelectingForVariant] = useState<number | string | null>(null);
 
-    // Categories (Multi-select)
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(initialData?.categories || []);
+    // Categories (Single select)
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string>(initialData?.categoryId || "");
 
-    const [mainPrice, setMainPrice] = useState(initialData?.price || "");
-    const [mainStock, setMainStock] = useState(initialData?.stock || "");
+    const [mainPrice, setMainPrice] = useState(initialData?.basePrice || "");
+    const isMockStock = !initialData?.variants?.length;
+    const [mainStock, setMainStock] = useState(initialData?.stock || (isMockStock ? "" : 0));
 
     // Computed state for disabling main price/stock
-    // If ANY variant has a price > 0, main price should be disabled/dimmed
     const hasVariantPrices = variants.some(v => v.price !== null && v.price > 0);
     const hasVariantStocks = variants.some(v => v.stock !== null && v.stock > 0);
 
     const handleImageUpload = () => {
-        // Mock upload
+        // Mock upload logic - in real app would upload to S3/Cloudinary
         const newImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuDN7alVJYJImA_YeB77T8ihi8RpAgmepzTlPWfQ8qjShEHjRzuq_xHEZnWTxhC5yJ_-Cjm_aS4hyU_qrFwlqXwDVoAJOgwe1BiyluKCBsIWLRxcyF9bH3Bq8UTuXqu-CJr6p8REWkuLLIAscHN8NB-_OoOKOnjgd1tGAjaD-_cE-Ykvf-pHY5TFh3sfu5vY01Z2jKesMB_bPFkNj1tjJyc0Ru3ySq1jJUHU9QU6NL-5YNpeodii6aD5h3yoLTVqPmTtOFpEfCzvh7e2";
         setImages([...images, newImage]);
-        // Immediately open editor for the new image? Or let user click?
-        // User said: "görseli seçtikten sonra... ayarlayıp kaydet deyince görsel oraya kayıt edilsin"
-        // Let's open editor for the new image automatically
-        setEditingImageIndex(images.length); // Index of the new image
+        setEditingImageIndex(images.length);
     };
 
     const handleEditorSave = (newUrl: string) => {
@@ -68,15 +113,14 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
     };
 
     const addVariant = () => {
-        setVariants([...variants, { id: Date.now(), color: "", size: "", stock: null, price: null }]);
+        setVariants([...variants, { id: `temp-${Date.now()}`, color: "", size: "", stock: null, price: null }]);
     };
 
-    const removeVariant = (id: number) => {
+    const removeVariant = (id: number | string) => {
         setVariants(variants.filter(v => v.id !== id));
     };
 
-    const updateVariant = (id: number, field: keyof Variant, value: any) => {
-        // If value is empty string, convert to null
+    const updateVariant = (id: number | string, field: keyof Variant, value: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         const finalValue = value === "" ? null : value;
         setVariants(variants.map(v => v.id === id ? { ...v, [field]: finalValue } : v));
     };
@@ -88,22 +132,45 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
         }
     };
 
-    const toggleCategory = (cat: string) => {
-        if (selectedCategories.includes(cat)) {
-            setSelectedCategories(selectedCategories.filter(c => c !== cat));
-        } else {
-            setSelectedCategories([...selectedCategories, cat]);
-        }
+    const toggleCategory = (catId: string) => {
+        setSelectedCategoryId(catId);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate API call
-        console.log("Submitting:", { images, variants, selectedCategories, mainPrice, mainStock });
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setLoading(false);
-        router.push("/admin/urunler");
+
+        try {
+            const formData = {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                name: (e.target as any).name.value,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                description: (e.target as any).description.value,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                brand: (e.target as any).brand.value,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                sku: (e.target as any).sku.value,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                status: (e.target as any).status.value,
+                price: mainPrice,
+                stock: mainStock,
+                categoryId: selectedCategoryId,
+                images,
+                variants
+            };
+
+            const result = await updateProduct(initialData?.id, formData);
+            if (result.success) {
+                router.push("/admin/urunler");
+            } else {
+                alert(result.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Bir hata oluştu");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -164,11 +231,11 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                         <h2 className="text-lg font-bold text-[#111827]">Temel Bilgiler</h2>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Ürün Adı</label>
-                            <input defaultValue={initialData?.name} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]" placeholder="Örn: Sac de Jour Nano" required />
+                            <input name="name" defaultValue={initialData?.name} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]" placeholder="Örn: Sac de Jour Nano" required />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                            <textarea defaultValue={initialData?.description} rows={4} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]" placeholder="Ürün açıklaması..." />
+                            <textarea name="description" defaultValue={initialData?.description} rows={4} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]" placeholder="Ürün açıklaması..." />
                         </div>
                     </div>
 
@@ -222,35 +289,61 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Fields */}
                                     <div className="col-span-10 grid grid-cols-4 gap-3">
                                         <div className="space-y-1">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Renk</label>
-                                            <select
-                                                value={variant.color}
-                                                onChange={(e) => updateVariant(variant.id, 'color', e.target.value)}
-                                                className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
-                                            >
-                                                <option value="">Seç...</option>
-                                                <option value="Siyah">Siyah</option>
-                                                <option value="Beyaz">Beyaz</option>
-                                                <option value="Kırmızı">Kırmızı</option>
-                                                <option value="Altın">Altın</option>
-                                            </select>
+                                            <div className="relative">
+                                                <input
+                                                    list={`colors-${variant.id}`}
+                                                    value={variant.color}
+                                                    onChange={(e) => updateVariant(variant.id, 'color', e.target.value)}
+                                                    className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                                    placeholder="Seç veya Yaz"
+                                                />
+                                                <datalist id={`colors-${variant.id}`}>
+                                                    <option value="Siyah">Siyah</option>
+                                                    <option value="Beyaz">Beyaz</option>
+                                                    <option value="Kırmızı">Kırmızı</option>
+                                                    <option value="Altın">Altın</option>
+                                                    <option value="Gümüş">Gümüş</option>
+                                                    <option value="Mavi">Mavi</option>
+                                                    <option value="Yeşil">Yeşil</option>
+                                                    <option value="Pembe">Pembe</option>
+                                                    <option value="Mor">Mor</option>
+                                                    <option value="Gri">Gri</option>
+                                                    <option value="Kahverengi">Kahverengi</option>
+                                                    <option value="Bej">Bej</option>
+                                                    <option value="Lacivert">Lacivert</option>
+                                                    <option value="Bordo">Bordo</option>
+                                                    <option value="Turuncu">Turuncu</option>
+                                                    <option value="Sarı">Sarı</option>
+                                                    <option value="Krem">Krem</option>
+                                                    <option value="Vizon">Vizon</option>
+                                                    <option value="Taba">Taba</option>
+                                                    <option value="Haki">Haki</option>
+                                                </datalist>
+                                            </div>
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Beden</label>
-                                            <select
-                                                value={variant.size}
-                                                onChange={(e) => updateVariant(variant.id, 'size', e.target.value)}
-                                                className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
-                                            >
-                                                <option value="">Seç...</option>
-                                                <option value="Nano">Nano</option>
-                                                <option value="Small">Small</option>
-                                                <option value="Std">Standart</option>
-                                            </select>
+                                            <div className="relative">
+                                                <input
+                                                    list={`sizes-${variant.id}`}
+                                                    value={variant.size}
+                                                    onChange={(e) => updateVariant(variant.id, 'size', e.target.value)}
+                                                    className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                                    placeholder="Seç veya Yaz"
+                                                />
+                                                <datalist id={`sizes-${variant.id}`}>
+                                                    <option value="Standart">Standart</option>
+                                                    <option value="Nano">Nano</option>
+                                                    <option value="Mini">Mini</option>
+                                                    <option value="Small">Small</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
+                                                    <option value="XL">XL</option>
+                                                </datalist>
+                                            </div>
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Fiyat (Opsiyonel)</label>
@@ -273,7 +366,6 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                                             />
                                         </div>
                                     </div>
-
                                     {/* Delete */}
                                     <div className="col-span-1 flex justify-end pt-5">
                                         <button type="button" onClick={() => removeVariant(variant.id)} className="text-gray-400 hover:text-red-500"><span className="material-icons">delete</span></button>
@@ -289,17 +381,17 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                     <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
                         <h2 className="text-lg font-bold text-[#111827]">Kategoriler</h2>
                         <div className="flex flex-wrap gap-2">
-                            {CATEGORIES.map(cat => (
+                            {categories.map(cat => (
                                 <button
-                                    key={cat}
+                                    key={cat.id}
                                     type="button"
-                                    onClick={() => toggleCategory(cat)}
-                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${selectedCategories.includes(cat)
-                                            ? "bg-[#FF007F] text-white border-[#FF007F]"
-                                            : "bg-white text-gray-600 border-gray-200 hover:border-[#FF007F]"
+                                    onClick={() => toggleCategory(cat.id)}
+                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${selectedCategoryId === cat.id
+                                        ? "bg-[#FF007F] text-white border-[#FF007F]"
+                                        : "bg-white text-gray-600 border-gray-200 hover:border-[#FF007F]"
                                         }`}
                                 >
-                                    {cat}
+                                    {cat.name}
                                 </button>
                             ))}
                         </div>
@@ -347,7 +439,7 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                     {/* Status */}
                     <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
                         <h2 className="text-lg font-bold text-[#111827]">Durum</h2>
-                        <select defaultValue={initialData?.status} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]">
+                        <select name="status" defaultValue={initialData?.isActive ? 'Aktif' : 'Pasif'} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]">
                             <option value="Aktif">Aktif</option>
                             <option value="Pasif">Pasif</option>
                             <option value="Taslak">Taslak</option>
@@ -359,7 +451,7 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                         <h2 className="text-lg font-bold text-[#111827]">Organizasyon</h2>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Marka</label>
-                            <select defaultValue={initialData?.brand} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]">
+                            <select name="brand" defaultValue={initialData?.brand} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]">
                                 <option>Seçiniz...</option>
                                 <option value="Saint Laurent">Saint Laurent</option>
                                 <option value="Gucci">Gucci</option>
@@ -368,7 +460,7 @@ export default function ProductForm({ initialData, title }: ProductFormProps) {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
-                            <input defaultValue={initialData?.sku} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]" placeholder="Örn: SL-001" />
+                            <input name="sku" defaultValue={initialData?.sku} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-[#FF007F] focus:border-[#FF007F]" placeholder="Örn: SL-001" />
                         </div>
                     </div>
                 </div>

@@ -1,34 +1,48 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import ProductTable from "./ProductTable";
+import { serializeData } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
-    const products = await db.product.findMany({
-        include: {
-            category: true,
-            variants: {
-                include: {
-                    attributes: {
-                        include: {
-                            attributeValue: {
-                                include: {
-                                    attribute: true,
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+    const params = await searchParams;
+    const page = Number(params.page) || 1;
+    const pageSize = 25;
+    const skip = (page - 1) * pageSize;
+
+    const [productsData, totalCount] = await Promise.all([
+        db.product.findMany({
+            take: pageSize,
+            skip: skip,
+            include: {
+                category: true,
+                variants: {
+                    include: {
+                        attributes: {
+                            include: {
+                                attributeValue: {
+                                    include: {
+                                        attribute: true,
+                                    },
                                 },
                             },
                         },
                     },
-                },
-                orderBy: {
-                    sku: "asc",
+                    orderBy: {
+                        sku: "asc",
+                    },
                 },
             },
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+            orderBy: {
+                createdAt: "desc",
+            },
+        }),
+        db.product.count()
+    ]);
+
+    const products = serializeData(productsData);
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     return (
         <div className="space-y-6">
@@ -36,7 +50,7 @@ export default async function ProductsPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Ürünler</h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Mağazanızdaki tüm ürünleri buradan yönetebilirsiniz.
+                        Mağazanızdaki tüm ürünleri buradan yönetebilirsiniz. Toplam {totalCount} ürün.
                     </p>
                 </div>
                 <Link
@@ -48,7 +62,11 @@ export default async function ProductsPage() {
                 </Link>
             </div>
 
-            <ProductTable products={products} />
+            <ProductTable
+                products={products}
+                currentPage={page}
+                totalPages={totalPages}
+            />
         </div>
     );
 }
