@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shopping Bag - L'Elite Luxury Store</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-primary min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-primary/5 px-6 lg:px-20 py-4">
+<div class="max-w-[1440px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-6">
+<a class="group flex items-center gap-2 text-sm font-medium hover:text-primary/60 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Back
+                </a>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h1 class="text-xl font-bold tracking-tight uppercase">L'Elite</h1>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative p-1">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold size-4 rounded-full flex items-center justify-center">3</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-6 lg:px-20 py-12">
+<div class="flex flex-col lg:flex-row gap-16">
+<!-- Left Column: Shopping Bag Items -->
+<div class="flex-1">
+<div class="mb-10 flex items-baseline justify-between border-b border-primary/10 pb-6">
+<h2 class="text-3xl font-extrabold tracking-tight">Shopping Bag</h2>
+<span class="text-primary/50 text-sm font-medium">3 Items in your bag</span>
+</div>
+<div class="space-y-10">
+<!-- Item 1: Saint Laurent Bag -->
+<div class="flex flex-col md:flex-row gap-8 items-start pb-10 border-b border-primary/5">
+<div class="w-full md:w-48 aspect-[4/5] bg-[#F2F2F2] rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Saint Laurent Bag" class="w-full h-full object-cover" data-alt="Luxurious black leather designer handbag on neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBan1d4tfq6FA6LwDIbSgrMamBqoEJvVJpJ1RTBATEI3QE27jkomAhktBPfpBUrSHXxONudtUdFS4YAyD51QT648D-kw6JICWNQDHXife7_auStDsbO5dQateVAPxM17oa2MJbrWlHZ3ddOyZVc81ugcA3ZglTz9JW5-czn3xIswMN6q2HpF2e89NRSKv-gsSW0QMlWd8fPdi0CWu5Xe5yZfyGRBUJDKhyp_lOQu3_oBTN1mYoDbcu7-BEzs5TbVaZZPwB3YIAET9Bi"/>
+</div>
+<div class="flex-1 flex flex-col h-full min-h-[160px]">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Saint Laurent</p>
+<h3 class="text-xl font-semibold">Loulou Small in Quilted Leather</h3>
+<p class="text-primary/60 text-sm mt-1">Color: Noir • Size: Small</p>
+</div>
+<p class="text-xl font-bold">€2,450.00</p>
+</div>
+<div class="mt-auto flex items-center justify-between pt-6">
+<div class="flex items-center border border-primary/10 rounded-lg overflow-hidden bg-white">
+<button class="p-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<span class="px-4 text-sm font-bold min-w-[40px] text-center">1</span>
+<button class="p-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<button class="flex items-center gap-1.5 text-sm font-medium text-primary/40 hover:text-red-600 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+                                    Remove
+                                </button>
+</div>
+</div>
+</div>
+<!-- Item 2: Gucci Scarf -->
+<div class="flex flex-col md:flex-row gap-8 items-start pb-10 border-b border-primary/5">
+<div class="w-full md:w-48 aspect-[4/5] bg-[#F2F2F2] rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Gucci Scarf" class="w-full h-full object-cover" data-alt="Elegant floral print silk scarf displayed artistically" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXvpuUxjEu7V6AOFRERkVpqf71zSyVAaRQP-PpEbYnaMalfu1Mgtbrozcw2ZM47EjKL0YIWXmAOMH7WIkSLrP8yFX9DLqK7_0njnkTTOqEq38W7T14P0LK5sKQPe4OBub9jX6Rs9cP-I-ig_H0tOqxAaz4nATCugfS5SBbWoaW1O6oZHreARRmDkGpNtTLj4mI6tokfxuySOFjNoVUCT-XdFhVWHvfA2w6J2ATPKQFgKpXroOCeyUr3PiboZqrnuklJwv-XX6TBF02"/>
+</div>
+<div class="flex-1 flex flex-col h-full min-h-[160px]">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Gucci</p>
+<h3 class="text-xl font-semibold">Flora Print Silk Scarf</h3>
+<p class="text-primary/60 text-sm mt-1">Color: Multi • Size: 90x90cm</p>
+</div>
+<p class="text-xl font-bold">€410.00</p>
+</div>
+<div class="mt-auto flex items-center justify-between pt-6">
+<div class="flex items-center border border-primary/10 rounded-lg overflow-hidden bg-white">
+<button class="p-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<span class="px-4 text-sm font-bold min-w-[40px] text-center">1</span>
+<button class="p-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<button class="flex items-center gap-1.5 text-sm font-medium text-primary/40 hover:text-red-600 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+                                    Remove
+                                </button>
+</div>
+</div>
+</div>
+<!-- Item 3: Prada Bag -->
+<div class="flex flex-col md:flex-row gap-8 items-start pb-10 border-b border-primary/5">
+<div class="w-full md:w-48 aspect-[4/5] bg-[#F2F2F2] rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Prada Bag" class="w-full h-full object-cover" data-alt="Minimalist luxury nylon bag with metal logo detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8L8WanRMiRMf3FZfSZdEp_vfUJhG7HPaaJ7_9W_ijxB7cQ0BqPPW7oOK5gOspy_dVk1KTCcqgK0qgLZfRRwdauEphmbufHAIf9gBmkVGCkcYtEdyZP-MzZs5TzS4b_VvwTGHqJKBeebfnXfAowZmZxmgloHj80bpf8r6SZjNg1DGVXJCtMp8MffNljxu853R2ZRcj60UyW120nOJBWcUFBs5bGHTfmkTDyDAVnNvYmys6HAq721losttQHByqkfkRKemvmC_xvNkJ"/>
+</div>
+<div class="flex-1 flex flex-col h-full min-h-[160px]">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold uppercase tracking-[0.2em] text-primary/40 mb-1">Prada</p>
+<h3 class="text-xl font-semibold">Re-Edition 2005 Nylon Bag</h3>
+<p class="text-primary/60 text-sm mt-1">Color: Alabastro • Size: One Size</p>
+</div>
+<p class="text-xl font-bold">€580.00</p>
+</div>
+<div class="mt-auto flex items-center justify-between pt-6">
+<div class="flex items-center border border-primary/10 rounded-lg overflow-hidden bg-white">
+<button class="p-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<span class="px-4 text-sm font-bold min-w-[40px] text-center">1</span>
+<button class="p-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<button class="flex items-center gap-1.5 text-sm font-medium text-primary/40 hover:text-red-600 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+                                    Remove
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12">
+<a class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary hover:gap-4 transition-all duration-300" href="#">
+                        Continue Shopping
+                        <span class="material-symbols-outlined text-lg">trending_flat</span>
+</a>
+</div>
+</div>
+<!-- Right Column: Order Summary -->
+<div class="lg:w-[400px]">
+<div class="sticky top-28 space-y-8">
+<div class="bg-white p-8 rounded-xl border border-primary/5 shadow-sm">
+<h3 class="text-lg font-bold uppercase tracking-tight mb-8">Order Summary</h3>
+<div class="space-y-4 mb-8 pb-8 border-b border-primary/5">
+<div class="flex justify-between text-sm">
+<span class="text-primary/60 font-medium">Subtotal (Ara Toplam)</span>
+<span class="font-bold">€3,440.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-primary/60 font-medium">Shipping (Kargo)</span>
+<span class="text-green-600 font-bold uppercase">Free</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-primary/60 font-medium">VAT (KDV)</span>
+<span class="font-bold">Included</span>
+</div>
+</div>
+<div class="flex justify-between items-baseline mb-8">
+<span class="text-xl font-bold">Total (Toplam)</span>
+<span class="text-2xl font-black">€3,440.00</span>
+</div>
+<!-- Promo Code Section -->
+<div class="mb-8 group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-primary/40 mb-2" for="promo">Promo Code</label>
+<div class="relative flex border-b border-primary/20 group-focus-within:border-primary transition-colors">
+<input class="w-full py-2 bg-transparent border-none focus:ring-0 text-sm font-medium placeholder:text-primary/20" id="promo" placeholder="Enter code" type="text"/>
+<button class="text-[10px] font-bold uppercase tracking-widest hover:text-primary/60 transition-colors px-2">Apply</button>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-5 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-primary/90 transition-all active:scale-[0.98] shadow-lg shadow-primary/20">
+                            Checkout (Alışverişi Tamamla)
+                        </button>
+<div class="mt-8 grid grid-cols-3 gap-4">
+<div class="flex flex-col items-center justify-center p-3 border border-primary/5 rounded-lg opacity-40 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-2xl mb-1">lock</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Secure</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 border border-primary/5 rounded-lg opacity-40 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-2xl mb-1">payments</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Verified</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 border border-primary/5 rounded-lg opacity-40 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-2xl mb-1">local_shipping</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Express</span>
+</div>
+</div>
+</div>
+<!-- Support Card -->
+<div class="p-6 bg-primary/5 rounded-xl border border-primary/5">
+<p class="text-xs font-bold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">support_agent</span>
+                            Concierge Service
+                        </p>
+<p class="text-sm text-primary/60 font-medium leading-relaxed">
+                            Need assistance with your luxury selection? Our personal shoppers are available 24/7.
+                        </p>
+<a class="inline-block mt-4 text-[10px] font-bold uppercase tracking-widest border-b border-primary/20 hover:border-primary transition-all" href="#">Connect with Stylist</a>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Trust Section -->
+<footer class="mt-20 border-t border-primary/5 py-12 bg-white">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-20">
+<div class="flex flex-wrap justify-between items-center gap-10">
+<div class="flex items-center gap-8 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
+<span class="text-sm font-bold tracking-tighter italic">VISA</span>
+<span class="text-sm font-bold tracking-tighter italic">Mastercard</span>
+<span class="text-sm font-bold tracking-tighter italic">AMEX</span>
+<span class="text-sm font-bold tracking-tighter italic">Apple Pay</span>
+<span class="text-sm font-bold tracking-tighter italic">PayPal</span>
+</div>
+<div class="flex gap-12">
+<div class="text-center md:text-left">
+<p class="text-[10px] font-bold uppercase tracking-widest text-primary/30 mb-2">Shipping</p>
+<p class="text-xs font-medium">Complementary Worldwide Delivery</p>
+</div>
+<div class="text-center md:text-left">
+<p class="text-[10px] font-bold uppercase tracking-widest text-primary/30 mb-2">Returns</p>
+<p class="text-xs font-medium">14-Day Free Returns Policy</p>
+</div>
+</div>
+</div>
+<div class="mt-12 text-center">
+<p class="text-[10px] font-medium text-primary/30 tracking-widest uppercase">© 2024 L'Elite Luxury Store. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</body></html>

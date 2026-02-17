@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── STORE (L'ELITE) ────────────────────────── */
+  --color-primary: #1a1a1a;
+  --color-background-light: #f7f7f7;
+  --color-background-alt: #f9fafb;
+  --color-background-dark: #191919;
+
+  /* ─── ADMIN (Lina Butik) ────────────────────── */
+  --color-admin-primary: #FF007F;
+  --color-admin-primary-hover: #D6006B;
+  --color-admin-bg: #F9FAFB;
+  --color-admin-surface: #FFFFFF;
+  --color-admin-border: #E5E7EB;
+  --color-admin-text: #374151;
+  --color-admin-bg-dark: #111827;
+  --color-admin-surface-dark: #1F2937;
+  --color-admin-border-dark: #374151;
+
+  /* ─── FONT ──────────────────────────────────── */
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-admin: "Inter", sans-serif;
+}
+
+/* ─── GLOBAL ────────────────────────────────────── */
+body {
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── GLASSMORPHISM HEADER ──────────────────────── */
+.glass-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── SCROLLBAR ─────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─── PRODUCT CARD HOVER ────────────────────────── */
+.product-card:hover .secondary-img {
+  opacity: 1;
+}
+
+/* ─── ICONS ─────────────────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
+
+.fill-icon {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}

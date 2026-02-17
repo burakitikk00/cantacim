@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sac de Jour Nano - L'Elite Luxury Store</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-white text-primary selection:bg-primary/10">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-12">
+<a class="flex items-center gap-2 group" href="#">
+<div class="size-8 bg-primary text-white flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-xl">diamond</span>
+</div>
+<span class="text-xl font-bold tracking-tight uppercase">L'Elite</span>
+</a>
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary/60 transition-colors uppercase tracking-wider" href="#">New Arrivals</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors uppercase tracking-wider" href="#">Bags</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors uppercase tracking-wider" href="#">Shoes</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors uppercase tracking-wider" href="#">Clothing</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors uppercase tracking-wider" href="#">Sale</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-transparent focus-within:border-gray-200 transition-all">
+<span class="material-symbols-outlined text-gray-400 text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-gray-400" placeholder="Search collection..." type="text"/>
+</div>
+<button class="relative p-2 hover:bg-gray-50 rounded-full transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="relative p-2 hover:bg-gray-50 rounded-full transition-colors">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute top-1 right-1 size-4 bg-primary text-[10px] text-white flex items-center justify-center rounded-full font-bold">1</span>
+</button>
+<div class="size-9 rounded-full bg-gray-100 overflow-hidden ring-1 ring-gray-200">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a stylish user profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZhv2vEKw_zf_wVPfOLYwUIwiGYhOMtUo9LwV-e_EQ4JlWllEZCsihF8q1UDSi9Fi3HiZY2kM3xSZAQ8T-unJz9JT5uEyrNPfH4Qw6frL9CTSc0-U3-RIIFSHpdBsfDyzrSeJoLZ18RW9e_T29rJy2_Gz0n0HTiDyyoNZOQeobwxa7rrxy7c0cqn6zh9ubUlGNpnm0PgeTMFjZArgBR3kWVQ6Pv2zvQmZGXnxX17j4s3u-Fe40NY4JS9opSUnMCXiYXDsVS9RuBBLi"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-widest mb-12">
+<a class="hover:text-primary transition-colors" href="#">Home</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Bags</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Saint Laurent</a>
+<span class="material-symbols-outlined text-xs text-primary/30">chevron_right</span>
+<span class="text-primary">Sac de Jour Nano</span>
+</nav>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- Left Column: Image Gallery -->
+<div class="lg:col-span-7 flex gap-6 h-fit lg:sticky lg:top-28">
+<!-- Thumbnails -->
+<div class="flex flex-col gap-4 w-20 shrink-0 no-scrollbar overflow-y-auto max-h-[700px]">
+<div class="aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden ring-1 ring-primary cursor-pointer transition-all">
+<img alt="Thumbnail 1" class="w-full h-full object-cover" data-alt="Luxury leather bag front view high detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaMUIzs8tMbD6Jdp6h7nDFK-t9YBYB6x_vKfQanmFdP2vI7Qo5clJevDG6RHK6orMN-QYMTvw3eek4T8kMOMYRrt2xxqHBMECIfAzxjSBFxeHOifnDaFcXUiKTjKK1TqKRJKgAB3c89TI08kNNMtMyi9gKLvZzBGpq6YI6W5RSvisIkWJnBVrPvWRCfTd_gq7QilmyTPIpEHCXQUeR8Va9V19_Ut9RqD_PqcbBIOdsGwHXU-XZ-jViKVfzRDWSnJYmKcSfmFUl_FLV"/>
+</div>
+<div class="aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden hover:ring-1 hover:ring-gray-300 cursor-pointer transition-all">
+<img alt="Thumbnail 2" class="w-full h-full object-cover" data-alt="Luxury leather bag side view detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAz6S_Pgst2j0m2X-LdzIVIMnGt6FO2asSzgeohHq2SJznJ83d3SQH5fzT-dzLTHMW7wGpD1yN1iCx5bZw7jeb25kdbOe7owS83H65a_53WyxDJyB0cV-ldxU9Q7KY3fhP4svr2BDZFgF90TBmvf4mWqVw3dUZqyuWFcmlQp4h_lkdBiY55UlDErlFFEdr1HrJnx00tw75rLixNH9f_Oaq5uXQ1C1SKvt84s0teVzQyGyJAchrnvsytDSttRGm_CtewFOvgQikRGXRz"/>
+</div>
+<div class="aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden hover:ring-1 hover:ring-gray-300 cursor-pointer transition-all">
+<img alt="Thumbnail 3" class="w-full h-full object-cover" data-alt="Luxury leather bag interior view detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOPSPFbAWQbuZ43GvR7OrKmoWneWrJm9ukZL2xn6Q8SJHnLlcea4pDPdn9KtGA-kAd05yS9b_J0lqlPsbwm6qtAwOH1JHejsMfhjA3hntPZ1rGHLC0ML1v6ZIKTa6HpukE--cX-YkbCpCVWbjivSAlzD91RHCjeZsTrpVyALaHTBYG7v_5hOBCDAwyy82sKCha_Frob_625rlDNItgv54GPjWSoU8LLSmct5-5psNEG__Pkvu6jJ1oqM5_rNBFMxs8rlpklZpW1UXT"/>
+</div>
+<div class="aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden hover:ring-1 hover:ring-gray-300 cursor-pointer transition-all">
+<img alt="Thumbnail 4" class="w-full h-full object-cover" data-alt="Luxury leather bag hardware close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2q_JyZOlUU-pZ7_EVugpvgz-8UIlPOB_ImPN4Amx_QDkuv9CbCwLXg0LSbwcUKsoHYGhJez29q4iWWWkHrgaKycjGUgzX99rM79_02pHqzrSAKt32b7SFMyhpsg5Y8c6zbOnUoiwlAxNoFCc9_ZWUEpPSyXXTPQSrMWORPc-X_yu28Wj91x8adA2GIgMICB-fXcY_YKXqasAqgPE2fZd16J_gzTUZezpN3xQjaGrmocNRjSH-seREuNOxU0Bita8iauyKBzxzSU4N"/>
+</div>
+</div>
+<!-- Main Image -->
+<div class="flex-1 aspect-[3/4] bg-[#f9fafb] rounded-xl overflow-hidden group">
+<img alt="Main Product" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Full view of tan leather designer handbag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvW91LYEDiLJKj9rNEEKjVlb1hhiWv59rNHXXYaOkLDzIMeGVdDcQqRy_FsgmV9DwmxZGXb2Dfhfq5keJOr6mzqjuwg1X7loC9GRcARylg4vnEmapmzdJ9_3ljQ9YDw_YokJquYDTaZ_Z_IGhapSI2BJ0WH5BJxDKVgk9Vwgo1WS29rVFMQhy9bcLNM8l6HZkS-Im6hHbCo3sw34u-4Cq76IfwTjMy9h1PaairGhdeJzi52pyd4npdTnuhobWlcRATkuS09Lga0RS5"/>
+</div>
+</div>
+<!-- Right Column: Product Info -->
+<div class="lg:col-span-5 space-y-10">
+<div class="space-y-4">
+<h2 class="text-sm font-semibold tracking-[0.2em] text-gray-500 uppercase">Saint Laurent</h2>
+<h1 class="text-4xl font-bold tracking-tight text-primary">Sac de Jour Nano Leather Bag</h1>
+<div class="flex items-center gap-4">
+<div class="flex text-primary">
+<span class="material-symbols-outlined fill-icon text-lg">star</span>
+<span class="material-symbols-outlined fill-icon text-lg">star</span>
+<span class="material-symbols-outlined fill-icon text-lg">star</span>
+<span class="material-symbols-outlined fill-icon text-lg">star</span>
+<span class="material-symbols-outlined text-lg">star_half</span>
+</div>
+<span class="text-sm font-medium text-gray-400 underline underline-offset-4 cursor-pointer">48 Reviews</span>
+<div class="h-4 w-px bg-gray-200"></div>
+<span class="text-xs font-bold text-green-600 uppercase tracking-widest">In Stock</span>
+</div>
+<div class="pt-4">
+<span class="text-3xl font-bold text-primary">₺84.500</span>
+</div>
+</div>
+<!-- Variations -->
+<div class="space-y-6 pt-6 border-t border-gray-100">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-primary mb-4 block">Color: <span class="text-gray-500 font-normal">Tan</span></span>
+<div class="flex gap-4">
+<button class="size-10 rounded-full border-2 border-primary p-0.5 transition-all">
+<div class="w-full h-full rounded-full bg-[#C19A6B]"></div>
+</button>
+<button class="size-10 rounded-full border border-gray-200 p-0.5 hover:border-gray-400 transition-all">
+<div class="w-full h-full rounded-full bg-[#1A1A1A]"></div>
+</button>
+<button class="size-10 rounded-full border border-gray-200 p-0.5 hover:border-gray-400 transition-all">
+<div class="w-full h-full rounded-full bg-[#8B0000]"></div>
+</button>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs font-bold uppercase tracking-widest text-primary">Select Size</span>
+<button class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">Size Guide</button>
+</div>
+<div class="grid grid-cols-4 gap-3">
+<button class="py-3 border border-primary bg-primary text-white text-xs font-bold rounded-lg transition-all">NANO</button>
+<button class="py-3 border border-gray-200 hover:border-gray-400 text-xs font-bold rounded-lg transition-all">BABY</button>
+<button class="py-3 border border-gray-200 hover:border-gray-400 text-xs font-bold rounded-lg transition-all text-gray-400">SMALL</button>
+<button class="py-3 border border-gray-200 hover:border-gray-400 text-xs font-bold rounded-lg transition-all text-gray-400">LARGE</button>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex gap-4 pt-4">
+<button class="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl">shopping_bag</span>
+                        Add to Cart
+                    </button>
+<button class="size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined text-2xl">favorite</span>
+</button>
+</div>
+<!-- Accordions -->
+<div class="pt-8 space-y-px">
+<details class="group border-t border-gray-100" open="">
+<summary class="flex justify-between items-center py-6 cursor-pointer list-none">
+<span class="text-xs font-bold uppercase tracking-widest">Product Description</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="pb-8 text-sm leading-relaxed text-gray-600">
+                            The Sac De Jour Nano features two tubular top handles, an adjustable and removable leather crossbody strap and a padlock in a removable leather case. Detailed with the brand’s signature accordion sides and a compression strap with tabs. 100% Calfskin leather.
+                        </div>
+</details>
+<details class="group border-t border-gray-100">
+<summary class="flex justify-between items-center py-6 cursor-pointer list-none">
+<span class="text-xs font-bold uppercase tracking-widest">Material &amp; Care</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="pb-8 text-sm leading-relaxed text-gray-600">
+                            Professional leather clean only. Avoid prolonged exposure to moisture and direct sunlight.
+                        </div>
+</details>
+<details class="group border-t border-b border-gray-100">
+<summary class="flex justify-between items-center py-6 cursor-pointer list-none">
+<span class="text-xs font-bold uppercase tracking-widest">Shipping &amp; Returns</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="pb-8 text-sm leading-relaxed text-gray-600">
+                            Free worldwide shipping on orders over ₺50.000. Returns accepted within 14 days of delivery.
+                        </div>
+</details>
+</div>
+</div>
+</div>
+<!-- You May Also Like Section -->
+<section class="mt-32 pt-20 border-t border-gray-100">
+<div class="flex justify-between items-end mb-12">
+<div class="space-y-2">
+<h3 class="text-2xl font-bold tracking-tight">Complete the Look</h3>
+<p class="text-sm text-gray-500">Hand-picked essentials to complement your style.</p>
+</div>
+<div class="flex gap-2">
+<button class="size-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<button class="size-10 rounded-full border border-primary flex items-center justify-center bg-primary text-white hover:bg-black transition-all">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<!-- Product Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-[3/4] bg-gray-50 rounded-xl overflow-hidden mb-4 relative">
+<img alt="Accessory 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Slim gold designer card holder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1f8Dpms9DHynDNhbSgwsUb_3RwhVdq_V60H73R0aLjVya3KYUFs_2ls8ujsJ77NGvfCMlqnmVfeNQYZ8krGg3EaRZVs6gsdMhtKe89zFqwcvACwguLsqoVLBQRcqz6dWcYcfMJwVpOq6KdkYME1MfFcYFNQ8W6eGM3sibYAyshr-sflexynGFB1iafhZgjmCRrBlKtKxZyP4MPNA9XSKJfEwXGe5_r7IhUsXOplwh1KUG8vy_EkCkiSLl5UqHbeRqrXGBBd1Il838"/>
+<button class="absolute bottom-4 right-4 size-10 bg-white rounded-lg shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Saint Laurent</p>
+<h4 class="text-sm font-semibold group-hover:underline">Leather Card Case</h4>
+<p class="text-sm font-medium text-gray-900">₺9.800</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-[3/4] bg-gray-50 rounded-xl overflow-hidden mb-4 relative">
+<img alt="Accessory 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Luxury designer mobile phone case" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh3sCIeGlMAnDJ4DrPS6znDbaz6kiaNxSx7me98wK6Wb_0L4aHNd2m2W9KMXthVfmlwIcbEv3Q4ds7pFeUGO71xyqLRRQM9pwrUiu5jlQzWP3M1-uBrLgbFLR-d7Ds8yx8MxV8xXiaaVcRQM0RPVl_Mma1ER0GK3XNPa-7Hb15qK2yVXkJtHddltQQhbJymeip2XrwQhUO1jY1CWGpZ4SXOmAkEGd6i5ZOAAdj9ugh1RBZoPtWvB2j0cy2p-NmrdnCWDqubF5wlCIP"/>
+<button class="absolute bottom-4 right-4 size-10 bg-white rounded-lg shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Saint Laurent</p>
+<h4 class="text-sm font-semibold group-hover:underline">Monogram Phone Case</h4>
+<p class="text-sm font-medium text-gray-900">₺12.400</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-[3/4] bg-gray-50 rounded-xl overflow-hidden mb-4 relative">
+<img alt="Accessory 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Classic black designer sunglasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0PesV603qtPymgmSWtIkSEfRErJUUe9oBtrM-wpHzSuLuh0HJvOVswK6uKWU9Sl-w6Mz9EcW36cHiWOXJos3N0dHbIwIe8lkW-Z_XdgwAMswFqWpddToyYCdJMyXnaO08wR9dsE7ZUqoiHxDxd4EQTiDXsEoUG-YU-lSjDJ3tNM6Gosz4lXeA9mGJynAdSRauNgO5jG71hH7VvNts1pAuNtIhcKuNePzHf932233Aapq-HekoD8MvK3UGDGxwLbMRQz4bZo6h43tC"/>
+<button class="absolute bottom-4 right-4 size-10 bg-white rounded-lg shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Saint Laurent</p>
+<h4 class="text-sm font-semibold group-hover:underline">SL 276 Cat-Eye</h4>
+<p class="text-sm font-medium text-gray-900">₺14.200</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-[3/4] bg-gray-50 rounded-xl overflow-hidden mb-4 relative">
+<img alt="Accessory 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Elegant leather designer high heels" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhKCVfLkeIakmDGjF8TwU23Ac72q9M8Ol74q4CN6ZU5Q8pv68uzsbq2PPqWrpSXbOLIlaFBboJE82bI7qZL8XuwvRwHhiLcSM0kMbRKau-BjPvZH1QHaYMvI4NtqvUKWAvtBzVAG2CZ1ylRXRinr7Oa-ISeeDTpmmL4lP7ByFJGbwrujLijj2MnZzTOl7LIoBwdnuLLWxC9jVTcD6-dKQOTVBGL7-4K3xMZWDvg1iiNeGpy8bevWA7af9oCFaN54voQzsJv7nthiOs"/>
+<button class="absolute bottom-4 right-4 size-10 bg-white rounded-lg shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Saint Laurent</p>
+<h4 class="text-sm font-semibold group-hover:underline">Opyum Leather Pumps</h4>
+<p class="text-sm font-medium text-gray-900">₺34.500</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-gray-50 mt-32 border-t border-gray-200">
+<div class="max-w-7xl mx-auto px-6 py-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="space-y-6">
+<a class="flex items-center gap-2" href="#">
+<div class="size-6 bg-primary text-white flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-sm">diamond</span>
+</div>
+<span class="text-lg font-bold tracking-tight uppercase">L'Elite</span>
+</a>
+<p class="text-sm text-gray-500 leading-relaxed">Curating the world's most exquisite luxury items since 1994. Experience the pinnacle of design and craftsmanship.</p>
+</div>
+<div class="space-y-6">
+<h5 class="text-xs font-bold uppercase tracking-widest">Client Service</h5>
+<ul class="space-y-4 text-sm text-gray-500">
+<li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Track Your Order</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Book an Appointment</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Returns &amp; Exchanges</a></li>
+</ul>
+</div>
+<div class="space-y-6">
+<h5 class="text-xs font-bold uppercase tracking-widest">About L'Elite</h5>
+<ul class="space-y-4 text-sm text-gray-500">
+<li><a class="hover:text-primary transition-colors" href="#">Our History</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sustainability</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Store Locator</a></li>
+</ul>
+</div>
+<div class="space-y-6">
+<h5 class="text-xs font-bold uppercase tracking-widest">Stay Inspired</h5>
+<p class="text-sm text-gray-500">Join our newsletter for exclusive previews and collection launches.</p>
+<div class="flex">
+<input class="bg-white border border-gray-200 focus:ring-1 focus:ring-primary focus:border-primary px-4 py-2 text-sm flex-1 outline-none" placeholder="Email Address" type="email"/>
+<button class="bg-primary text-white px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-black transition-all">Join</button>
+</div>
+</div>
+</div>
+<div class="mt-20 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-[10px] font-medium text-gray-400 uppercase tracking-widest">© 2024 L'Elite Luxury Store. All rights reserved.</p>
+<div class="flex gap-8">
+<a class="text-[10px] font-medium text-gray-400 hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacy Policy</a>
+<a class="text-[10px] font-medium text-gray-400 hover:text-primary transition-colors uppercase tracking-widest" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

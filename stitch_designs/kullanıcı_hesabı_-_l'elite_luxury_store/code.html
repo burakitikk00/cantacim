@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Elite Luxury Store - Hesabım</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .sidebar-active {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+        .status-badge-yellow {
+            background-color: #fefce8;
+            color: #854d0e;
+        }
+        .status-badge-green {
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-primary font-display">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12 flex h-20 items-center justify-between">
+<!-- Logo & Main Nav -->
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-3">
+<div class="size-8 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h1 class="text-xl font-bold tracking-tight uppercase">L'Elite</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-gray-500 transition-colors" href="#">Koleksiyonlar</a>
+<a class="text-sm font-medium hover:text-gray-500 transition-colors" href="#">Yeni Gelenler</a>
+<a class="text-sm font-medium hover:text-gray-500 transition-colors" href="#">Mücevher</a>
+<a class="text-sm font-medium hover:text-gray-500 transition-colors" href="#">Saat</a>
+</nav>
+</div>
+<!-- Search & Actions -->
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-gray-50 border border-gray-100 rounded-lg px-3 py-1.5 w-64">
+<span class="material-symbols-outlined text-gray-400 text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-gray-400" placeholder="Ürün ara..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-gray-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="p-2 hover:bg-gray-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute top-1.5 right-1.5 size-2 bg-primary rounded-full border-2 border-white"></span>
+</button>
+<div class="size-10 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden cursor-pointer">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a stylish man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3IxAAra1oyqio-kMGiyhXh2OxVwi4DVfXzF04XmGEwcsLg-FdQYOCq3AGMaoD1tipNosJxGLENTzcNIediMxHB6HX4RzEJTiGekzOlidnYi65usHV8l0jTQCwOxd3VLzWux4S4lNOGybcmyOvkGVp-wBbVnMmRm3ikDbmw1ef-psGF557pg6B8R7zz46OCLFT7j0nPIrXQ8YpLsabfTQ5u4xye8JhohixxqIqfytbjX7Bp4kJkafiQW4OYlsbV1-T_WDzXi7u2mG9"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
+<div class="flex flex-col lg:flex-row gap-12">
+<!-- Sidebar Navigation -->
+<aside class="w-full lg:w-72 shrink-0">
+<div class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+<div class="px-4 py-6 border-b border-gray-50 mb-4">
+<p class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-1">Hesabım</p>
+<h2 class="text-lg font-bold">Panelim</h2>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg sidebar-active text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-xl">package_2</span>
+<span class="text-sm">Siparişlerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 hover:bg-gray-50 transition-all" href="#">
+<span class="material-symbols-outlined text-xl">location_on</span>
+<span class="text-sm">Adreslerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 hover:bg-gray-50 transition-all" href="#">
+<span class="material-symbols-outlined text-xl">person</span>
+<span class="text-sm">Hesap Bilgileri</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 hover:bg-gray-50 transition-all" href="#">
+<span class="material-symbols-outlined text-xl">favorite</span>
+<span class="text-sm">Favorilerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 hover:bg-gray-50 transition-all" href="#">
+<span class="material-symbols-outlined text-xl">confirmation_number</span>
+<span class="text-sm">İndirim Kuponlarım</span>
+</a>
+<div class="pt-4 mt-4 border-t border-gray-50">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all" href="#">
+<span class="material-symbols-outlined text-xl">logout</span>
+<span class="text-sm font-medium">Çıkış Yap</span>
+</a>
+</div>
+</nav>
+</div>
+</aside>
+<!-- Main Content Area -->
+<section class="flex-1 space-y-8">
+<!-- Welcome Header -->
+<div class="bg-white rounded-xl border border-gray-100 p-8 shadow-sm relative overflow-hidden">
+<div class="relative z-10">
+<h2 class="text-3xl font-extrabold tracking-tight mb-2">Merhaba, Caner 👋</h2>
+<p class="text-gray-500 max-w-xl leading-relaxed">
+                            Elite dünyasına tekrar hoş geldiniz. Tüm siparişlerinizi, teslimat adreslerinizi ve hesap detaylarınızı buradan kolayca yönetebilirsiniz.
+                        </p>
+</div>
+<!-- Subtle background decoration -->
+<div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none opacity-50"></div>
+</div>
+<!-- Stats Widgets -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+<div>
+<p class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Toplam Sipariş</p>
+<h3 class="text-2xl font-bold">12</h3>
+</div>
+<div class="size-12 rounded-lg bg-gray-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+<div>
+<p class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Favori Ürünler</p>
+<h3 class="text-2xl font-bold">08</h3>
+</div>
+<div class="size-12 rounded-lg bg-gray-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+<div>
+<p class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Aktif Kuponlar</p>
+<h3 class="text-2xl font-bold">02</h3>
+</div>
+<div class="size-12 rounded-lg bg-gray-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">redeem</span>
+</div>
+</div>
+</div>
+<!-- Recent Orders Section -->
+<div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+<div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+<h3 class="text-lg font-bold">Son Siparişlerim</h3>
+<a class="text-sm font-semibold text-primary underline underline-offset-4 hover:opacity-70" href="#">Tümünü Gör</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-bold">
+<th class="px-8 py-4">Sipariş No</th>
+<th class="px-8 py-4">Tarih</th>
+<th class="px-8 py-4 text-center">Durum</th>
+<th class="px-8 py-4 text-right">Toplam</th>
+<th class="px-8 py-4 text-right">İşlem</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-50">
+<tr class="group hover:bg-gray-50/30 transition-colors">
+<td class="px-8 py-5 text-sm font-semibold text-primary">#EL-98421</td>
+<td class="px-8 py-5 text-sm text-gray-500">12 Ekim 2023</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase status-badge-yellow">Hazırlanıyor</span>
+</td>
+<td class="px-8 py-5 text-sm font-bold text-right">42.500 TL</td>
+<td class="px-8 py-5 text-right">
+<button class="text-xs font-bold uppercase tracking-wider text-primary border border-primary px-4 py-2 rounded hover:bg-primary hover:text-white transition-all">Detay Gör</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50/30 transition-colors">
+<td class="px-8 py-5 text-sm font-semibold text-primary">#EL-98210</td>
+<td class="px-8 py-5 text-sm text-gray-500">04 Ekim 2023</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase status-badge-green">Kargoda</span>
+</td>
+<td class="px-8 py-5 text-sm font-bold text-right">18.200 TL</td>
+<td class="px-8 py-5 text-right">
+<button class="text-xs font-bold uppercase tracking-wider text-primary border border-primary px-4 py-2 rounded hover:bg-primary hover:text-white transition-all">Detay Gör</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50/30 transition-colors">
+<td class="px-8 py-5 text-sm font-semibold text-primary">#EL-97855</td>
+<td class="px-8 py-5 text-sm text-gray-500">28 Eylül 2023</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-600">Teslim Edildi</span>
+</td>
+<td class="px-8 py-5 text-sm font-bold text-right">125.000 TL</td>
+<td class="px-8 py-5 text-right">
+<button class="text-xs font-bold uppercase tracking-wider text-primary border border-primary px-4 py-2 rounded hover:bg-primary hover:text-white transition-all">Detay Gör</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Profile Overview -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Address Info -->
+<div class="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-400">home</span>
+                                Varsayılan Adres
+                            </h4>
+<button class="text-xs font-bold uppercase text-gray-400 hover:text-primary transition-colors">Düzenle</button>
+</div>
+<div class="text-sm space-y-2">
+<p class="font-semibold">Caner Aras</p>
+<p class="text-gray-500 leading-relaxed">
+                                Bebek Mah. Cevdetpaşa Cad. No: 42/1<br/>
+                                Beşiktaş, İstanbul, 34342<br/>
+                                Türkiye
+                            </p>
+<p class="text-gray-500 pt-2">+90 (532) *** ** 42</p>
+</div>
+</div>
+<!-- Profile Info -->
+<div class="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-400">shield_person</span>
+                                Hesap Özeti
+                            </h4>
+<button class="text-xs font-bold uppercase text-gray-400 hover:text-primary transition-colors">Yönet</button>
+</div>
+<div class="space-y-4">
+<div>
+<p class="text-[10px] uppercase font-bold text-gray-400 mb-1">E-Posta Adresi</p>
+<p class="text-sm font-medium">caner.aras@elite.com</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-gray-400 mb-1">Üyelik Tipi</p>
+<p class="text-sm font-bold text-amber-600 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">stars</span>
+                                    Platinum Üye
+                                </p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-gray-400 mb-1">Kayıt Tarihi</p>
+<p class="text-sm font-medium">14 Ocak 2021</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white border-t border-gray-100 py-16 mt-12">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+<div class="col-span-1 md:col-span-1">
+<div class="flex items-center gap-3 mb-6">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold tracking-tight uppercase">L'Elite</h2>
+</div>
+<p class="text-sm text-gray-400 leading-relaxed mb-6">
+                        Dünyanın en seçkin markaları ve zamansız tasarımlarıyla lüks alışverişin zirve noktası.
+                    </p>
+<div class="flex items-center gap-4">
+<a class="text-gray-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-gray-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+<a class="text-gray-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">call</span></a>
+</div>
+</div>
+<div>
+<h5 class="text-xs uppercase font-bold tracking-widest mb-6">Alışveriş</h5>
+<ul class="space-y-4 text-sm text-gray-500">
+<li><a class="hover:text-primary transition-colors" href="#">Koleksiyonlar</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Yeni Gelenler</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Hediye Rehberi</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Markalar</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-xs uppercase font-bold tracking-widest mb-6">Destek</h5>
+<ul class="space-y-4 text-sm text-gray-500">
+<li><a class="hover:text-primary transition-colors" href="#">Teslimat &amp; İade</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sıkça Sorulan Sorular</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Bize Ulaşın</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Mağaza Konumları</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-xs uppercase font-bold tracking-widest mb-6">Bülten</h5>
+<p class="text-sm text-gray-400 mb-4 leading-relaxed">Yeni koleksiyonlardan ilk siz haberdar olun.</p>
+<div class="flex">
+<input class="bg-gray-50 border-gray-100 text-sm py-2 px-4 w-full focus:ring-primary focus:border-primary border rounded-l-lg" placeholder="E-posta" type="email"/>
+<button class="bg-primary text-white px-6 py-2 rounded-r-lg text-sm font-bold uppercase transition-opacity hover:opacity-90">Kayıt</button>
+</div>
+</div>
+</div>
+<div class="pt-8 border-t border-gray-50 flex flex-col md:row items-center justify-between gap-4">
+<p class="text-[11px] text-gray-400 uppercase tracking-widest">© 2024 L'Elite Luxury Store. Tüm Hakları Saklıdır.</p>
+<div class="flex items-center gap-6">
+<p class="text-[10px] text-gray-400 uppercase tracking-widest cursor-pointer hover:text-primary transition-colors">KVKK</p>
+<p class="text-[10px] text-gray-400 uppercase tracking-widest cursor-pointer hover:text-primary transition-colors">Gizlilik Politikası</p>
+<p class="text-[10px] text-gray-400 uppercase tracking-widest cursor-pointer hover:text-primary transition-colors">Çerez Ayarları</p>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

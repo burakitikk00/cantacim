@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lina Butik - Yönetim Paneli</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FF007F", // Vibrant pink from screenshots
+                        "primary-hover": "#D6006B",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937",
+                        "text-light": "#374151",
+                        "text-dark": "#E5E7EB",
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#374151",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark antialiased transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col transition-colors duration-200">
+<div class="h-20 flex items-center px-6 border-b border-border-light dark:border-border-dark">
+<a class="flex items-center gap-2 group" href="#">
+<span class="text-2xl font-bold text-primary group-hover:text-primary-hover transition-colors">Lina Butik</span>
+<span class="material-icons text-primary text-xl group-hover:translate-x-1 transition-transform">login</span>
+</a>
+</div>
+<nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+<a class="flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-pink-50 dark:bg-pink-900/20 text-primary dark:text-pink-400" href="#">
+<span class="material-icons mr-3">home</span>
+                    Hesap Özeti
+                </a>
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-pink-400 transition-colors">
+<div class="flex items-center">
+<span class="material-icons mr-3">local_offer</span>
+                            Ürünler
+                        </div>
+<span class="material-icons text-gray-400 text-lg">chevron_right</span>
+</button>
+</div>
+<a class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-pink-400 transition-colors" href="#">
+<span class="material-icons mr-3">shopping_basket</span>
+                    Siparişler
+                    <span class="ml-auto bg-primary text-white py-0.5 px-2 rounded-full text-xs">6</span>
+</a>
+<button class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-pink-400 transition-colors">
+<div class="flex items-center">
+<span class="material-icons mr-3">storefront</span>
+                        Dükkan Yönetimi
+                    </div>
+<span class="material-icons text-gray-400 text-lg">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-pink-400 transition-colors">
+<div class="flex items-center">
+<span class="material-icons mr-3">person</span>
+                        Hesap Yönetimi
+                    </div>
+<span class="material-icons text-gray-400 text-lg">chevron_right</span>
+</button>
+</nav>
+<div class="border-t border-border-light dark:border-border-dark p-4">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+<span class="material-icons">account_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-gray-900 dark:text-white truncate">Admin User</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 truncate">admin@linabutik.com</p>
+</div>
+<button class="text-gray-400 hover:text-primary dark:hover:text-pink-400">
+<span class="material-icons">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-6 lg:p-10 transition-colors duration-200">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+<div>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Hesap Özeti</h1>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dükkanınızın genel durumunu buradan takip edebilirsiniz.</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-sm text-gray-500 dark:text-gray-400">Son Güncelleme: Şimdi</span>
+<button class="p-2 rounded-lg bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+<span class="material-icons text-sm">refresh</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bugüne Kadarki Toplam Satış</p>
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">33,400 TL</h3>
+</div>
+<div class="flex items-center text-xs font-medium text-green-500">
+<span class="material-icons text-sm mr-1">trending_up</span>
+<span>+12% geçen aydan</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Toplam Sipariş</p>
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">10</h3>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 mt-2">
+<div class="bg-blue-500 h-1.5 rounded-full" style="width: 70%"></div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Açık Sipariş</p>
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">6</h3>
+</div>
+<div class="flex items-center text-xs font-medium text-orange-500">
+<span class="material-icons text-sm mr-1">pending_actions</span>
+<span>İşlem Bekliyor</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div>
+<p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Son 30 Gün Satış</p>
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">3,680 TL</h3>
+</div>
+<div class="flex items-center justify-between mt-2">
+<span class="text-xs text-gray-500 dark:text-gray-400">İadeler:</span>
+<span class="text-sm font-bold text-red-500">0 TL</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 mb-8">
+<div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white">Satış Hacmi</h2>
+<div class="relative inline-block text-left mt-4 sm:mt-0">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+<option>Son 7 Gün</option>
+<option selected="">Geçen Ay</option>
+<option>Bu Yıl</option>
+</select>
+</div>
+</div>
+<div class="relative h-64 w-full">
+<div class="absolute left-0 top-0 bottom-6 w-10 flex flex-col justify-between text-xs text-gray-400 dark:text-gray-500 text-right pr-2">
+<span>3800</span>
+<span>2850</span>
+<span>1900</span>
+<span>950</span>
+<span>0</span>
+</div>
+<div class="absolute left-12 right-0 top-0 bottom-6 border-l border-b border-gray-200 dark:border-gray-700">
+<div class="absolute top-0 w-full border-t border-gray-100 dark:border-gray-800 border-dashed"></div>
+<div class="absolute top-1/4 w-full border-t border-gray-100 dark:border-gray-800 border-dashed"></div>
+<div class="absolute top-2/4 w-full border-t border-gray-100 dark:border-gray-800 border-dashed"></div>
+<div class="absolute top-3/4 w-full border-t border-gray-100 dark:border-gray-800 border-dashed"></div>
+<svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+<defs>
+<linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#3B82F6" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#3B82F6" stop-opacity="0"></stop>
+</linearGradient>
+</defs>
+<path d="M0,100 L50,100 L100,100 L130,100 C140,100 150,0 160,0 C170,0 180,100 190,100 L1000,100" fill="url(#chartGradient)" stroke="none" vector-effect="non-scaling-stroke"></path>
+<path d="M0,100 L50,100 L100,100 L130,100 C140,100 150,0 160,0 C170,0 180,100 190,100 L1000,100" fill="none" stroke="#3B82F6" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+</svg>
+</div>
+<div class="absolute left-12 right-0 bottom-0 flex justify-between text-xs text-gray-400 dark:text-gray-500 mt-2 px-2">
+<span>29 Jun</span>
+<span>01 Jul</span>
+<span>03 Jul</span>
+<span>05 Jul</span>
+<span>07 Jul</span>
+<span>09 Jul</span>
+<span>11 Jul</span>
+<span>13 Jul</span>
+<span>15 Jul</span>
+<span>17 Jul</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="px-6 py-4 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white">En Çok Satan Ürünler</h2>
+<a class="text-sm text-primary hover:text-primary-hover font-medium" href="#">Tümünü Gör</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
+<thead class="bg-gray-50 dark:bg-gray-800 text-xs uppercase text-gray-500 dark:text-gray-400">
+<tr>
+<th class="px-6 py-3 font-medium" scope="col">Ürün Adı</th>
+<th class="px-6 py-3 font-medium text-right" scope="col">Fiyat</th>
+<th class="px-6 py-3 font-medium text-right" scope="col">Satış Adedi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
+<div class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0">
+<img alt="Bag" class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWkYNZTXDSMUJZste_RUGTXE_eNGk1-e-RZgvIfr2G0_Oszf_NZDotET0eB3Na5B5VKaF0VjY4sjbhFm4_FObfU968z0IT1_ijc67QlWQkdWIWVxgOeOmg7Z5w8jQyMroGWkrwlZggIdii1nSWC9vhK3iQiPTpJME6bIjNcMeHb1OAYeC06UG2cF_6dF2Nrn4cNJCkOv0yNKVPQDZprKdZJnFhUuSWet-xKGbzs0_aO55oAMcex7TO9954atJxRYZN-GfQe3k1P3cl"/>
+</div>
+                                        Coach El ve Omuz Çantası
+                                    </td>
+<td class="px-6 py-4 text-right">₺4,480.00</td>
+<td class="px-6 py-4 text-right font-semibold text-primary">12</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
+<div class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0">
+<img alt="Glasses" class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-dt8Aavkwzw5kXpmQ0WTv5H6k14yC5JgJydPYHirb_gcU0ZyJ9pXMW5UYO-LztnM8tmbKpGXGIbmpXbylOn5Tsw40x1MiuAWTR9CfSEE5M85pLHkEGaMIAZOXUFxNSx50FYVYptItRL0NCwo6AUMYCDGixhrS5DG18j0KHlZVaJXTduUBS8rA0pJkkgxssHpDNCBQpGBGkN5ob5Nu_EcfoQZoU6MLXaP0CBYDtXlLI8PcKmFaYXdmsyKuiaLquRaT9NDDZCwGnnVZ"/>
+</div>
+                                        Versace Güneş Gözlüğü
+                                    </td>
+<td class="px-6 py-4 text-right">₺3,830.00</td>
+<td class="px-6 py-4 text-right font-semibold text-primary">8</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
+<div class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0">
+<img alt="Glasses" class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFkjNeTxXySPiQs35cnGZ66BcMoMLvWe710u51s2zOGz3vb7obnLMDrkGbQVUmTpCjeI0wksSTj03FchsJczAsaVTPXPp6MMpi6pXBaXJMIvKGG5NTqfqva67U_92f-giJS-fte1tQFcdUm4DjvFTi65_ep2-FLxUS5Xqw9NQjtHMWzRD6JqA7qKi71BC6kIAAhaOtshZ5VTBAYzDbEWdq9nlWPkrZuiKtntF8NKquU2fhUCEkAu--lwfsiz43ztRTxUusslsEaXZN"/>
+</div>
+                                        Miu Miu Güneş Gözlüğü
+                                    </td>
+<td class="px-6 py-4 text-right">₺3,130.00</td>
+<td class="px-6 py-4 text-right font-semibold text-primary">5</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
+<div class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0">
+<img alt="Bag" class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpehSRvkeX2_FcfGwbunn-Y5ndHSbalSq149DZsqrAwfvk109Q9Udj1mjsUFQrWABeftKCMpiGik5ce5q_vV-v3CwCT1JmADGmzWs6sD2uWxTDU4dxfhIj_sC8qc4R8fYPwdOwaaJckFprOQOkwZ7Iw067XFEjVuLcqXZ8DGSDzNNiD6gsVnSqWv12C5FuRcVJTBXuwJwgxeZ2fXbnYwkHcWS0Xk3BHdD2vDXbH15_yUyYdAs7sZ82LmyOMJHFjWUZLhf8LyGypAYI"/>
+</div>
+                                        Hermes Çanta (Replika)
+                                    </td>
+<td class="px-6 py-4 text-right">₺1,200.00</td>
+<td class="px-6 py-4 text-right font-semibold text-primary">3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark flex flex-col">
+<div class="px-6 py-4 border-b border-border-light dark:border-border-dark">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white">Son İşlemler</h2>
+</div>
+<div class="p-6 space-y-6">
+<div class="flex gap-4">
+<div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-icons text-xl">shopping_cart</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Yeni Sipariş #1234</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">2 dakika önce • ₺4,480.00</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-icons text-xl">person_add</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Yeni Üye Kaydı</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">15 dakika önce • Ayşe Yılmaz</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
+<span class="material-icons text-xl">inventory_2</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Stok Uyarısı</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 saat önce • Coach Çanta (2 kaldı)</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 h-10 w-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-primary dark:text-pink-400">
+<span class="material-icons text-xl">rate_review</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Yeni Yorum</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">3 saat önce • "Harika ürün!"</p>
+</div>
+</div>
+</div>
+<div class="mt-auto px-6 py-4 border-t border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
+<button class="w-full text-center text-sm font-medium text-primary hover:text-primary-hover transition-colors">
+                            Tüm Bildirimleri Gör
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

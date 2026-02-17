@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'ELITE | Luxury Bags &amp; Scarves</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#ffffff",
+                        "background-alt": "#f9fafb",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .product-card:hover .secondary-img { opacity: 1; }
+    </style>
+</head>
+<body class="bg-background-light text-primary font-display antialiased">
+<!-- Sticky Glassmorphism Header -->
+<header class="fixed top-0 left-0 right-0 z-50 border-b border-primary/5 glass-header">
+<div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+<!-- Left: Logo & Navigation -->
+<div class="flex items-center gap-12">
+<a class="text-2xl font-800 tracking-tighter flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-3xl">diamond</span>
+                    L'ELITE
+                </a>
+<nav class="hidden lg:flex items-center gap-8">
+<div class="group relative py-2">
+<a class="text-sm font-medium hover:text-primary/60 transition-colors" href="#">Collections</a>
+</div>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors" href="#">Bags</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors" href="#">Scarves</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors" href="#">Brands</a>
+<a class="text-sm font-medium hover:text-primary/60 transition-colors" href="#">About</a>
+</nav>
+</div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-6">
+<!-- Expanding Search -->
+<div class="relative flex items-center group">
+<input class="w-10 group-hover:w-64 transition-all duration-300 ease-in-out border-none bg-transparent focus:ring-0 text-sm pl-10 pr-4 py-2 cursor-pointer group-hover:cursor-text" placeholder="Search brands, styles..." type="text"/>
+<span class="material-symbols-outlined absolute left-2 pointer-events-none text-xl">search</span>
+</div>
+<button class="hover:opacity-60 transition-opacity">
+<span class="material-symbols-outlined">person</span>
+</button>
+<button class="hover:opacity-60 transition-opacity relative">
+<span class="material-symbols-outlined">favorite</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">2</span>
+</button>
+<button class="hover:opacity-60 transition-opacity relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">1</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[85vh] w-full overflow-hidden">
+<div class="absolute inset-0 bg-primary/20 z-10"></div>
+<img alt="Hero Bag" class="w-full h-full object-cover object-center" data-alt="Luxury designer leather handbag in minimal setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8QtKVzT_HEqLRDxl73THujO_12fJIiRzxBsmD8c4v6ndLBbxcUU3UkXUjCSbNVUvXQsAI6gPshv5nV3avvfv_Igtrv9ZngT8uPcmzSVvYWzq1-DEIs8VeKTwiGZjLvifhdSTQHaJqmxEa_jqYiarOJu3DRCX8075umOnetJp8HqNDf-xFPkHf9Ysz_mdAyu3n6Ihhq5y2tVE2VUN-emUdapPRV9hyuEcZHQFcZTyMZs6-7K32S88MQ00BfvFUB81w2gQFglBe9OA6"/>
+<div class="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6">
+<h1 class="text-white text-5xl md:text-7xl font-800 tracking-tight mb-6 max-w-4xl">
+                    ZAMANSIZ ŞIKLIK,<br/>ELİT DOKUNUŞLAR
+                </h1>
+<p class="text-white/90 text-lg md:text-xl font-light mb-10 max-w-2xl">
+                    Dünyaca ünlü markaların en seçkin çanta ve şal koleksiyonlarını keşfedin.
+                </p>
+<button class="bg-white text-primary px-10 py-4 font-bold tracking-wide rounded hover:bg-primary hover:text-white transition-all duration-300">
+                    KOLEKSİYONU İNCELE
+                </button>
+</div>
+</section>
+<!-- Featured Categories -->
+<section class="max-w-[1440px] mx-auto px-6 py-24">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Category 1 -->
+<div class="group cursor-pointer relative aspect-[3/4] overflow-hidden">
+<img alt="Lüks Çantalar" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Premium leather luxury designer bags collection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKWxe881n95ir27wFG0NfFT4TFlGz8ODP6YUcb0CsG05ufc8DO6TLs7vlhEudXNjomqf4EkW7c4jHmsj_muZYPBkMI7sZB-UeFhNaDJx_QNyiA9vpi9ZiiRCoq5XVBVDogwS6HSTVaXLeEjABcfhzPkVy_DcVTOqfPzrbiO0QsK7cmrwSZ23Yy782vjI72y4lWomYvDp0RIEzIKXTkAuT63CPcYpwi-TB_Qq_fIvJQXz05xzrgJ3a3BOYSpzzKAhdpoWExUJCLdyfV"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<h3 class="text-white text-2xl font-bold mb-2">Lüks Çantalar</h3>
+<p class="text-white/80 text-sm font-medium tracking-widest uppercase">Keşfet</p>
+</div>
+</div>
+<!-- Category 2 -->
+<div class="group cursor-pointer relative aspect-[3/4] overflow-hidden">
+<img alt="İpek Şallar" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Elegant silk scarves with intricate patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEYBjQASbFdmvPOsld6PEC43ZEUy4fbcgE2hCiF1P2MfcB3FzPS80sbzAmtJY4jE2IDAY-CTNMw3SOqtG_N5_Gn0IlgWThGzbcYHZaBe7_7mxKh5ulg6pZ07ZyEyIH5q2bJsdxgA1WDMug-o3G2kmp1XjuEN-ZtZ9ziAbC2B7PCTq6dpNmoJg1NiqvEyQJWuWrRwHhBOCY26mVAMMFB1TXN_VSizEZad3KmxtHwYf-Qc3Gr-Sh_4odCNGN0mAmBvadLXsoYpM97hET"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<h3 class="text-white text-2xl font-bold mb-2">İpek Şallar</h3>
+<p class="text-white/80 text-sm font-medium tracking-widest uppercase">Keşfet</p>
+</div>
+</div>
+<!-- Category 3 -->
+<div class="group cursor-pointer relative aspect-[3/4] overflow-hidden">
+<img alt="Yeni Sezon" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Latest fashion season luxury accessory arrivals" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACmHZ1JYZV6qzxjmMjRPYyfmBa2WRFoMDk46Pa5aqylNq7LOL2OSAoNGYgww9kw3LYeSv44fGo211emZcaxlNK28s28keCgg6knz2LVgct4GjZ6BCCbU0lUilEPvpJDeNSU6s15M5fWG6jusvzJcKM2mYJ7OIeS-rcsM7I4tfdRXSeVRSanJARJc88YAvvITrqMdYS44COeB4A2CYseQZw0m5bVf16US2FeWCKVJy59-U6zOfi5BxZD1Wj3S4yHHD7xFnzlIDOZn-u"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<h3 class="text-white text-2xl font-bold mb-2">Yeni Sezon</h3>
+<p class="text-white/80 text-sm font-medium tracking-widest uppercase">Keşfet</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Best Sellers Carousel -->
+<section class="bg-background-alt py-24">
+<div class="max-w-[1440px] mx-auto px-6">
+<div class="flex items-end justify-between mb-12">
+<div>
+<h2 class="text-3xl font-800 tracking-tight mb-2">En Çok Satanlar</h2>
+<p class="text-primary/60">Sezonun en sevilen, ikonik parçaları.</p>
+</div>
+<div class="flex gap-4">
+<button class="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex gap-8 overflow-x-auto hide-scrollbar pb-8">
+<!-- Product Card 1 -->
+<div class="product-card min-w-[320px] group cursor-pointer">
+<div class="relative aspect-[4/5] bg-white overflow-hidden mb-4">
+<img alt="Product" class="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" data-alt="High quality designer leather tote bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwBQX8dRVkHZ2H1Gfv7OOzQm8AniVNCTWyGGjmrhY5nyRBLiBl1PMYRyFn-UfwsWbz-1WS38JCZpe53K_LGIheaxyU-6ariFK_I_u0UTgWpn_S_e7IwOhDjlu9GCdJ6DYkUSuevOvoPSFxdCmPqnd0Uyq1WoNC7fQHP5DbWraSxEpcP8hOTFIlsdQpKVT2YWG_ibtMmHgJiHJHVftQdvyCJMy4OZWaJsO6fITfMKWi1VYaU_cYYLso3ioFmpz13WEC5js5dR6KwW9g"/>
+<img alt="Product Hover" class="secondary-img w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-500" data-alt="Interior detail of luxury leather bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVyIWOvQuio6rmFD4x1DRtThSDF7AOQMZ1fDP2IhVRQZhKx4zFpctx4pN3mQAQ6DOVoXzeDgFJoTE9L9R6-iApuRoVnf6QJTmjsAfQ_ic7jANaBObHqtp1oAmixLECgeApJ7-KiPov6aHE-mysnobuRqdP33i2zY6Jneb7iHaCc7jTCA_RWJn18sab-CWWptx9HfodbDZk6TrRjLAU-ogYxyVfIIezeC2KMGf9mLV20pXkZ71ItcEbWcFDoJwAO1zzPzTjPtyy-bH3"/>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-primary text-xs font-bold px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
+                                HIZLI EKLE
+                            </button>
+</div>
+<p class="text-xs text-primary/40 font-bold tracking-widest mb-1">GUCCI</p>
+<h3 class="font-medium mb-1">Dionysus Mini Leather Bag</h3>
+<p class="text-sm font-bold">24.500 TL</p>
+</div>
+<!-- Product Card 2 -->
+<div class="product-card min-w-[320px] group cursor-pointer">
+<div class="relative aspect-[4/5] bg-white overflow-hidden mb-4">
+<img alt="Product" class="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" data-alt="Minimalist luxury shoulder bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoVYCq_L_oyrOJVM7ehReMLap1cIDDN-ddjp1hUKO1NHHKODVGlfrV8EoXN0FL6uCH4MEfrXiMHjIEU-8BSSDvF2Qce1gsMyrtBI0jRBSqamSuVd82GFPz7A0H4B7-PoNdK2nuLVt8VZ4F6b6e4oregePiUS83Q1M1JJoR0brou6AfHv54C5A6z_C47L7R9cEeimQsG7WaCN0fMBCw1BIy9O5ISMOJa0svkxl7GxCVtqJAJwk2ilQpE7d0apl8qTxslRS2j8FQx5e5"/>
+<img alt="Product Hover" class="secondary-img w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-500" data-alt="Side profile of elegant leather bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuFwUyJ7cwDUaucrSg8u6W2YCxQz0MK0eB1M-o4A_DCs7PUD5Zi72d_u-p8G7QcuzlVX7nXHH2--E6oaAMBMYs5fSFFRqlgeDKKDNI3AdPk0AMm-bA-r6fkcrPns8avIBNS3aW6T1SBo1wl-Miy0k1vhQS89AtEEe2GH4emVBlfLf459BA0IisXAgOnUupyXZrrY2NjtaQbEEYg_7ZnL9gaMPDGScXaLfuI_cpZ_itN3vYHxgah_PHKy5iWvocWWZTYr9T2jb6Sdst"/>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-primary text-xs font-bold px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
+                                HIZLI EKLE
+                            </button>
+</div>
+<p class="text-xs text-primary/40 font-bold tracking-widest mb-1">PRADA</p>
+<h3 class="font-medium mb-1">Cleo Brushed Leather Bag</h3>
+<p class="text-sm font-bold">32.200 TL</p>
+</div>
+<!-- Product Card 3 -->
+<div class="product-card min-w-[320px] group cursor-pointer">
+<div class="relative aspect-[4/5] bg-white overflow-hidden mb-4">
+<img alt="Product" class="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" data-alt="Silk scarf with luxury brand pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApoaX37g9c3rJvioT88La0HMWzLAFoA1gm7Y4_BCkNh86jXKQF_Wctm4ckuJSCjNCmoHGp6apydz5IQsoc3TRYAY52bX5aI1iOTAXlUnPjlu32dzyiIPhM4sHBph7Zsb1IGinTg3nnvtbsoHs98f_WfVNAqe8kvTuQwKPyuM7COIRrNKuvcWIByaAt-9-Kmobl1UQP0hAp_gFl5018IZyzciAMT2NYL5fwzUv7WAggBTddVCIlHItDWVT8ZdU20gUNjOnUDJlS0yYL"/>
+<img alt="Product Hover" class="secondary-img w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-500" data-alt="Close up of silk fabric texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlGiwmwpGfg6iArNJk64zttA7RSF5qDme20dsc-e-Nb82x0FlOn-y1lAKN-xWFAthCORnc6JZYIcIeYY0bbZL056YWndSz_hK8z6t8nAmW_8Pvujl6sk45Zqi2LU4DziyLRX0CbGn5_pj0xPyABQCcHIaPUA5mwfq33dhWfdisw6ymauwQ4Uzu8gkVq-lfYZgFVV5mniCYQFM-Bxl_mJlGQAwdG8Vr0CFkLuqk-attoPu_tE0DwFiywvceZPwL8Klodbvd8jZZtdny"/>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-primary text-xs font-bold px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
+                                HIZLI EKLE
+                            </button>
+</div>
+<p class="text-xs text-primary/40 font-bold tracking-widest mb-1">HERMES</p>
+<h3 class="font-medium mb-1">Carré 90 Silk Scarf</h3>
+<p class="text-sm font-bold">12.800 TL</p>
+</div>
+<!-- Product Card 4 -->
+<div class="product-card min-w-[320px] group cursor-pointer">
+<div class="relative aspect-[4/5] bg-white overflow-hidden mb-4">
+<img alt="Product" class="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" data-alt="Modern designer bag on display" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnUsTKCO1TbwzbHR1ulJ_-pFNwTB43brmxykrNtuP29ysJcpIN4oNyC8XfVNQA1seLX-hW4GlvW0s7I7gO0KzTlgzYJBVjIKtqaMTy-brSlFCrG5rlMLL2dVym3ILSH2uUjxa6Ht0Md_j23ePBCchKhAnjoQi3Jht-vuGIO_O6OmimVdZ0uQANWWTOHIrvguzwWWlkYYM0zTg-6eSuo9oRyC4nbASg1agoI2HCo7TY0A1gAiBij0eO66zEuglXXvaScCWn6CtJU7jn"/>
+<img alt="Product Hover" class="secondary-img w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-500" data-alt="Detail of luxury bag hardware" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiINC17t-Con7feMc7KBY2-e7XVafQvbTMAd37t0uupP2YD1M-Sjo93Lrkk1ZluxPhLtDvFn4UE0T4diUHgPDkGoT9YMu8ZjvbcDlJZrVG96Zm-qQAy5jBG16vOQY9XICug5PLEeV5UhSknr0Euz-pXcFQdOxhUFySVJGEY6ReWLscYr0K14pBKy3tELT0QMrTHNmc6OXOIdlVemeaK_WCSHZdlf-EeBs5H2BXtPWr2dSCbgI3HOUL9O79YLaFqOthlHQZD0rP7yvs"/>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-primary text-xs font-bold px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
+                                HIZLI EKLE
+                            </button>
+</div>
+<p class="text-xs text-primary/40 font-bold tracking-widest mb-1">SAINT LAURENT</p>
+<h3 class="font-medium mb-1">Loulou Medium Bag</h3>
+<p class="text-sm font-bold">45.000 TL</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Promotion Banners -->
+<section class="max-w-[1440px] mx-auto px-6 py-24">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="relative group h-[500px] overflow-hidden">
+<img alt="Hermes Etkisi" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" data-alt="Editorial luxury fashion background Hermes style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb17di4d60daPHp5D8RQL-TxFLukaIfl9TLn-JmqmApYutxSVokeEaojn9JAGz6fK0IRMf8dbYr7ax6kFZgldkCshn_j2zbfMOfDlx_VLQTQFj4x7ycKCiMD3AZrpRG1qcwQTxAwq8kslXhv58iyRk8-8fGfrirUO-0Ju3ThuENiCOuEOlITa9ZJHPA60JxwlEtTEMBnmIu07sLzxROzA4EhKyT0aeGZWDHHL2LH9hhRKQIaVA4SESTY5ssrl7woy43WHGEFkZsvtJ"/>
+<div class="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-12">
+<h2 class="text-white text-4xl font-800 mb-6 uppercase tracking-tight">Yeni Sezon:<br/>Hermes Etkisi</h2>
+<a class="text-white border-b border-white pb-1 text-sm font-bold tracking-widest hover:text-white/70 transition-colors" href="#">İNCELE</a>
+</div>
+</div>
+<div class="relative group h-[500px] overflow-hidden">
+<img alt="Özel İndirimler" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" data-alt="Minimal fashion model posing with luxury accessories" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXIoLl2c9XNQsWVmvmNisaFD4XT8Lo2z6mTlgIxmfwq7Ch3r61Em6G-RUDjTz1e9G5xC55oZJAagmRne53C9t9uCI5uNAfVGfLkEdybK6J4x9nQGCyLQ3ixCb1S6DSUms53MV8iqnymviCTKabjKt74jv49MZ65Tk8GEuatZIALkqLN5HhUYnC9vQZ-VZFkwZ5bPQo5XZQ1s4IYqSM82CBLWN3MPCyFiU4-KyS_oyb515aY4-a6QIo_AsWqaSYpnda4JUf3vSFbg0H"/>
+<div class="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-12">
+<h2 class="text-white text-4xl font-800 mb-6 uppercase tracking-tight">Özel İndirimler</h2>
+<p class="text-white/90 mb-8 max-w-xs font-medium italic">Seçili ikonik modellerde %30'a varan ayrıcalıklı fiyatlar.</p>
+<a class="text-white border-b border-white pb-1 text-sm font-bold tracking-widest hover:text-white/70 transition-colors" href="#">ŞİMDİ AL</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Brand Story Section -->
+<section class="py-24 bg-white">
+<div class="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center gap-20">
+<div class="w-full md:w-1/2">
+<img alt="Brand Story" class="w-full rounded shadow-2xl" data-alt="Boutique luxury interior showroom minimal aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBukMJrg8RFeExwrpeZtec1Ig-Ej7b0dS0CdFF3SKOO3fG8JLSn3cVSK0NBni0JxTpoALfKJ8f4B1DstZvLEopEJGkvRroaLgk_YgRU04feQudX6vLkcvIbtmSSaa5zk0ZAz62ryVLUsUQQDhlDd07u29VZ5Pc7EhmPHR9lCLq1W4po8d5fq0GSpUhk2NcbyS0jV1wc1bpFWiyB7Hz-P4KZfTFJh42SpqYYUlGI3ev8obk2lGStsKJ55r42GoFuiuWTQt6YK9CL_ND"/>
+</div>
+<div class="w-full md:w-1/2">
+<span class="text-primary/40 font-bold tracking-[0.3em] text-xs uppercase mb-6 block">L'ELITE MİRASI</span>
+<h2 class="text-4xl font-800 mb-8 tracking-tight">Zarafetin ve Kalitenin Buluştuğu Nokta</h2>
+<p class="text-primary/70 leading-relaxed mb-8">
+                        L'ELITE olarak, modanın sadece giyinmek değil, bir yaşam tarzı ve sanatsal bir ifade olduğuna inanıyoruz. Dünyanın en saygın moda evlerinden özenle seçtiğimiz çantalar ve %100 saf ipek şallar ile stilinize elit bir dokunuş katıyoruz.
+                    </p>
+<p class="text-primary/70 leading-relaxed mb-10">
+                        Her bir parçanın arkasındaki ustalığı, mirası ve tutkuyu sizinle buluştururken; kusursuz müşteri deneyimi ve güvenilir alışverişin garantisini veriyoruz.
+                    </p>
+<button class="border-b-2 border-primary pb-1 font-bold text-sm tracking-widest hover:text-primary/60 transition-colors">HİKAYEMİZİ KEŞFEDİN</button>
+</div>
+</div>
+</section>
+<!-- Newsletter -->
+<section class="border-y border-primary/5 py-24">
+<div class="max-w-[1440px] mx-auto px-6 text-center">
+<h2 class="text-2xl font-bold mb-4">L'ELITE Privé'ye Katılın</h2>
+<p class="text-primary/60 mb-10 max-w-lg mx-auto">Yeni koleksiyonlar, özel etkinlikler ve kişiselleştirilmiş tekliflerden ilk siz haberdar olun.</p>
+<form class="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto justify-center">
+<input class="flex-1 bg-background-alt border-none focus:ring-1 focus:ring-primary px-6 py-4 rounded text-sm" placeholder="E-posta adresiniz" type="email"/>
+<button class="bg-primary text-white px-12 py-4 font-bold text-sm tracking-widest hover:opacity-90 transition-opacity rounded">ABONE OL</button>
+</form>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-white pt-24 pb-12">
+<div class="max-w-[1440px] mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+<!-- Column 1 -->
+<div>
+<h4 class="font-bold mb-8 text-sm uppercase tracking-widest">Kurumsal</h4>
+<ul class="space-y-4 text-sm text-primary/60">
+<li><a class="hover:text-primary transition-colors" href="#">Hakkımızda</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Mağazalarımız</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Kariyer</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sürdürülebilirlik</a></li>
+</ul>
+</div>
+<!-- Column 2 -->
+<div>
+<h4 class="font-bold mb-8 text-sm uppercase tracking-widest">Müşteri Hizmetleri</h4>
+<ul class="space-y-4 text-sm text-primary/60">
+<li><a class="hover:text-primary transition-colors" href="#">Bize Ulaşın</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sıkça Sorulan Sorular</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">İade ve Değişim</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Teslimat Bilgileri</a></li>
+</ul>
+</div>
+<!-- Column 3 -->
+<div>
+<h4 class="font-bold mb-8 text-sm uppercase tracking-widest">Hızlı Linkler</h4>
+<ul class="space-y-4 text-sm text-primary/60">
+<li><a class="hover:text-primary transition-colors" href="#">Hesabım</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sipariş Takibi</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Hediye Kartı</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Üyelik Programı</a></li>
+</ul>
+</div>
+<!-- Column 4 -->
+<div>
+<h4 class="font-bold mb-8 text-sm uppercase tracking-widest">Takip Edin</h4>
+<div class="flex gap-4 mb-8">
+<a class="w-10 h-10 border border-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-xl">camera</span>
+</a>
+<a class="w-10 h-10 border border-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-xl">music_note</span>
+</a>
+<a class="w-10 h-10 border border-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-xl">share</span>
+</a>
+</div>
+<p class="text-sm text-primary/40 leading-relaxed">Nişantaşı, Abdi İpekçi Cd. No:42<br/>Şişli, İstanbul</p>
+</div>
+</div>
+<div class="border-t border-primary/5 pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
+<p class="text-xs text-primary/40">© 2024 L'ELITE Luxury Retail. Tüm Hakları Saklıdır.</p>
+<div class="flex gap-4 items-center opacity-40">
+<span class="material-symbols-outlined">payments</span>
+<span class="material-symbols-outlined">credit_card</span>
+<span class="font-bold italic text-xs tracking-tighter">VISA</span>
+<span class="font-bold italic text-xs tracking-tighter">MASTERCARD</span>
+</div>
+<div class="flex gap-8 text-xs text-primary/40">
+<a class="hover:text-primary" href="#">Kullanım Koşulları</a>
+<a class="hover:text-primary" href="#">KVKK</a>
+<a class="hover:text-primary" href="#">Çerez Politikası</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Elite Luxury Store - Hesap Bilgileri</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .platinum-gradient {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+        }
+        .sidebar-item-active {
+            background-color: rgba(26, 26, 26, 0.05);
+            border-left: 3px solid #1a1a1a;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-primary min-h-screen">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-72 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 flex flex-col fixed h-full">
+<div class="p-8 flex flex-col h-full">
+<!-- Brand Logo -->
+<div class="mb-12">
+<h1 class="text-xl font-bold tracking-widest uppercase">L'Elite Luxury</h1>
+<p class="text-xs text-zinc-400 mt-1 uppercase tracking-tighter">Premium Shopping</p>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg sidebar-item-active text-primary font-semibold" href="#">
+<span class="material-symbols-outlined text-[22px]">person</span>
+<span class="text-sm">Hesap Bilgileri</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">shopping_bag</span>
+<span class="text-sm">Siparişlerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">favorite</span>
+<span class="text-sm">Favorilerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">location_on</span>
+<span class="text-sm">Adreslerim</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors mt-8" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm">Ayarlar</span>
+</a>
+</nav>
+<!-- Logout -->
+<div class="pt-8 border-t border-zinc-100 dark:border-zinc-800">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Çıkış Yap</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-72 flex-1 p-12 max-w-6xl">
+<!-- Header Section -->
+<header class="mb-12 flex justify-between items-end">
+<div>
+<h2 class="text-3xl font-bold tracking-tight mb-2">Profil Ayarları</h2>
+<p class="text-zinc-500">Kişisel bilgilerinizi ve hesap tercihlerinizi buradan güncelleyebilirsiniz.</p>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+<div class="w-12 h-12 rounded-full bg-zinc-200 overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="Modern professional headshot of a smiling man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn9fgT5i_yxMCRQjeCYSX9L6t1RkEY-Os_UfhMfvcdbbvqruQJjpSymbNQW9-b1Ub80_n8qGNmjQCbrjk2OSSy2_w18ALBLWnPmJEWmNBx7J-KreN2ELWsMfQlPK7OpMXtPOwcFwhN2Qqe3KFGxgP0PCnVdp_PjIm4mZ8SNGN4RLgtD5pwKHVte6d4sf7mEf9AtKIpCoADiCo6VDsOxkiLnDMkBf4UpcmqeBDJchNI0FgHfMKKxKPsgPmOB9Z5nO91PfdNn2ocV0ys"/>
+</div>
+<div>
+<p class="text-sm font-bold">Ahmet Yılmaz</p>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="platinum-gradient text-[10px] font-bold text-slate-800 px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                                Platinum Üye
+                            </span>
+</div>
+</div>
+</div>
+</header>
+<!-- Settings Form -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Personal Info Section -->
+<div class="lg:col-span-2 space-y-8">
+<section class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-zinc-400">badge</span>
+<h3 class="text-lg font-bold">Kişisel Bilgiler</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">Ad Soyad</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" type="text" value="Ahmet Yılmaz"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">E-posta Adresi</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" type="email" value="ahmet.yilmaz@example.com"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">Telefon Numarası</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" type="tel" value="+90 (532) 123 45 67"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">Doğum Tarihi</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" type="date" value="1992-05-15"/>
+</div>
+</div>
+</section>
+<!-- Password Section -->
+<section class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-zinc-400">lock</span>
+<h3 class="text-lg font-bold">Şifre Güncelleme</h3>
+</div>
+<div class="grid grid-cols-1 gap-6 max-w-md">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">Mevcut Şifre</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">Yeni Şifre</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" placeholder="Yeni şifrenizi girin" type="password"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-widest text-zinc-400">Şifre Tekrarı</label>
+<input class="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50" placeholder="Yeni şifrenizi tekrar girin" type="password"/>
+</div>
+</div>
+<div class="mt-8 flex items-center gap-2 text-xs text-zinc-400">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+<span>Hesabınız 256-bit SSL sertifikası ile korunmaktadır.</span>
+</div>
+</section>
+</div>
+<!-- Right Sidebar Content (Summary/Status) -->
+<div class="space-y-6">
+<div class="bg-primary text-white rounded-2xl p-8 shadow-xl">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-3xl opacity-50">diamond</span>
+<span class="text-[10px] font-bold tracking-widest border border-white/30 rounded-full px-3 py-1 uppercase">Aktif</span>
+</div>
+<h4 class="text-xl font-bold mb-2">Platinum Status</h4>
+<p class="text-white/70 text-sm leading-relaxed mb-6">Elite ayrıcalıklarından yararlanmaya devam edin. Bir sonraki seviye için 2.450 TL harcama yapmanız gerekiyor.</p>
+<div class="w-full bg-white/20 h-1.5 rounded-full mb-2">
+<div class="bg-white h-full rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-tighter opacity-80">
+<span>Platinum</span>
+<span>Royal Elite</span>
+</div>
+</div>
+<div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
+<h5 class="font-bold text-sm mb-4">Hızlı İstatistikler</h5>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-zinc-500 text-xs">Toplam Sipariş</span>
+<span class="font-bold text-sm">12</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-zinc-500 text-xs">Favori Ürünler</span>
+<span class="font-bold text-sm">24</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-zinc-500 text-xs">Üyelik Tarihi</span>
+<span class="font-bold text-sm">Ocak 2023</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Actions -->
+<div class="mt-12 flex items-center justify-end gap-4 border-t border-zinc-200 dark:border-zinc-800 pt-8">
+<button class="px-8 py-3 rounded-lg text-sm font-semibold text-zinc-500 hover:bg-zinc-100 transition-colors">
+                    İptal
+                </button>
+<button class="bg-primary text-white px-12 py-3 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg">
+                    Bilgileri Güncelle
+                </button>
+</div>
+</main>
+</div>
+</body></html>

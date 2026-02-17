@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Elite - Siparişiniz İçin Teşekkür Ederiz</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-white text-primary antialiased">
+<!-- Header -->
+<header class="border-b border-gray-100 px-6 py-6 md:px-12">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-8">
+<a class="flex items-center gap-2" href="#">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="text-xl font-extrabold tracking-tight">L'ELITE</span>
+</a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:opacity-70 transition-opacity" href="#">Mağaza</a>
+<a class="text-sm font-medium hover:opacity-70 transition-opacity" href="#">Koleksiyonlar</a>
+</nav>
+</div>
+<div class="flex items-center gap-5">
+<button class="p-2 hover:bg-gray-50 rounded-full transition-colors">
+<span class="material-symbols-outlined text-2xl">search</span>
+</button>
+<button class="p-2 hover:bg-gray-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined text-2xl">shopping_bag</span>
+<span class="absolute top-1 right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-gray-100 overflow-hidden border border-gray-200">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Elegant woman profile picture for user account" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfQNi9zhOoCUcdu1Ar7-bYrvQBfair5Z-cKSEd2ZAqYDVz2YZmzmRIbHoHPTnbBIZlCmCC68b3I-zq_OvvQd0OYwOP-y5NXCT7c6CqbDWgsHk3fStDNBv2m65Ewb-kp2g4mRyol6rPKfcjyL0UdV4_4wMn4gg7EikL7fCt5p6Coz6bKk6ciCsE0z8bfTEuw4Et4NfRZvQJ_16guBd01uZxdaSCLG2auWTHCJ_jbIL3fkIPAsDOPwkrMkawNDBXit4Vyp0XeDenLnE0"/>
+</div>
+</div>
+</div>
+</header>
+<main class="min-h-[70vh] flex flex-col items-center justify-center px-6 py-20 text-center">
+<!-- Success Animation Placeholder / Icon -->
+<div class="mb-10 relative flex items-center justify-center">
+<div class="absolute w-32 h-32 bg-primary/5 rounded-full animate-pulse"></div>
+<div class="w-24 h-24 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-sm relative z-10">
+<span class="material-symbols-outlined text-6xl text-primary font-light">check_circle</span>
+</div>
+</div>
+<!-- Confirmation Text -->
+<div class="max-w-2xl space-y-4">
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
+                Siparişiniz İçin Teşekkür Ederiz!
+            </h1>
+<p class="text-gray-500 text-lg md:text-xl font-light leading-relaxed">
+                Siparişiniz başarıyla alındı ve hazırlık sürecine başlandı.
+            </p>
+</div>
+<!-- Order Number Box -->
+<div class="mt-12 mb-10 py-4 px-8 bg-gray-50 rounded-lg border border-gray-100 inline-block">
+<span class="text-gray-400 text-sm uppercase tracking-widest font-semibold block mb-1">Onay Kodu</span>
+<span class="text-2xl font-bold tracking-tight text-primary">#LE-202485</span>
+</div>
+<!-- Info Message -->
+<p class="text-gray-500 text-sm font-medium mb-12 flex items-center gap-2">
+<span class="material-symbols-outlined text-xl">mail</span>
+            E-posta adresinize bir onay mesajı gönderdik.
+        </p>
+<!-- CTA Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+<a class="flex-1 bg-primary text-white px-8 py-4 rounded-lg font-bold text-sm tracking-wide hover:bg-black transition-all flex items-center justify-center gap-2" href="#">
+                Siparişlerim
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</a>
+<a class="flex-1 border border-primary text-primary px-8 py-4 rounded-lg font-bold text-sm tracking-wide hover:bg-gray-50 transition-all flex items-center justify-center gap-2" href="#">
+                Alışverişe Devam Et
+            </a>
+</div>
+</main>
+<!-- Footer Inspired by L'Elite Styling -->
+<footer class="bg-white border-t border-gray-100 pt-20 pb-10 px-6 md:px-12">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+<div class="col-span-1 md:col-span-1">
+<div class="flex items-center gap-2 mb-6">
+<div class="size-5 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="text-lg font-extrabold tracking-tight">L'ELITE</span>
+</div>
+<p class="text-gray-500 text-sm leading-relaxed max-w-xs">
+                    Lüksün ve zarafetin buluştuğu nokta. Seçkin tasarımlarımızla stilinizi bir üst seviyeye taşıyoruz.
+                </p>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-6 uppercase tracking-wider">Müşteri Hizmetleri</h4>
+<ul class="space-y-4 text-sm text-gray-500 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">Teslimat &amp; İade</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Bize Ulaşın</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sıkça Sorulan Sorular</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Ödeme Yöntemleri</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-6 uppercase tracking-wider">Kurumsal</h4>
+<ul class="space-y-4 text-sm text-gray-500 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">Hakkımızda</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Kariyer</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sürdürülebilirlik</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">KVKK Aydınlatma Metni</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-sm font-bold mb-6 uppercase tracking-wider">Haber Bülteni</h4>
+<p class="text-sm text-gray-500 mb-4">Yeni koleksiyonlardan ilk siz haberdar olun.</p>
+<form class="relative">
+<input class="w-full border-b border-gray-200 py-2 text-sm focus:border-primary focus:ring-0 outline-none transition-colors" placeholder="E-posta adresiniz" type="email"/>
+<button class="absolute right-0 bottom-2 text-primary" type="submit">
+<span class="material-symbols-outlined">trending_flat</span>
+</button>
+</form>
+</div>
+</div>
+<div class="max-w-7xl mx-auto pt-8 border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-6">
+<p class="text-[12px] text-gray-400 font-medium">© 2024 L'Elite Luxury. Tüm hakları saklıdır.</p>
+<div class="flex items-center gap-6">
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined text-xl">public</span></a>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined text-xl">photo_camera</span></a>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined text-xl">play_circle</span></a>
+</div>
+</div>
+</footer>
+</body></html>

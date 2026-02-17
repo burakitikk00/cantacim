@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ödeme - L'Elite Luxury Store</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-primary min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-zinc-200 px-6 py-4 lg:px-20">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary text-white flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-xl">diamond</span>
+</div>
+<h1 class="text-xl font-extrabold tracking-tighter text-primary">L'ELITE</h1>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest">
+<a class="hover:opacity-60 transition-opacity" href="#">Mağaza</a>
+<a class="hover:opacity-60 transition-opacity" href="#">Koleksiyonlar</a>
+<a class="hover:opacity-60 transition-opacity" href="#">Destek</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-zinc-100 rounded-full transition-colors">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<button class="p-2 hover:bg-zinc-100 rounded-full transition-colors">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-12 lg:px-20">
+<!-- Breadcrumbs & Title -->
+<div class="mb-12">
+<nav class="flex items-center gap-2 text-xs uppercase tracking-widest text-zinc-400 mb-4">
+<a class="hover:text-primary transition-colors" href="#">Sepet</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Ödeme Bilgileri</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Onay</span>
+</nav>
+<h2 class="text-4xl font-extrabold tracking-tight text-primary">Güvenli Ödeme</h2>
+<p class="text-zinc-500 mt-2">Lütfen siparişinizi tamamlamak için bilgilerinizi eksiksiz doldurunuz.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- Left Column: Checkout Steps -->
+<div class="lg:col-span-8 space-y-16">
+<!-- 1. Delivery Address Section -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-4">
+<span class="size-8 flex items-center justify-center bg-primary text-white rounded-full text-sm font-bold">1</span>
+<h3 class="text-2xl font-bold tracking-tight">Teslimat Adresi</h3>
+</div>
+<button class="text-sm font-bold underline underline-offset-4 hover:opacity-60 transition-opacity flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            Yeni Adres Ekle
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Selected Address Card -->
+<div class="relative border-2 border-primary p-6 rounded-xl bg-white shadow-sm cursor-pointer group">
+<div class="absolute top-4 right-4 text-primary">
+<span class="material-symbols-outlined fill-1">check_circle</span>
+</div>
+<h4 class="font-bold text-lg mb-2">Ev Adresim</h4>
+<p class="text-zinc-500 text-sm leading-relaxed mb-4">
+                                Harbiye Mah. Abdi İpekçi Cad. No:12/4<br/>
+                                Nişantaşı, Şişli<br/>
+                                34367 İstanbul, Türkiye
+                            </p>
+<p class="text-xs font-bold text-zinc-400 uppercase tracking-tighter">+90 532 *** 45 67</p>
+</div>
+<!-- Secondary Address Card -->
+<div class="border border-zinc-200 p-6 rounded-xl bg-white hover:border-zinc-400 transition-colors cursor-pointer group">
+<h4 class="font-bold text-lg mb-2">İş Adresi</h4>
+<p class="text-zinc-500 text-sm leading-relaxed mb-4">
+                                Büyükdere Cad. No:199 Levent Loft<br/>
+                                Levent, Beşiktaş<br/>
+                                34394 İstanbul, Türkiye
+                            </p>
+<p class="text-xs font-bold text-zinc-400 uppercase tracking-tighter">+90 212 *** 88 00</p>
+</div>
+</div>
+</section>
+<!-- 2. Shipping Method Section -->
+<section>
+<div class="flex items-center gap-4 mb-6">
+<span class="size-8 flex items-center justify-center bg-primary text-white rounded-full text-sm font-bold">2</span>
+<h3 class="text-2xl font-bold tracking-tight">Kargo Yöntemi</h3>
+</div>
+<div class="space-y-4">
+<label class="flex items-center justify-between p-5 border-2 border-primary bg-white rounded-xl cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="size-12 bg-zinc-100 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+</div>
+<div>
+<p class="font-bold">Elite Express Delivery</p>
+<p class="text-sm text-zinc-500">Yarın teslimat (24 saat içinde)</p>
+</div>
+</div>
+<p class="font-extrabold text-primary">₺149,00</p>
+<input checked="" class="hidden" name="shipping" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-5 border border-zinc-200 bg-white rounded-xl cursor-pointer hover:border-zinc-400 transition-colors">
+<div class="flex items-center gap-4">
+<div class="size-12 bg-zinc-100 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-zinc-400">inventory_2</span>
+</div>
+<div>
+<p class="font-bold text-zinc-700">Standart Kurye</p>
+<p class="text-sm text-zinc-400">2-3 iş günü içinde teslimat</p>
+</div>
+</div>
+<p class="font-extrabold text-primary">Ücretsiz</p>
+<input class="hidden" name="shipping" type="radio"/>
+</label>
+</div>
+</section>
+<!-- 3. Payment Method Section -->
+<section>
+<div class="flex items-center gap-4 mb-6">
+<span class="size-8 flex items-center justify-center bg-primary text-white rounded-full text-sm font-bold">3</span>
+<h3 class="text-2xl font-bold tracking-tight">Ödeme Bilgileri</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+<!-- Card Simulation -->
+<div class="w-full aspect-[1.58/1] bg-gradient-to-br from-zinc-800 to-black rounded-2xl p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden group">
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<div class="absolute -right-10 -top-10 size-40 bg-white/20 rounded-full blur-3xl"></div>
+<div class="absolute -left-10 -bottom-10 size-40 bg-zinc-400/20 rounded-full blur-3xl"></div>
+</div>
+<div class="flex justify-between items-start relative z-10">
+<div class="size-10 bg-zinc-700/50 rounded-lg flex items-center justify-center border border-white/10">
+<span class="material-symbols-outlined text-white">contactless</span>
+</div>
+<div class="h-8">
+<img alt="Mastercard" class="h-full object-contain filter brightness-200" data-alt="Mastercard logo on credit card" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnmvZrl70UGwhBgooZ8aSS8oRuMIzm6bxfZFCe-eUqrn7eAsEDDbu8Gjd7G70CGVW7ZKmWS9nDcqZQ4GXY1wyY5fdeNk-LEiRtLcgilEg9MHFcXeJpjE1mpm4GPGNxu7zJ1QSBxZiC4f3uu4D2Okl_du-rDU8rWVegzlGkGxSIvGzEx_ipPGaiLSJkBg0JtmlwFkotvhMggKvf-o7aVRdhg0bWDrF66-aBa-Pq-m4KZMSFlD0zluM1hwvjB-TE3THhJ3wMy3Y4CwpF"/>
+</div>
+</div>
+<div class="relative z-10">
+<p class="text-xs uppercase tracking-[0.2em] opacity-50 mb-1">Kart Sahibi</p>
+<p class="text-lg font-medium tracking-widest uppercase">M**** K****</p>
+</div>
+<div class="flex justify-between items-end relative z-10">
+<p class="text-2xl font-mono tracking-[0.15em]">**** **** **** 4242</p>
+<div class="text-right">
+<p class="text-[10px] uppercase tracking-widest opacity-50">Sona Erme</p>
+<p class="font-mono">12/28</p>
+</div>
+</div>
+</div>
+<!-- Payment Form -->
+<div class="space-y-4">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Kart Üzerindeki İsim</label>
+<input class="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Ad Soyad" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Kart Numarası</label>
+<div class="relative">
+<input class="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="0000 0000 0000 0000" type="text"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-zinc-400">credit_card</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">SKT</label>
+<input class="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="AA / YY" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">CVV</label>
+<input class="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="123" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="w-5 h-5 border-zinc-300 text-primary focus:ring-primary rounded transition-all" type="checkbox"/>
+</div>
+<span class="text-sm text-zinc-600 group-hover:text-primary transition-colors">Fatura adresi teslimat adresiyle aynı olsun.</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="w-5 h-5 border-zinc-300 text-primary focus:ring-primary rounded transition-all" type="checkbox"/>
+</div>
+<span class="text-sm text-zinc-600 group-hover:text-primary transition-colors">3D Secure ile güvenli ödeme yapmak istiyorum.</span>
+</label>
+</div>
+</section>
+</div>
+<!-- Right Column: Order Summary (Sticky) -->
+<div class="lg:col-span-4">
+<div class="sticky top-28 bg-white border border-zinc-200 rounded-2xl p-8 shadow-sm">
+<h3 class="text-xl font-bold mb-6 pb-6 border-b border-zinc-100">Sipariş Özeti</h3>
+<!-- Item List Preview -->
+<div class="space-y-6 mb-8">
+<div class="flex gap-4">
+<div class="size-16 bg-zinc-100 rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Luxury red sneaker shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByL3ceVbFvW7uYEwwRmwi-UiYl5qIKes6baZ4_2034l2jgC7gYb4Tc6zfiK1hupwrJiThc5gBOiIxw-vEYy114xIMiaawj-Lcck8QdRYFAL-cMk59STDDrT9DSNp94g_2gji7c4dE2oKD-VFnJM-U_BJnI_E3yXzuaip6YLtcWgPh4D71X3RNuI-6EkSBgDZJg3-L0Avp1cYBagsM_lQ8QmzIycPPOGLQcbyPPK6wvhigszi2TXavwH8awNbf0XTlu5_kcZWRXDmw6"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-primary line-clamp-1">Velvet Nero Sneakers</p>
+<p class="text-xs text-zinc-500 mt-1">Beden: 42 | Siyah</p>
+<div class="flex justify-between items-center mt-2">
+<span class="text-xs font-medium">1 Adet</span>
+<span class="text-sm font-extrabold">₺4.250,00</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="size-16 bg-zinc-100 rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Luxury black leather handbag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5Xsr7uS7Yt1MbwDIGRYl2hl2jQtxCD8rMT4Rhi8BR-6yxvGS8yLxvBZzd97g30UzaxJuObROa-sXfH76zPfd6q33XOHuwv1iu8wcWjFJh3OocN3GVppoAEuslGVYvnqCXcYlh8wp5JE9dv5e2v31tZqs21vs95S7vEcuRPg0xUqIsGodgcFmfQCSGT2W5BZ8bd15U8_iNG0qK1ElPcE_JHhOq6MF3t5M6auTRt6Y_GW7OlH7M7OLV594AmMTPu-KSOlRYZE2c4_I-"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-primary line-clamp-1">L'Elite Signature Bag</p>
+<p class="text-xs text-zinc-500 mt-1">Tek Beden | Deri</p>
+<div class="flex justify-between items-center mt-2">
+<span class="text-xs font-medium">1 Adet</span>
+<span class="text-sm font-extrabold">₺12.400,00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Totals -->
+<div class="space-y-4 pt-6 border-t border-zinc-100 mb-8">
+<div class="flex justify-between text-zinc-500">
+<span>Ara Toplam</span>
+<span>₺16.650,00</span>
+</div>
+<div class="flex justify-between text-zinc-500">
+<span>Kargo Ücreti</span>
+<span class="text-primary font-medium">₺149,00</span>
+</div>
+<div class="flex justify-between text-zinc-500">
+<span>KDV (%20)</span>
+<span>₺3.330,00</span>
+</div>
+<div class="flex justify-between items-end pt-4 border-t border-zinc-100">
+<span class="text-lg font-bold">Toplam</span>
+<div class="text-right">
+<p class="text-2xl font-extrabold tracking-tighter text-primary">₺20.129,00</p>
+</div>
+</div>
+</div>
+<!-- Complete Order Button -->
+<button class="w-full bg-primary text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]">
+                        Siparişi Tamamla
+                    </button>
+<!-- Trust Badges -->
+<div class="mt-8 flex flex-col items-center gap-4">
+<div class="flex items-center gap-4 opacity-40 grayscale hover:grayscale-0 transition-all">
+<img alt="Visa" class="h-4" data-alt="Visa logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAM79h086N4JwHQzeHJf9MoevzYcUW0qNRH0fgf_giOpateQVwAVTRhmxvaqmjIcfGgBwbyVc_XlTDo0X4eqY0wSTuIyTiCH9Oc-U5sOr9ozCUJaJKmQ-gePh5nGla2XGhDiLoYYz9Ui3N0I5QllEv9axTCzAUXgJhFEJmiHQgYw8Dz78We33ugoQa_M5HpKre2w0-TFcG3L9SGQ4jL41JWz4BEFSiah5EORPPZbzoQ2OWrPLq5fWJ0y-amEWam3-5slthJeAhsksP"/>
+<img alt="PayPal" class="h-4" data-alt="PayPal logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHmBBCUwcQD-SHv9SxzZ1Lo0uoOKqGLjVftqbxOJmCjeYALStTlTSzxCoFk_Sd-Eg7tuSrO-5iQ0fsPgjjWGhNUYi-PgCuE_AUatxrtezN5croUEiYz55l3yM6sapyjRwUZ6P1Zl8Sepu5p3szI8nSqHpkb-5BIk_o-EN6ZkxOZBdC213B2jPVZDqe1aDERr0LNquc4W0y8SNR5kVmxIOsxIJrD7e21mPjMGi2E4ynhQsbJ8TUrJGECPcKUnIpfuU_c_djQVmT3MJ0"/>
+<img alt="Mastercard" class="h-4" data-alt="Mastercard logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj5wl8WTCn83qpxhN926l1-tUX4zqx03Iecio0wLtBxYkfJXNnsjA8EVAMUaLmAP4rbr5yy472shkP06pwj1S2-FB-aZRxtczsqN0XT_ir_ywBh_d7ePt8h-7rGOK2UzK_IT2-ZAnfvp8Ks360DQIOdWdT_pA5-k_NuOKBL4JVcSyoqmR7cyKE23Epf_2BjouA0Yqdqthc-o1SyhmEB2h1D6FN0gF0Oyyv7VZkrOPlr7rZRfK0h3hlXCSNrJGJfBvDEzno-wn-rvCc"/>
+</div>
+<div class="flex items-center gap-2 text-[10px] text-zinc-400 uppercase tracking-widest font-medium">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                            256-Bit SSL Sertifikalı Güvenli Ödeme
+                        </div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-20 border-t border-zinc-200 py-12 bg-white">
+<div class="max-w-7xl mx-auto px-6 lg:px-20 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-3 opacity-50">
+<div class="size-6 bg-primary text-white flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-[14px]">diamond</span>
+</div>
+<span class="text-sm font-bold tracking-tighter">L'ELITE LUXURY STORE</span>
+</div>
+<div class="flex gap-8 text-xs font-bold uppercase tracking-widest text-zinc-400">
+<a class="hover:text-primary" href="#">Kullanım Koşulları</a>
+<a class="hover:text-primary" href="#">Gizlilik Politikası</a>
+<a class="hover:text-primary" href="#">İade Koşulları</a>
+</div>
+<p class="text-xs text-zinc-400">© 2024 L'Elite. Tüm Hakları Saklıdır.</p>
+</div>
+</footer>
+</body></html>

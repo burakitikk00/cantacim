@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Elite | Özel Çanta Koleksiyonu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(26, 26, 26, 0.05);
+        }
+        .product-card:hover .quick-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e5e5e5;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-white font-display text-primary antialiased">
+<!-- Global Sticky Glassmorphism Header -->
+<header class="glass-header sticky top-0 z-50 w-full transition-all duration-300">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12 flex h-20 items-center justify-between">
+<!-- Left Navigation -->
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-sm font-medium tracking-wide hover:text-primary/60 transition-colors" href="#">NEW IN</a>
+<a class="text-sm font-medium tracking-wide hover:text-primary/60 transition-colors" href="#">DESIGNERS</a>
+<a class="text-sm font-medium tracking-wide border-b border-primary" href="#">BAGS</a>
+<a class="text-sm font-medium tracking-wide hover:text-primary/60 transition-colors" href="#">ACCESSORIES</a>
+</nav>
+<!-- Logo -->
+<div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h1 class="text-2xl font-extrabold tracking-tighter uppercase italic">L'Elite</h1>
+</div>
+<!-- Right Utilities -->
+<div class="flex items-center gap-5">
+<div class="hidden md:flex items-center bg-background-light px-3 py-1.5 rounded-full border border-transparent focus-within:border-primary/10 transition-all">
+<span class="material-symbols-outlined text-[20px] text-primary/40">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-32 xl:w-48 placeholder:text-primary/40" placeholder="Search" type="text"/>
+</div>
+<button class="flex items-center justify-center p-2 hover:bg-background-light rounded-full transition-colors">
+<span class="material-symbols-outlined font-light">favorite</span>
+</button>
+<button class="flex items-center justify-center p-2 hover:bg-background-light rounded-full transition-colors relative">
+<span class="material-symbols-outlined font-light">shopping_bag</span>
+<span class="absolute top-1.5 right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full">2</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-cover bg-center border border-primary/5 cursor-pointer" data-alt="User profile avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUBpHoLtYoWRMVWu3NypJfpO7ALVoXVO_zD5KoBqU5icTZM3I3qAb8wgKWxtxfNlGqKV7Zgkrv15xV5YmVcQwwRO1wOCKcUYk2sPOnkOUSExeivbLOBHXyWJa7iIaudXYwOpHcBHLcfNNEn-LPwmynBRyBVpF7S2ub5-FVoW8inyv3rnTaXDVPGGPbRMMIJFJCB2HWPrltYICakAEqVcuZGgiynxHthcHYXV8zBLkzO-ZzfJk_91O09zTUa3HznEfs8PICAph7NGUL');"></div>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-6 lg:px-12 pt-8 pb-24">
+<!-- Breadcrumb & Title Section -->
+<div class="mb-12">
+<nav class="flex items-center gap-2 text-[11px] uppercase tracking-widest text-primary/40 mb-4">
+<a class="hover:text-primary transition-colors" href="#">Anasayfa</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Çantalar</span>
+</nav>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-4xl lg:text-5xl font-light tracking-tight text-primary">Özel Çanta Koleksiyonu</h2>
+<p class="text-primary/40 mt-2 text-sm">Toplam 124 benzersiz parça listeleniyor.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-[11px] uppercase tracking-widest text-primary/60">Sırala:</span>
+<select class="border-none bg-transparent focus:ring-0 text-sm font-semibold p-0 cursor-pointer hover:text-primary/60">
+<option>Önerilenler</option>
+<option>En Yeniler</option>
+<option>Fiyat: Artan</option>
+<option>Fiyat: Azalan</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-12">
+<!-- Left Sidebar: Filters -->
+<aside class="w-full lg:w-64 flex-shrink-0 space-y-8 border-r border-primary/5 pr-8 hidden lg:block">
+<!-- Filter Group: Marka -->
+<div>
+<button class="flex w-full items-center justify-between py-2 text-xs font-bold uppercase tracking-widest border-b border-primary/10">
+                        MARKA
+                        <span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<div class="mt-4 space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 border-primary/20 rounded focus:ring-primary text-primary" type="checkbox"/>
+<span class="text-sm group-hover:text-primary/60 transition-colors">Gucci</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 border-primary/20 rounded focus:ring-primary text-primary" type="checkbox"/>
+<span class="text-sm group-hover:text-primary/60 transition-colors">Prada</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 border-primary/20 rounded focus:ring-primary text-primary" type="checkbox"/>
+<span class="text-sm group-hover:text-primary/60 transition-colors">Saint Laurent</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 border-primary/20 rounded focus:ring-primary text-primary" type="checkbox"/>
+<span class="text-sm group-hover:text-primary/60 transition-colors">Bottega Veneta</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 border-primary/20 rounded focus:ring-primary text-primary" type="checkbox"/>
+<span class="text-sm group-hover:text-primary/60 transition-colors">Loewe</span>
+</label>
+</div>
+</div>
+<!-- Filter Group: Renk -->
+<div>
+<button class="flex w-full items-center justify-between py-2 text-xs font-bold uppercase tracking-widest border-b border-primary/10">
+                        RENK
+                        <span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<!-- Filter Group: Beden -->
+<div>
+<button class="flex w-full items-center justify-between py-2 text-xs font-bold uppercase tracking-widest border-b border-primary/10">
+                        BEDEN
+                        <span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<!-- Filter Group: Fiyat -->
+<div>
+<button class="flex w-full items-center justify-between py-2 text-xs font-bold uppercase tracking-widest border-b border-primary/10">
+                        FİYAT
+                        <span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<div class="mt-6 px-2">
+<input class="w-full h-1 bg-primary/10 appearance-none cursor-pointer accent-primary" type="range"/>
+<div class="flex justify-between mt-3 text-[11px] font-medium text-primary/60">
+<span>0 TL</span>
+<span>50.000 TL+</span>
+</div>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-white py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-primary/90 transition-all rounded">
+                        Filtreleri Uygula
+                    </button>
+</div>
+</aside>
+<!-- Product Grid -->
+<section class="flex-1">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
+<!-- Product Card 1 -->
+<div class="product-card group cursor-pointer">
+<div class="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+<img alt="Luxury leather bag in caramel color" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close up of luxury leather caramel bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkRGY6CiZAL2WxOfpKgf4yfYxsuPVl91qcJ0WQ6gnJVNGGzDnSy__4QCik1k8QZK8VJ3mQXxzN2yVyADw7qfFOKUAWx6SwlnjBYZNqyatLeu67D2vjlzLeYOEGkDQVhffDzyEe0c3SCsXi3ZdWc-iieIFoZrLzCQ2wljWOX_I5aB1VhIu1NZNwWtXwneIga7EQA9Yw-zFNqGCJvT-OfKKh2C1xA6LzJrtgTZ91u9GBu2WW2SxLKUSRsBQj82twsccRBuCDKuFoNMJ8"/>
+<button class="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<div class="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 transition-all duration-300">
+<button class="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">Hızlı Bakış</button>
+</div>
+</div>
+<div class="mt-6 space-y-1.5 text-center">
+<h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">SAINT LAURENT</h3>
+<p class="text-[15px] font-normal">Sac de Jour Nano Leather Bag</p>
+<p class="text-[16px] font-bold">₺84.500</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="product-card group cursor-pointer">
+<div class="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+<img alt="Classic black quilted shoulder bag" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Elegant black quilted luxury shoulder bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN7alVJYJImA_YeB77T8ihi8RpAgmepzTlPWfQ8qjShEHjRzuq_xHEZnWTxhC5yJ_-Cjm_aS4hyU_qrFwlqXwDVoAJOgwe1BiyluKCBsIWLRxcyF9bH3Bq8UTuXqu-CJr6p8REWkuLLIAscHN8NB-_OoOKOnjgd1tGAjaD-_cE-Ykvf-pHY5TFh3sfu5vY01Z2jKesMB_bPFkNj1tjJyc0Ru3ySq1jJUHU9QU6NL-5YNpeodii6aD5h3yoLTVqPmTtOFpEfCzvh7e2"/>
+<button class="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<div class="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 transition-all duration-300">
+<button class="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">Hızlı Bakış</button>
+</div>
+</div>
+<div class="mt-6 space-y-1.5 text-center">
+<h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">GUCCI</h3>
+<p class="text-[15px] font-normal">GG Marmont Small Shoulder Bag</p>
+<p class="text-[16px] font-bold">₺62.200</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="product-card group cursor-pointer">
+<div class="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+<img alt="Cream colored designer clutch" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Minimalist cream luxury clutch bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbZx-KD9CxRNXQgKzljSH5QIznrENGIvFhHIzXxB7zXLww4f0R9iGghGEV8VdEgOCE0Cs4TzvKqAdwvNQUKF_E9FlkBz0K_GjRLU_WrqmMn3EH7nzfSjNJzUfjopQ5XJhlR3uWaqq6erJyWSXhJ78ctnYI9CYDgtl4EwEJpLExsK9lVFZvrXMPaXRheXifpPuf1192qCEizFbDPt99uDaa6tHBkEAhANujwljM5X6X--C1KIFHuoPT0870jxFdZTq4dTaEkWv2Qv91"/>
+<button class="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<div class="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 transition-all duration-300">
+<button class="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">Hızlı Bakış</button>
+</div>
+</div>
+<div class="mt-6 space-y-1.5 text-center">
+<h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">BOTTEGA VENETA</h3>
+<p class="text-[15px] font-normal">The Pouch Leather Clutch</p>
+<p class="text-[16px] font-bold">₺96.750</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="product-card group cursor-pointer">
+<div class="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+<img alt="Dark grey tote bag" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Spacious grey luxury leather tote bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEuZCrkgNZrsvDpk-a5fCuU-SJLV8EjbwfsP1WLEjriSGebYL4dNXGMLZICj3p_T3Uq_aAQ4Ns4wUlOa0Mqp_LxLJ3BGqPcVTo0nMYKLZhM85HEpfYLTvwpbagnF51yHMzQkzDC9awZd9ChKde54UJy65CwfSndnZdpxDtlIKeCzvaXbVV181Qfkd81Jk1Ywipt1NoJgVuD9h3cAq5dLCoE6pvDZDi8ZmcFsx_FYwkdHOZK_J0ag3kuj3UHiW3an00dY4fmUcnnd2V"/>
+<button class="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<div class="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 transition-all duration-300">
+<button class="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">Hızlı Bakış</button>
+</div>
+</div>
+<div class="mt-6 space-y-1.5 text-center">
+<h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">PRADA</h3>
+<p class="text-[15px] font-normal">Saffiano Leather Tote Bag</p>
+<p class="text-[16px] font-bold">₺104.000</p>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="product-card group cursor-pointer">
+<div class="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+<img alt="Mini structured white bag" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Mini structured white designer top handle bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASe0dhUgZKrANiJf6jWiaxTJSBrCGXyOH2TvVACvO5IG2BB2y1yOzozNnIdvy8aDSkBH0YMpDuQqyJSDHdyYPBLljdQKAhz0S1Ywrv3JqAPTUDErHihnLUlgC6c-oZVdu-vc2tm6KB48-GOr3qPbULqY8ohjjyQF3SxHlp84ZYl6ctKiisonzkMDp0eYS-r72TVkPDFeXkInq6Q64FpeGEsDPTpmivsZIupwfRwHi6sXyjEm1VLsfL5jZVERdxFpIiMfR8aMrxFZl4"/>
+<button class="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<div class="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 transition-all duration-300">
+<button class="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">Hızlı Bakış</button>
+</div>
+</div>
+<div class="mt-6 space-y-1.5 text-center">
+<h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">LOEWE</h3>
+<p class="text-[15px] font-normal">Puzzle Small Textured Leather</p>
+<p class="text-[16px] font-bold">₺89.900</p>
+</div>
+</div>
+<!-- Product Card 6 -->
+<div class="product-card group cursor-pointer">
+<div class="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+<img alt="Burgundy cross body bag" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Deep burgundy luxury crossbody leather bag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYctHTzYESQL3WRmvfmP94NohBNoXz5RCYWPXNCwMGc-vSBvoCcTmGce1WZISqGl-WkWXB0RIzl0ml1C28faQFELMh-YUDEiq3nFLz3JsuK71mIbgkDFOHi0C6xPt3LUOdrVttWrxnzJWSFeJuIX9GszUEJux_DvztP7oqKGBZLdmw25qQmT6zbZgPjMEDuezSkrug7Ptunib38_8GNPghY_FN3Co-nskW9jEJGlDCspwxzO7mKnNURG2kSF99Jm4qBRpeL-9e4GgL"/>
+<button class="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<div class="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 transition-all duration-300">
+<button class="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">Hızlı Bakış</button>
+</div>
+</div>
+<div class="mt-6 space-y-1.5 text-center">
+<h3 class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">CÉLINE</h3>
+<p class="text-[15px] font-normal">Triomphe Shoulder Bag</p>
+<p class="text-[16px] font-bold">₺78.400</p>
+</div>
+</div>
+</div>
+<!-- Load More Section -->
+<div class="mt-24 flex flex-col items-center gap-6">
+<p class="text-xs text-primary/40 uppercase tracking-widest">Görüntülenen Ürün: 12 / 124</p>
+<div class="w-full max-w-[400px] h-[1px] bg-primary/10 relative">
+<div class="absolute left-0 top-0 h-full bg-primary w-[10%]"></div>
+</div>
+<button class="mt-4 px-12 py-4 border border-primary text-[11px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all rounded">
+                        Daha Fazla Gör
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer Simple -->
+<footer class="border-t border-primary/5 py-12">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2 grayscale opacity-60">
+<div class="size-4">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold tracking-tighter uppercase italic">L'Elite</h2>
+</div>
+<div class="flex gap-8 text-[11px] font-medium tracking-widest text-primary/40 uppercase">
+<a class="hover:text-primary transition-colors" href="#">İletişim</a>
+<a class="hover:text-primary transition-colors" href="#">Gizlilik</a>
+<a class="hover:text-primary transition-colors" href="#">KVKK</a>
+<a class="hover:text-primary transition-colors" href="#">Yardım</a>
+</div>
+<p class="text-[11px] text-primary/30 uppercase tracking-widest">© 2024 L'Elite Luxury. Tüm Hakları Saklıdır.</p>
+</div>
+</footer>
+</body></html>

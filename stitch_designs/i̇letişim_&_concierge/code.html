@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact &amp; Concierge | L'Elite Luxury Store</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a1a1a",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .monochrome-map {
+            filter: grayscale(100%) invert(90%) contrast(100%);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-primary dark:text-white antialiased">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-3xl">diamond</span>
+<h1 class="text-xl font-extrabold tracking-tight uppercase">L'Elite</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:opacity-60 transition-opacity" href="#">Collections</a>
+<a class="text-sm font-medium hover:opacity-60 transition-opacity" href="#">Boutique</a>
+<a class="text-sm font-medium border-b border-primary" href="#">Concierge</a>
+<a class="text-sm font-medium hover:opacity-60 transition-opacity" href="#">About</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined p-2 hover:bg-primary/5 rounded-full transition-colors">search</button>
+<button class="material-symbols-outlined p-2 hover:bg-primary/5 rounded-full transition-colors">shopping_bag</button>
+<button class="material-symbols-outlined p-2 hover:bg-primary/5 rounded-full transition-colors">person</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative h-[60vh] flex items-center justify-center overflow-hidden bg-primary text-white">
+<div class="absolute inset-0 opacity-40">
+<img alt="Luxury boutique interior with minimalist design" class="w-full h-full object-cover" data-alt="Elegant minimalist luxury boutique interior view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJX_UnfppC1vOe70KYvn1NGLdlVPJ8XRBEMTnifiqGBhkBaPuct7_IHL-RpmIYLTZ7U72V8V6gc2m01xhVZOinBKICNgztTBK8eczL8rnjVA7QWuKfMkiiTrAi6AKmsdCKfUVy_uSPiqmTEf-RqV0N4mu92giW6_XkxqY55lc0mdwHCxLQiKeFH2t6Zc3CDV2AGTxJKUQLFIL4DnyRftp9Cbj7ZsMoRvosNx3PPpwN_hIBEZ5lyCVBMyqp4rWov7cOl_m1Zm7wDydP"/>
+</div>
+<div class="relative z-10 text-center px-6 max-w-4xl">
+<span class="text-xs uppercase tracking-[0.4em] mb-4 block font-light">Exclusivity Redefined</span>
+<h2 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">Personalized Concierge Service</h2>
+<p class="text-lg md:text-xl font-light opacity-90 leading-relaxed max-w-2xl mx-auto">
+                    Experience the pinnacle of luxury with our bespoke styling services and private shopping experiences.
+                </p>
+</div>
+</section>
+<!-- Main Content Area -->
+<div class="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-12 gap-20">
+<!-- Contact & Form Section -->
+<div class="lg:col-span-7">
+<div class="mb-12">
+<h3 class="text-3xl font-bold mb-4">Style Consulting Request</h3>
+<p class="text-primary/60 dark:text-white/60">Fill out the form below to connect with our expert stylists for a tailored wardrobe consultation.</p>
+</div>
+<form class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs uppercase tracking-widest font-semibold opacity-70">Full Name</label>
+<input class="w-full bg-transparent border-b border-primary/20 focus:border-primary focus:ring-0 py-3 transition-colors outline-none" placeholder="Julian Vane" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs uppercase tracking-widest font-semibold opacity-70">Email Address</label>
+<input class="w-full bg-transparent border-b border-primary/20 focus:border-primary focus:ring-0 py-3 transition-colors outline-none" placeholder="j.vane@luxury.com" type="email"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs uppercase tracking-widest font-semibold opacity-70">Preferred Service</label>
+<select class="w-full bg-transparent border-b border-primary/20 focus:border-primary focus:ring-0 py-3 transition-colors outline-none appearance-none">
+<option>Wardrobe Refresh</option>
+<option>Event Styling</option>
+<option>Personal Shopping</option>
+<option>Gift Concierge</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-xs uppercase tracking-widest font-semibold opacity-70">Preferred Date</label>
+<input class="w-full bg-transparent border-b border-primary/20 focus:border-primary focus:ring-0 py-3 transition-colors outline-none" type="date"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs uppercase tracking-widest font-semibold opacity-70">Message for Stylist</label>
+<textarea class="w-full bg-transparent border-b border-primary/20 focus:border-primary focus:ring-0 py-3 transition-colors outline-none resize-none" placeholder="Tell us about your style goals..." rows="4"></textarea>
+</div>
+<button class="bg-primary text-white px-12 py-5 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-all rounded-sm flex items-center gap-3">
+                        Submit Request
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Side Info Section -->
+<div class="lg:col-span-5 space-y-16">
+<!-- VIP Appointment Card -->
+<div class="bg-primary p-10 text-white rounded-lg">
+<span class="material-symbols-outlined text-4xl mb-6">calendar_month</span>
+<h4 class="text-2xl font-bold mb-4">VIP Appointment</h4>
+<p class="font-light opacity-80 mb-8 leading-relaxed">
+                        Book a private after-hours session at our flagship boutique for an exclusive shopping experience with dedicated staff.
+                    </p>
+<a class="inline-flex items-center gap-2 border-b border-white/40 pb-1 text-sm font-medium hover:border-white transition-colors" href="#">
+                        Book Private Session
+                    </a>
+</div>
+<!-- Contact Details -->
+<div class="space-y-8">
+<h4 class="text-xs uppercase tracking-[0.3em] font-bold border-b border-primary/10 pb-4">Direct Contact</h4>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-primary/40">location_on</span>
+<div>
+<p class="font-bold mb-1">Flagship Boutique</p>
+<p class="text-primary/60 dark:text-white/60 text-sm leading-relaxed">
+                                742 Fifth Avenue, New York<br/>NY 10019, United States
+                            </p>
+</div>
+</div>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-primary/40">call</span>
+<div>
+<p class="font-bold mb-1">Concierge Line</p>
+<p class="text-primary/60 dark:text-white/60 text-sm">
+                                +1 (212) 555-0198
+                            </p>
+</div>
+</div>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-primary/40">mail</span>
+<div>
+<p class="font-bold mb-1">General Inquiries</p>
+<p class="text-primary/60 dark:text-white/60 text-sm">
+                                concierge@lelitestore.com
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Monochrome Map Section -->
+<section class="w-full h-[500px] relative">
+<div class="absolute inset-0 bg-primary/5">
+<!-- Fallback for interactive map representation -->
+<img alt="Map of New York luxury district" class="w-full h-full object-cover monochrome-map opacity-50" data-alt="Monochrome minimalist map of Manhattan luxury district" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpy8NFWDmQ4oVngmEVMiualyphuouyzW9YBBfzOjz81BwDfYGnXNhwbHPlPaZQGPkndW3o_jm12clFBjeySwv5JVkFMrWyWI3i_YCmEb0-Wrc4AqUA4M2REJ8SgA2V9ND47Bw9LKu7x2d7fm-MC8hCbRhWc01EQTgmtFbuQOZ03cvF5CKRzf2nLvHnMK_wBGaT-mjZTm9QeuIPSKMeURJ1ra_F1tSEqh8WbkyoN7Wn-kNgNPwAHSNlTEcGZkU0G37-I8mBxoFym7py"/>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="bg-primary text-white p-6 rounded-lg shadow-2xl flex items-center gap-4">
+<span class="material-symbols-outlined text-3xl">location_on</span>
+<div>
+<p class="text-xs uppercase tracking-widest font-bold">L'Elite Flagship</p>
+<p class="text-sm opacity-80">Fifth Avenue, NY</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-white dark:bg-background-dark py-12 border-t border-primary/5">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-2xl">diamond</span>
+<span class="text-sm font-bold uppercase tracking-widest">L'Elite Luxury</span>
+</div>
+<div class="flex gap-12 text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+<a class="hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="hover:opacity-100 transition-opacity" href="#">Sustainability</a>
+</div>
+<p class="text-[10px] uppercase tracking-widest opacity-40">© 2024 L'Elite Store Group</p>
+</div>
+</footer>
+</main>
+</body></html>

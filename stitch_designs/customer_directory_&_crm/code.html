@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lina Butik - Müşteri Yönetimi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#F5007E", // Pink color from the screenshots
+                        "primary-hover": "#D4006D",
+                        "background-light": "#F8F9FB",
+                        "background-dark": "#1F2937",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#374151",
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#4B5563",
+                        "text-main-light": "#111827",
+                        "text-main-dark": "#F9FAFB",
+                        "text-muted-light": "#6B7280",
+                        "text-muted-dark": "#9CA3AF",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-body antialiased selection:bg-primary selection:text-white">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-shrink-0 flex flex-col transition-colors duration-200">
+<div class="h-20 flex items-center px-6">
+<a class="flex items-center gap-2 text-2xl font-bold text-primary" href="#">
+                    Lina Butik
+                    <span class="material-icons text-xl transform rotate-180">logout</span>
+</a>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+<a class="flex items-center px-4 py-3 text-sm font-medium text-text-main-light dark:text-text-main-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="#">
+<span class="material-icons mr-3 text-gray-500 dark:text-gray-400">home</span>
+                    Hesap Özeti
+                </a>
+<div>
+<button class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-text-main-light dark:text-text-main-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-gray-500 dark:text-gray-400">local_offer</span>
+                            Ürünler
+                        </div>
+<span class="material-icons text-gray-400 text-sm">chevron_right</span>
+</button>
+</div>
+<a class="flex items-center px-4 py-3 text-sm font-medium text-text-main-light dark:text-text-main-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="#">
+<span class="material-icons mr-3 text-gray-500 dark:text-gray-400">shopping_basket</span>
+                    Siparişler
+                </a>
+<a class="flex items-center px-4 py-3 text-sm font-medium bg-pink-50 dark:bg-pink-900/20 text-primary rounded-lg transition-colors" href="#">
+<span class="material-icons mr-3 text-primary">people</span>
+                    Müşteriler
+                </a>
+<div>
+<button class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-text-main-light dark:text-text-main-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-gray-500 dark:text-gray-400">storefront</span>
+                            Dükkan Yönetimi
+                        </div>
+<span class="material-icons text-gray-400 text-sm">chevron_right</span>
+</button>
+</div>
+<div>
+<button class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-text-main-light dark:text-text-main-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-gray-500 dark:text-gray-400">person</span>
+                            Hesap Yönetimi
+                        </div>
+<span class="material-icons text-gray-400 text-sm">chevron_right</span>
+</button>
+</div>
+</nav>
+</aside>
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-8 relative">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+<div>
+<h1 class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">Müşteri Yönetimi</h1>
+<p class="text-sm text-text-muted-light dark:text-text-muted-dark mt-1">Müşteri veritabanınızı görüntüleyin ve yönetin.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center px-4 py-2 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg text-sm font-medium text-text-main-light dark:text-text-main-dark hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">
+<span class="material-icons text-base mr-2">file_download</span>
+                        Dışa Aktar
+                    </button>
+<button class="flex items-center justify-center px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+<span class="material-icons text-base mr-2">add</span>
+                        Yeni Müşteri
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+<h3 class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">Toplam Müşteri</h3>
+<p class="text-3xl font-bold mt-2 text-text-main-light dark:text-text-main-dark">2,543</p>
+<span class="text-xs text-green-500 flex items-center mt-1">
+<span class="material-icons text-xs mr-1">trending_up</span> +12% bu ay
+                    </span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+<h3 class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">Yeni Müşteriler (30 Gün)</h3>
+<p class="text-3xl font-bold mt-2 text-text-main-light dark:text-text-main-dark">128</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+<h3 class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">Aktif Müşteriler</h3>
+<p class="text-3xl font-bold mt-2 text-text-main-light dark:text-text-main-dark">892</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+<h3 class="text-sm font-medium text-text-muted-light dark:text-text-muted-dark">VIP Müşteriler</h3>
+<p class="text-3xl font-bold mt-2 text-primary">45</p>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark mb-6">
+<div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+<div class="relative w-full md:w-96">
+<span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-border-light dark:border-border-dark rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white placeholder-gray-400" placeholder="İsim, e-posta veya telefon ile ara..." type="text"/>
+</div>
+<div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+<select class="px-3 py-2 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg text-sm text-text-main-light dark:text-text-main-dark focus:ring-primary focus:border-primary">
+<option>Tüm Müşteriler</option>
+<option>VIP Müşteriler</option>
+<option>Yeni Üyeler</option>
+<option>Pasif Üyeler</option>
+</select>
+<select class="px-3 py-2 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg text-sm text-text-main-light dark:text-text-main-dark focus:ring-primary focus:border-primary">
+<option>Sırala: Son Aktif</option>
+<option>Sırala: Toplam Harcama</option>
+<option>Sırala: Kayıt Tarihi</option>
+</select>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-gray-50 dark:bg-gray-800 border-b border-border-light dark:border-border-dark">
+<tr>
+<th class="px-6 py-4 font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider text-xs">Müşteri</th>
+<th class="px-6 py-4 font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider text-xs">Durum</th>
+<th class="px-6 py-4 font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider text-xs">Toplam Sipariş</th>
+<th class="px-6 py-4 font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider text-xs">Toplam Harcama</th>
+<th class="px-6 py-4 font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider text-xs">Son Aktif</th>
+<th class="px-6 py-4 font-semibold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider text-xs text-right">İşlemler</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-10 w-10 flex-shrink-0 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center text-primary font-bold">
+                                            AS
+                                        </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Ayşe Solmaz</div>
+<div class="text-xs text-text-muted-light dark:text-text-muted-dark">ayse.solmaz@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        Aktif
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark">
+                                    12
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark font-medium">
+                                    ₺14,250.00
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-muted-light dark:text-text-muted-dark">
+                                    2 saat önce
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary-hover font-semibold hover:underline">Görüntüle</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors bg-pink-50/30 dark:bg-pink-900/10">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-10 w-10 flex-shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-300 font-bold">
+                                            BK
+                                        </div>
+<div class="ml-4">
+<div class="flex items-center gap-2">
+<span class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Burcu Kaya</span>
+<span class="material-icons text-xs text-yellow-500" title="VIP Customer">star</span>
+</div>
+<div class="text-xs text-text-muted-light dark:text-text-muted-dark">burcu.kaya@test.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                                        VIP
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark">
+                                    45
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark font-medium">
+                                    ₺85,400.00
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-muted-light dark:text-text-muted-dark">
+                                    Bugün, 10:30
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary-hover font-semibold hover:underline">Görüntüle</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<img alt="Merve Demir" class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1_c60vx4JKcg7C7ZG-ATiLNNRaPe97LhQPm3VEj26Zh-Je0KOUbhNjb7Jn-tC7-Nr7pstVI_zQrY6jKGlfzfq39lJj5BoZpaonkToYNVyDeNYpn9O_h92Zslh20N42e2RNP4l1BYhSZYuqko6WuHv--4qp-vdMzDZE4OPBbTKvVWqA0Zkac2sdUSCmrP3ll51_Ad0szPtGFl_QpR7CI5g4iduPhqqYFWSzvKATWBDadRhHJBfSxbZam09MLJsfwjrMw6joEsCfMQT"/>
+<div class="ml-4">
+<div class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Merve Demir</div>
+<div class="text-xs text-text-muted-light dark:text-text-muted-dark">merve.d@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                        Yeni
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark">
+                                    1
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark font-medium">
+                                    ₺850.00
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-muted-light dark:text-text-muted-dark">
+                                    Dün
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary-hover font-semibold hover:underline">Görüntüle</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-10 w-10 flex-shrink-0 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 font-bold">
+                                            ZY
+                                        </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Zeynep Yılmaz</div>
+<div class="text-xs text-text-muted-light dark:text-text-muted-dark">zeynep.yilmaz@mail.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                        İnaktif
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark">
+                                    3
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark font-medium">
+                                    ₺2,400.00
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-muted-light dark:text-text-muted-dark">
+                                    25 gün önce
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary-hover font-semibold hover:underline">Görüntüle</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-10 w-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold">
+                                            EO
+                                        </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Elif Öztürk</div>
+<div class="text-xs text-text-muted-light dark:text-text-muted-dark">elif.ozturk@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        Aktif
+                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark">
+                                    8
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-main-light dark:text-text-main-dark font-medium">
+                                    ₺6,750.00
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-text-muted-light dark:text-text-muted-dark">
+                                    3 gün önce
+                                </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary-hover font-semibold hover:underline">Görüntüle</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-border-light dark:border-border-dark flex items-center justify-between bg-white dark:bg-surface-dark">
+<div class="text-sm text-text-muted-light dark:text-text-muted-dark">
+                        Toplam <span class="font-medium text-text-main-light dark:text-text-main-dark">2,543</span> kayıttan <span class="font-medium text-text-main-light dark:text-text-main-dark">1</span> ile <span class="font-medium text-text-main-light dark:text-text-main-dark">5</span> arası gösteriliyor
+                    </div>
+<div class="flex gap-2">
+<button class="px-3 py-1 border border-border-light dark:border-border-dark rounded text-sm text-text-muted-light dark:text-text-muted-dark hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50" disabled="">Önceki</button>
+<button class="px-3 py-1 bg-primary text-white rounded text-sm">1</button>
+<button class="px-3 py-1 border border-border-light dark:border-border-dark rounded text-sm text-text-main-light dark:text-text-main-dark hover:bg-gray-50 dark:hover:bg-gray-700">2</button>
+<button class="px-3 py-1 border border-border-light dark:border-border-dark rounded text-sm text-text-main-light dark:text-text-main-dark hover:bg-gray-50 dark:hover:bg-gray-700">3</button>
+<span class="px-2 py-1 text-gray-400">...</span>
+<button class="px-3 py-1 border border-border-light dark:border-border-dark rounded text-sm text-text-main-light dark:text-text-main-dark hover:bg-gray-50 dark:hover:bg-gray-700">12</button>
+<button class="px-3 py-1 border border-border-light dark:border-border-dark rounded text-sm text-text-main-light dark:text-text-main-dark hover:bg-gray-50 dark:hover:bg-gray-700">Sonraki</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

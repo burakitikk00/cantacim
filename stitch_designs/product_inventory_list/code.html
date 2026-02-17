@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lina Butik - Ürün Listeleme</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ec008c", // Pink from the screenshot
+              "primary-hover": "#d4007d",
+              "background-light": "#f3f4f6", // Light gray background
+              "background-dark": "#111827", // Dark gray background
+              "card-light": "#ffffff",
+              "card-dark": "#1f2937",
+              "text-light": "#374151",
+              "text-dark": "#f9fafb",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.375rem",
+            },
+          },
+        },
+      };
+    </script>
+</head>
+<body class="font-body bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 flex-shrink-0 bg-card-light dark:bg-card-dark border-r border-gray-200 dark:border-gray-700 hidden lg:flex lg:flex-col">
+<div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+<a class="flex items-center text-primary text-xl font-bold tracking-tight" href="#">
+                    Lina Butik <span class="material-icons ml-1 text-sm">login</span>
+</a>
+</div>
+<div class="flex-1 overflow-y-auto py-4">
+<nav class="space-y-1 px-3">
+<a class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white group" href="#">
+<span class="material-icons mr-3 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300">home</span>
+                        Hesap Özeti
+                    </a>
+<div class="space-y-1">
+<button class="bg-gray-50 dark:bg-gray-800 text-primary w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md group focus:outline-none">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-primary">local_offer</span>
+                                Ürünler
+                            </div>
+<span class="material-icons text-gray-400">expand_less</span>
+</button>
+<div class="space-y-1 pl-11">
+<a class="group flex items-center px-3 py-2 text-sm font-medium text-primary rounded-md bg-gray-50 dark:bg-gray-800" href="#">
+                                Ürün Listeleme
+                            </a>
+<a class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 rounded-md hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800" href="#">
+                                Satıştaki Ürünler
+                            </a>
+</div>
+</div>
+<a class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white group" href="#">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300">shopping_basket</span>
+                            Siparişler
+                        </div>
+</a>
+<button class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white group">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300">store</span>
+                            Dükkan Yönetimi
+                        </div>
+<span class="material-icons text-gray-400">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white group">
+<div class="flex items-center">
+<span class="material-icons mr-3 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300">person</span>
+                            Hesap Yönetimi
+                        </div>
+<span class="material-icons text-gray-400">chevron_right</span>
+</button>
+</nav>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<div class="lg:hidden flex items-center justify-between bg-white dark:bg-card-dark border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+<a class="text-primary font-bold text-lg" href="#">Lina Butik</a>
+<button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+<span class="material-icons">menu</span>
+</button>
+</div>
+<main class="flex-1 overflow-y-auto p-6 lg:p-10">
+<div class="max-w-7xl mx-auto">
+<div class="md:flex md:items-center md:justify-between mb-8">
+<div class="flex-1 min-w-0">
+<h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:truncate">
+                                Ürün Listeleme
+                            </h2>
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Mağazanızdaki tüm ürünleri buradan yönetin.
+                            </p>
+</div>
+<div class="mt-4 flex md:mt-0 md:ml-4">
+<button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" type="button">
+<span class="material-icons text-lg mr-2">add</span>
+                                Yeni Ürün Ekle
+                            </button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-lg shadow mb-6 p-4">
+<div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
+<div class="flex-1 max-w-lg">
+<div class="relative rounded-md shadow-sm">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons text-gray-400">search</span>
+</div>
+<input class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white" id="search" name="search" placeholder="Ürün adı, barkod veya kategori ara..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-gray-700 dark:text-white" id="category" name="category">
+<option>Tüm Kategoriler</option>
+<option>Çantalar</option>
+<option>Gözlükler</option>
+<option>Cüzdanlar</option>
+<option>Aksesuarlar</option>
+</select>
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-gray-700 dark:text-white" id="status" name="status">
+<option>Tüm Durumlar</option>
+<option>Aktif</option>
+<option>Pasif</option>
+<option>Stokta Yok</option>
+</select>
+<button class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" type="button">
+<span class="material-icons text-sm mr-1">filter_list</span>
+                                    Filtrele
+                                </button>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark shadow overflow-hidden sm:rounded-lg">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16" scope="col">
+                                            Görsel
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                            Ürün Adı
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                            Kategori
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                            Stok
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                            Fiyat
+                                        </th>
+<th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                            Durum
+                                        </th>
+<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                            İşlemler
+                                        </th>
+</tr>
+</thead>
+<tbody class="bg-white dark:bg-card-dark divide-y divide-gray-200 dark:divide-gray-700">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Hermes Çanta" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG0-DIxE1HUh9GD1MjgtEE8_1mx2ZezaOHASp5jvs5ya36fcfwJ8vqnCtyWOggJXLTnymmIuJWq2Abq2AdudkWRYff1P020iYQNyRooA55rLaT8ROCn-EtNxHuCsVVUPARgvhvzGKhbz5h8uJ8N9vx7nOr6bS0Uaox65vHDPMpRbuteduVei62w2MQDDPo1UedftkA9tHL8L-LEWoSWMXQ1Akn-PZXMPdpRqLhzF7g8yN3VZZr7xjNmmbi1vTjJDC5MyXvZlxOSX5C"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Hermes Çanta</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: HM-001</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Çantalar
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                                0
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺1.200,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle1" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle1"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Miu Miu El Çantası" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKYfGe_thhCQg3LLEgay-LlxP9CNYyzkVHBksn0Ql1Y2b6z3cNPMBYg9Jo0Mn7_ihh33b_2GXyIfWRHdv53uvMcvyelKx9WlpTkLQPWxkQC9vYEPh6dvfP-6eCoFf4femM9egcBQn0hh2lK57Rs0H7kY11te7GnouTrF919savSMSuViikp_eCgHAOZAPAWIvf3PgrF2QWc5dpPdPThMgKO3rmHkh7GeNTpc4EZ1z7aNLEKp_abnDlihz_uuiUr1wek4whu5zFDywk"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Miu Miu El ve Omuz Çantası</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: MM-024</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Çantalar
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                25
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺850,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle2" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle2"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Versace Çanta" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiO5ghhQdYO36FBs7tPRcPf1JjnreeiNORH_N3Qwq-4PjkCCYXaiaY-8W1w_D1aiSOtPZ5mscbowZQ1Mmje68HMlY7b92siJ92MMziR8MQHiC0RFNDS4yd3jjDYLL0KzkbkgMcilBwdOqDqqk0RVYMV4uY0-ziJ7xw0BZuLy087TPfMaEP8-ZVlfNl50S_T4-jvhK3Y_owXJgpGLuFVDEmcNmX6YW6DnnTlp6h5lQf3xTaKjcR-UeJxONa9-Azpl7EV6tj6MjD36T1"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Versace El ve Omuz Çantası</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: VR-101</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Çantalar
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                25
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺1.200,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle3" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle3"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Miu Miu Gözlük" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJVVtCuyLVQBX2O4J_V-Doi_6MJGD47Z4sZqIxUjS8Wn-IbTyO17q0yT2z6aGhYDihTvFVJ8ejy-Tb88vpmlRifl6rzEZHIboYlpOjB-d6XJQlE9xX57Vzb08aZv4X26hoV7y8zgYlehJXeSrQEP_2RPmwBn0FTHr45ZPky7q1v_5Adsrzux6CQUTdOd68q1LTagrd__OzbWdvJEJGEtWToylFmv0GqtHb8CBtavswSW9PGeTjqH--4RokI8fVPNxzv27ujC9S1g4h"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Miu Miu Güneş Gözlüğü</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: MM-G05</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Gözlükler
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                                5
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺850,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle4" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle4"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Vakko Cüzdan" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgu6ZePnKAEu_mzffDQIlWKch8gFibOKxOP8Gh7X1jfIabzDc12d6cKDhWMYQqAFbbaWKEh78BU4wKk0TOI1az9tdJ2ph1S4NCD_N-4En2g3pVpO02YL2UXLiTiDs9kw7rjQoSG3UJ2R4wd29QCiZdQ6wEEfmtlHQ3BRFfdNUEdpGoEiNYT8vJ1v0b8TcowOoK9pWdgMF75Yd-S5rbauLUZGek3HlNRpDWLRU10jU_Revqv9GG28jDf9NBeFXq0aPwCp1QnL7mydeb"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Vakko Cüzdan</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: VK-C01</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Cüzdanlar
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                25
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺850,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle5" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle5"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Coach Çanta" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDK7EH_xT0Kos3ZzDPWyPVeX9PKJYUKpyBiuzmMKz1-nCgMPM1XBFt48ljLvhgAWI87ME0aOqdLsTyuWxJ48rHRwGCN7XysDLQJxULps_U6FEjJhrT-rPthSksL6c-EV_MfXh8WE08zuh6G3LN2EhMiH3FHZqsHjkWvqxVfwPReCz-CQKwfC2jWANypGgauk6jU-PnQLJ5q7MOEayiM6B3Km4GQsa4FwUU8hkM68b9BetVSksSsWSUQw8YMhkJy2Ol3oJzCEJJrL0A"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Coach El ve Omuz Çantası</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: CH-088</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Çantalar
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                25
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺1.200,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle6" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle6"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Prada Çanta" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD677hwY6x_y17gKuTHyeStWnriMLTXnNfn4Bxa9EZ-dUfjE7nBI1U6s3Yewn0cHiaaZqLrLVqe5edBmErt_BUBTEYFQl_xUJ6Hkt23uFTemHdtMDLJ52HkNvSo5Q7K_J6pPrfAWWvh5ZeObteLeSjqXWe8Le4nPHd75si50efoRrXd6ZCcJ3fumGo5ORIilQKqiXuvVuMXu3lDpy7xKsHCjRu7RgNxcNrfJXSeFpirpB0zGpKNTXPWlw3Xh9o-weTgpK8M2dlUrQj_"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Prada El ve Omuz Çantası</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: PR-042</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Çantalar
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                25
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺1.200,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle7" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle7"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<img alt="Gucci Gözlük" class="h-12 w-12 rounded object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJACVyJu68PqP7NTCrOv4MTJpQrv36f20UI2R4WxIvSrTlUm2hCHSsELfdPn_BHK1VsAzXcy18U-zrQYIyaux053dqRjWK16viKdfSk9RavGbyFdi-A_bDpEJsvgyrgLZ0xW5C5lMsWvoh2q46sBm94OCSIlI8tMqOH_igKr9aivT8i6B-GKZNiQy-gCrkGsMPyZVoFzUdVPCNBBh6q9az56FctWNOG1mmmcwucrgM0Er11WQSXNBDGnRWm4c1OtVUA80YA5TZr6-W"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Gucci Güneş Gözlüğü</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">SKU: GC-G89</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            Gözlükler
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                25
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono">
+                                            ₺850,00
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-primary" id="toggle8" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer checked:bg-primary" for="toggle8"></label>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-2"><span class="material-icons text-base">edit</span></button>
+<button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><span class="material-icons text-base">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-white dark:bg-card-dark px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+<div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-gray-700 dark:text-gray-400">
+                                        Toplam <span class="font-medium">42</span> kayıttan <span class="font-medium">1</span> ile <span class="font-medium">8</span> arası gösteriliyor
+                                    </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+<a class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" href="#">
+<span class="sr-only">Önceki</span>
+<span class="material-icons text-sm">chevron_left</span>
+</a>
+<a aria-current="page" class="z-10 bg-primary border-primary text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">
+                                            1
+                                        </a>
+<a class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">
+                                            2
+                                        </a>
+<a class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">
+                                            3
+                                        </a>
+<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            ...
+                                        </span>
+<a class="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">
+                                            6
+                                        </a>
+<a class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" href="#">
+<span class="sr-only">Sonraki</span>
+<span class="material-icons text-sm">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<style>.toggle-checkbox:checked {
+            right: 0;
+            border-color: #ec008c;}
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ec008c;}
+        .toggle-checkbox {
+            right: auto;
+            left: 0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3rem;
+        }
+    </style>
+
+</body></html>
