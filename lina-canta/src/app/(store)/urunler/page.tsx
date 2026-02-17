@@ -9,13 +9,18 @@ export default async function ProductsPage({
 }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const { cat } = await searchParams;
+    const { cat, page } = await searchParams;
     const categorySlug = typeof cat === "string" ? cat : undefined;
+    const currentPage = typeof page === "string" ? parseInt(page) : 1;
+    const itemsPerPage = 25;
 
     const where: any = { isActive: true };
     if (categorySlug) {
         where.category = { slug: categorySlug };
     }
+
+    const totalItems = await db.product.count({ where });
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     const products = await db.product.findMany({
         where,
@@ -26,6 +31,8 @@ export default async function ProductsPage({
         orderBy: {
             createdAt: "desc",
         },
+        skip: (currentPage - 1) * itemsPerPage,
+        take: itemsPerPage,
     });
 
     const categories = await db.category.findMany({
@@ -54,7 +61,7 @@ export default async function ProductsPage({
                                 : "Özel Koleksiyon"}
                         </h2>
                         <p className="text-primary/40 mt-2 text-sm">
-                            Toplam {products.length} benzersiz parça listeleniyor.
+                            Toplam {totalItems} içerisinden {products.length} ürün listeleniyor.
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
@@ -74,7 +81,7 @@ export default async function ProductsPage({
             <div className="flex flex-col lg:flex-row gap-12">
                 {/* Left Sidebar: Filters */}
                 <aside className="w-full lg:w-64 flex-shrink-0 space-y-8 border-r border-primary/5 pr-8 hidden lg:block">
-                    {/* Filter Group: Kategoriler (Design uses Brand, we use Categories as primary filter for now) */}
+                    {/* Filter Group: Kategoriler */}
                     <div>
                         <button className="flex w-full items-center justify-between py-2 text-xs font-bold uppercase tracking-widest border-b border-primary/10">
                             KATEGORİLER
@@ -140,61 +147,110 @@ export default async function ProductsPage({
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
-                            {products.map((product) => (
-                                <Link
-                                    key={product.id}
-                                    href={`/urunler/${product.slug}`}
-                                    className="product-card group cursor-pointer block"
-                                >
-                                    <div className="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
-                                        {product.images[0] ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img
-                                                src={product.images[0]}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-primary/20">
-                                                <span className="material-symbols-outlined text-4xl">image</span>
-                                            </div>
-                                        )}
-                                        <button className="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm opacity-0 group-hover:opacity-100">
-                                            <span className="material-symbols-outlined text-[20px]">favorite</span>
-                                        </button>
-                                        <div className="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out">
-                                            <button className="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">
-                                                Hızlı Bakış
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="mt-6 space-y-1.5 text-center px-2">
-                                        <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">
-                                            {product.category.name}
-                                        </h3>
-                                        <p className="text-[15px] font-normal text-primary line-clamp-1">
-                                            {product.name}
-                                        </p>
-                                        <p className="text-[16px] font-bold text-primary">
-                                            {formatPrice(Number(product.basePrice))}
-                                        </p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
+                                {products.map((product) => {
+                                    // Use main image or fallback to any variant's image
+                                    const displayImage = product.images[0] || product.variants.find(v => v.image)?.image;
 
-                    {/* Load More Section (Static for now) */}
-                    {products.length > 0 && (
-                        <div className="mt-24 flex flex-col items-center gap-6">
-                            <p className="text-xs text-primary/40 uppercase tracking-widest">
-                                Görüntülenen Ürün: {products.length} / {products.length}
-                            </p>
-                            <div className="w-full max-w-[400px] h-[1px] bg-primary/10 relative">
-                                <div className="absolute left-0 top-0 h-full bg-primary w-full"></div>
+                                    return (
+                                        <Link
+                                            key={product.id}
+                                            href={`/urunler/${product.slug}`}
+                                            className="product-card group cursor-pointer block"
+                                        >
+                                            <div className="relative aspect-[3/4] overflow-hidden bg-background-light rounded-lg">
+                                                {displayImage ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img
+                                                        src={displayImage}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-primary/20 bg-gray-50">
+                                                        <span className="material-symbols-outlined text-4xl">image</span>
+                                                    </div>
+                                                )}
+                                                <button className="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm opacity-0 group-hover:opacity-100">
+                                                    <span className="material-symbols-outlined text-[20px]">favorite</span>
+                                                </button>
+                                                <div className="quick-view absolute inset-x-4 bottom-4 opacity-0 transform translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out">
+                                                    <button className="w-full bg-white py-3 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-primary hover:text-white transition-all rounded">
+                                                        Hızlı Bakış
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="mt-6 space-y-1.5 text-center px-2">
+                                                <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary/50">
+                                                    {product.category.name}
+                                                </h3>
+                                                <p className="text-[15px] font-normal text-primary line-clamp-1">
+                                                    {product.name}
+                                                </p>
+                                                <p className="text-[16px] font-bold text-primary">
+                                                    {formatPrice(Number(product.basePrice))}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
                             </div>
-                        </div>
+
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div className="mt-16 flex justify-center items-center gap-2">
+                                    {currentPage > 1 && (
+                                        <Link
+                                            href={`/urunler?${new URLSearchParams({
+                                                ...(categorySlug ? { cat: categorySlug } : {}),
+                                                page: (currentPage - 1).toString(),
+                                            })}`}
+                                            className="w-10 h-10 flex items-center justify-center rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-white transition-colors"
+                                        >
+                                            <span className="material-symbols-outlined text-sm">chevron_left</span>
+                                        </Link>
+                                    )}
+
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
+                                        // Simple pagination logic: show all for now, or could limit if many pages
+                                        // For now showing all pages up to a reasonable amount or simple logic
+                                        if (totalPages > 7 && Math.abs(p - currentPage) > 2 && p !== 1 && p !== totalPages) {
+                                            if (Math.abs(p - currentPage) === 3) return <span key={p} className="text-primary/40">...</span>;
+                                            return null;
+                                        }
+
+                                        return (
+                                            <Link
+                                                key={p}
+                                                href={`/urunler?${new URLSearchParams({
+                                                    ...(categorySlug ? { cat: categorySlug } : {}),
+                                                    page: p.toString(),
+                                                })}`}
+                                                className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${currentPage === p
+                                                    ? "bg-primary text-white border border-primary"
+                                                    : "border border-primary/20 text-primary hover:bg-primary/5"
+                                                    }`}
+                                            >
+                                                {p}
+                                            </Link>
+                                        );
+                                    })}
+
+                                    {currentPage < totalPages && (
+                                        <Link
+                                            href={`/urunler?${new URLSearchParams({
+                                                ...(categorySlug ? { cat: categorySlug } : {}),
+                                                page: (currentPage + 1).toString(),
+                                            })}`}
+                                            className="w-10 h-10 flex items-center justify-center rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-white transition-colors"
+                                        >
+                                            <span className="material-symbols-outlined text-sm">chevron_right</span>
+                                        </Link>
+                                    )}
+                                </div>
+                            )}
+                        </>
                     )}
                 </section>
             </div>
