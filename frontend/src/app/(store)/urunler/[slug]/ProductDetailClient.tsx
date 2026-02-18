@@ -104,9 +104,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     const isOutOfStock = selectedVariant ? selectedVariant.stock === 0 : false;
 
     return (
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="max-w-7xl mx-auto px-6 pt-28 md:pt-32 pb-16">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-widest mb-12">
+            <nav className="flex flex-wrap items-center gap-1 md:gap-2 text-[10px] md:text-xs font-medium text-gray-400 uppercase tracking-normal md:tracking-widest mb-6 md:mb-12">
                 <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
                 <span className="material-symbols-outlined text-xs">chevron_right</span>
                 <Link href="/urunler" className="hover:text-primary transition-colors">Çantalar</Link>
@@ -116,11 +116,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <span className="text-primary">{product.name}</span>
             </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-5xl mx-auto">
                 {/* Left Column: Image Gallery */}
-                <div className="lg:col-span-7 flex gap-6 h-fit lg:sticky lg:top-28">
+                <div className="flex gap-6 h-fit lg:sticky lg:top-28">
                     {/* Thumbnails */}
-                    <div className="flex flex-col gap-4 w-20 shrink-0 no-scrollbar overflow-y-auto max-h-[700px]">
+                    <div className="flex flex-col gap-4 w-16 shrink-0 no-scrollbar overflow-y-auto max-h-[500px]">
                         {displayImages.map((img, i) => (
                             <div
                                 key={i}
@@ -137,7 +137,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     </div>
 
                     {/* Main Image */}
-                    <div className="flex-1 aspect-[3/4] bg-[#f9fafb] rounded-xl overflow-hidden group">
+                    <div className="flex-1 aspect-[3/4] max-h-[600px] bg-[#f9fafb] rounded-xl overflow-hidden group">
                         <img
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -147,10 +147,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </div>
 
                 {/* Right Column: Product Info */}
-                <div className="lg:col-span-5 space-y-10">
-                    <div className="space-y-4">
-                        <h2 className="text-sm font-semibold tracking-[0.2em] text-gray-500 uppercase">{product.category.name}</h2>
-                        <h1 className="text-4xl font-bold tracking-tight text-primary">{product.name}</h1>
+                <div className="space-y-8 md:space-y-10">
+                    <div className="space-y-3 md:space-y-4">
+                        <h2 className="text-[10px] md:text-sm font-semibold tracking-[0.2em] text-gray-500 uppercase">{product.category.name}</h2>
+                        <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-primary leading-tight">{product.name}</h1>
                         <div className="flex items-center gap-4">
                             <div className="flex text-primary">
                                 {[1, 2, 3, 4].map((i) => (
@@ -158,7 +158,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 ))}
                                 <span className="material-symbols-outlined text-lg">star_half</span>
                             </div>
-                            <span className="text-sm font-medium text-gray-400 underline underline-offset-4 cursor-pointer">48 Değerlendirme</span>
+                            <span className="text-[11px] md:text-sm font-medium text-gray-400 underline underline-offset-4 cursor-pointer whitespace-nowrap">48 Değerlendirme</span>
                             <div className="h-4 w-px bg-gray-200"></div>
                             {isOutOfStock ? (
                                 <span className="text-xs font-bold text-red-600 uppercase tracking-widest">Tükendi</span>
@@ -166,12 +166,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 <span className="text-xs font-bold text-green-600 uppercase tracking-widest">Stokta</span>
                             )}
                         </div>
-                        <div className="pt-4 flex items-center gap-4">
+                        <div className="pt-2 md:pt-4 flex items-center gap-4">
                             <div className="flex flex-col">
-                                <span className="text-3xl font-bold text-primary">{formatPrice(Number(currentPrice) * 0.8)}</span>
-                                <span className="text-sm text-gray-400 line-through">{formatPrice(Number(currentPrice))}</span>
+                                <span className="text-2xl md:text-3xl font-bold text-primary">{formatPrice(Number(currentPrice) * 0.8)}</span>
+                                <span className="text-xs md:text-sm text-gray-400 line-through">{formatPrice(Number(currentPrice))}</span>
                             </div>
-                            <span className="text-xs font-bold text-red-600 uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                            <span className="text-[10px] md:text-xs font-bold text-red-600 uppercase tracking-widest bg-red-50 px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg border border-red-100">
                                 %20 İndirim Fırsatı
                             </span>
                         </div>
@@ -214,7 +214,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                                     <button
                                                         key={val.slug}
                                                         onClick={() => handleAttributeSelect(attrName, val.slug)}
-                                                        className={`py-3 border text-xs font-bold rounded-lg transition-all ${isSelected
+                                                        className={`py-2.5 md:py-3 border text-[11px] md:text-xs font-bold rounded-lg transition-all ${isSelected
                                                             ? "border-primary bg-primary text-white"
                                                             : "border-gray-200 hover:border-gray-400 text-gray-400"}`}
                                                     >
@@ -230,16 +230,16 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex gap-3 md:gap-4 pt-2 md:pt-4">
                         <button
                             disabled={isOutOfStock}
-                            className="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 bg-primary text-white h-14 md:h-16 rounded-lg font-bold uppercase tracking-widest text-[11px] md:text-sm hover:bg-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <span className="material-symbols-outlined text-xl">shopping_bag</span>
+                            <span className="material-symbols-outlined text-lg md:text-xl">shopping_bag</span>
                             {isOutOfStock ? "Tükendi" : "Sepete Ekle"}
                         </button>
-                        <button className="size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
-                            <span className="material-symbols-outlined text-2xl">favorite</span>
+                        <button className="size-14 md:size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
+                            <span className="material-symbols-outlined text-xl md:text-2xl">favorite</span>
                         </button>
                     </div>
 
@@ -293,33 +293,33 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         </button>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
                     {RELATED.map((r, i) => (
-                        <div key={i} className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md cursor-pointer">
+                        <div key={i} className="group relative flex flex-col overflow-hidden rounded-lg md:rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md cursor-pointer">
                             <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">
                                 <img
                                     alt={r.name}
                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     src={r.img}
                                 />
-                                <button className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500">
-                                    <span className="material-symbols-outlined fill text-lg">favorite</span>
+                                <button className="absolute right-2 top-2 md:right-3 md:top-3 flex h-7 w-7 md:h-9 md:w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500">
+                                    <span className="material-symbols-outlined fill text-base md:text-lg">favorite</span>
                                 </button>
                             </div>
-                            <div className="flex flex-1 flex-col p-4">
-                                <div className="mb-2">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary/40 text-gray-400">{r.brand}</p>
-                                    <h4 className="text-sm font-semibold">{r.name}</h4>
+                            <div className="flex flex-1 flex-col p-2.5 md:p-4">
+                                <div className="mb-1 md:mb-2">
+                                    <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest text-primary/40 text-gray-400">{r.brand}</p>
+                                    <h4 className="text-[11px] md:text-sm font-semibold line-clamp-1">{r.name}</h4>
                                 </div>
-                                <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-base font-bold text-gray-900">{r.price}</span>
+                                <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-primary/5 pt-2.5 md:pt-4 gap-1 sm:gap-0">
+                                    <div className="flex items-center gap-1.5 md:gap-2">
+                                        <span className="text-xs md:text-base font-bold text-gray-900">{r.price}</span>
                                         {r.oldPrice && (
-                                            <span className="text-xs text-gray-400 line-through">{r.oldPrice}</span>
+                                            <span className="text-[9px] md:text-xs text-gray-400 line-through">{r.oldPrice}</span>
                                         )}
                                     </div>
                                     {r.discount && (
-                                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                        <span className="text-[8px] md:text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-1.5 py-0.5 md:px-2 md:py-1 rounded">
                                             {r.discount}
                                         </span>
                                     )}
