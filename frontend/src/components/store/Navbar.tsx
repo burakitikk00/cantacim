@@ -50,7 +50,7 @@ export default function Navbar() {
                         <span className="material-symbols-outlined">person</span>
                     </Link>
 
-                    <Link href="/hesap/favoriler" className="hover:opacity-60 transition-opacity relative">
+                    <Link href="/hesap/favorilerim" className="hover:opacity-60 transition-opacity relative">
                         <span className="material-symbols-outlined">favorite</span>
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                             2

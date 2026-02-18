@@ -41,7 +41,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         db.product.count()
     ]);
 
-    const products = serializeData(productsData);
+    const products = JSON.parse(JSON.stringify(productsData));
     const totalPages = Math.ceil(totalCount / pageSize);
 
     return (

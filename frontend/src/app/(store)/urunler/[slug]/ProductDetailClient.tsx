@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 
@@ -49,6 +49,8 @@ const COLOR_MAP: Record<string, string> = {
     "Bej": "#F5F5DC",
     "Tan": "#C19A6B",
     "Bordo": "#800000",
+    "Lacivert": "#000080",
+    "Krem": "#FFFDD0"
 };
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
@@ -56,10 +58,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
 
-    // Group variants by attributes to build selectors
-    // This is a simplified approach. Dealing with complex variant combinations (e.g. Color + Size) requires more logic.
-    // For now, let's assume we extract all unique attributes and values available for this product.
-
+    // Group variants by attributes
     const allAttributes = product.variants.reduce((acc, variant) => {
         variant.attributes.forEach((attr) => {
             const attrName = attr.attribute.name;
@@ -70,6 +69,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 acc[attrName].push(attr.attributeValue);
             }
         });
+        // Sort values (optional)
         return acc;
     }, {} as Record<string, { value: string; slug: string }[]>);
 
@@ -95,70 +95,76 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     // Determine current display values
     const currentPrice = selectedVariant ? selectedVariant.price : product.basePrice;
 
-    // Combine product images and non-duplicate variant images
+    // Combine product images and unique variant images
     const variantImages = product.variants.map(v => v.image).filter((img): img is string => !!img && !product.images.includes(img));
     const uniqueVariantImages = Array.from(new Set(variantImages));
     const displayImages = [...product.images, ...uniqueVariantImages];
 
-    // If a variant is selected and has an image, we might want to override mainImage
     const mainImage = selectedVariant?.image || displayImages[selectedImgIndex] || "/placeholder.jpg";
+    const isOutOfStock = selectedVariant ? selectedVariant.stock === 0 : false;
 
     return (
-        <main className="max-w-7xl mx-auto px-6 pt-28 pb-8">
+        <main className="max-w-7xl mx-auto px-6 py-8">
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-widest mb-12">
-                <Link href="/" className="hover:text-primary transition-colors">Anasayfa</Link>
+                <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
                 <span className="material-symbols-outlined text-xs">chevron_right</span>
-                <Link href="/urunler" className="hover:text-primary transition-colors">Koleksiyon</Link>
+                <Link href="/urunler" className="hover:text-primary transition-colors">Çantalar</Link>
                 <span className="material-symbols-outlined text-xs">chevron_right</span>
                 <Link href={`/urunler?cat=${product.category.slug}`} className="hover:text-primary transition-colors">{product.category.name}</Link>
-                <span className="material-symbols-outlined text-xs">chevron_right</span>
+                <span className="material-symbols-outlined text-xs text-primary/30">chevron_right</span>
                 <span className="text-primary">{product.name}</span>
             </nav>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-                {/* Image Gallery */}
-                <div className="lg:col-span-7 flex gap-6 h-fit">
+                {/* Left Column: Image Gallery */}
+                <div className="lg:col-span-7 flex gap-6 h-fit lg:sticky lg:top-28">
                     {/* Thumbnails */}
-                    <div className="flex flex-col gap-4 w-20 shrink-0 max-h-[600px] lg:max-h-[800px] overflow-y-auto no-scrollbar pb-4 pr-1">
+                    <div className="flex flex-col gap-4 w-20 shrink-0 no-scrollbar overflow-y-auto max-h-[700px]">
                         {displayImages.map((img, i) => (
-                            <button
+                            <div
                                 key={i}
                                 onClick={() => setSelectedImgIndex(i)}
-                                className={`aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden cursor-pointer transition-all shrink-0 ${selectedImgIndex === i ? "ring-1 ring-primary" : "hover:ring-1 hover:ring-gray-300"}`}
+                                className={`aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden cursor-pointer transition-all ${selectedImgIndex === i ? "ring-1 ring-primary" : "hover:ring-1 hover:ring-gray-300"}`}
                             >
-                                <img alt={`View ${i + 1}`} className="w-full h-full object-cover" src={img} />
-                            </button>
+                                <img
+                                    alt={`${product.name} thumbnail ${i + 1}`}
+                                    className="w-full h-full object-cover"
+                                    src={img}
+                                />
+                            </div>
                         ))}
                     </div>
+
                     {/* Main Image */}
-                    <div className="flex-1 aspect-[3/4] bg-[#f9fafb] rounded-xl overflow-hidden group relative">
-                        {mainImage ? (
-                            <img alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" src={mainImage} />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-200">
-                                <span className="material-symbols-outlined text-6xl">image</span>
-                            </div>
-                        )}
+                    <div className="flex-1 aspect-[3/4] bg-[#f9fafb] rounded-xl overflow-hidden group">
+                        <img
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            src={mainImage}
+                        />
                     </div>
                 </div>
 
-                {/* Product Info */}
+                {/* Right Column: Product Info */}
                 <div className="lg:col-span-5 space-y-10">
                     <div className="space-y-4">
                         <h2 className="text-sm font-semibold tracking-[0.2em] text-gray-500 uppercase">{product.category.name}</h2>
                         <h1 className="text-4xl font-bold tracking-tight text-primary">{product.name}</h1>
                         <div className="flex items-center gap-4">
-                            {/* Rating/Reviews placeholder */}
                             <div className="flex text-primary">
-                                {[1, 2, 3, 4].map(i => <span key={i} className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>)}
+                                {[1, 2, 3, 4].map((i) => (
+                                    <span key={i} className="material-symbols-outlined fill-icon text-lg">star</span>
+                                ))}
                                 <span className="material-symbols-outlined text-lg">star_half</span>
                             </div>
                             <span className="text-sm font-medium text-gray-400 underline underline-offset-4 cursor-pointer">48 Değerlendirme</span>
-                            <div className="h-4 w-px bg-gray-200" />
-                            <span className="text-xs font-bold text-green-600 uppercase tracking-widest">
-                                {selectedVariant ? (selectedVariant.stock > 0 ? "Stokta" : "Tükendi") : "Stokta"}
-                            </span>
+                            <div className="h-4 w-px bg-gray-200"></div>
+                            {isOutOfStock ? (
+                                <span className="text-xs font-bold text-red-600 uppercase tracking-widest">Tükendi</span>
+                            ) : (
+                                <span className="text-xs font-bold text-green-600 uppercase tracking-widest">Stokta</span>
+                            )}
                         </div>
                         <div className="pt-4">
                             <span className="text-3xl font-bold text-primary">{formatPrice(Number(currentPrice))}</span>
@@ -171,38 +177,47 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             <div key={attrName}>
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="text-xs font-bold uppercase tracking-widest text-primary">
-                                        {attrName} Seçin: <span className="text-gray-500 font-normal">{selectedAttributes[attrName] || "Seçiniz"}</span>
+                                        {attrName}: <span className="text-gray-500 font-normal">{selectedAttributes[attrName] || "Seçiniz"}</span>
                                     </span>
+                                    {/* Optional Size Guide if needed */}
+                                    {/* <button className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">Beden Tablosu</button> */}
                                 </div>
-                                <div className="flex flex-wrap gap-4">
-                                    {values.map((val) => {
-                                        const isSelected = selectedAttributes[attrName] === val.slug;
-                                        if (attrName.toLowerCase() === "renk") {
-                                            const hex = COLOR_MAP[val.value] || "#CCCCCC";
-                                            return (
-                                                <button
-                                                    key={val.slug}
-                                                    onClick={() => handleAttributeSelect(attrName, val.slug)}
-                                                    title={val.value}
-                                                    className={`size-10 rounded-full border-2 transition-all p-0.5 ${isSelected ? "border-primary" : "border-gray-200 hover:border-gray-400"}`}
-                                                >
-                                                    <div className="w-full h-full rounded-full" style={{ backgroundColor: hex }} />
-                                                </button>
-                                            );
-                                        }
-                                        return (
-                                            <button
-                                                key={val.slug}
-                                                onClick={() => handleAttributeSelect(attrName, val.slug)}
-                                                className={`py-3 px-6 border text-xs font-bold rounded-lg transition-all ${isSelected
-                                                    ? "border-primary bg-primary text-white"
-                                                    : "border-gray-200 hover:border-gray-400 text-gray-600"
-                                                    }`}
-                                            >
-                                                {val.value}
-                                            </button>
-                                        );
-                                    })}
+                                <div className="flex flex-wrap gap-3">
+                                    {attrName.toLowerCase().includes("renk") ? (
+                                        <div className="flex gap-4">
+                                            {values.map((val) => {
+                                                const hex = COLOR_MAP[val.value] || "#CCCCCC";
+                                                const isSelected = selectedAttributes[attrName] === val.slug;
+                                                return (
+                                                    <button
+                                                        key={val.slug}
+                                                        onClick={() => handleAttributeSelect(attrName, val.slug)}
+                                                        className={`size-10 rounded-full border-2 p-0.5 transition-all ${isSelected ? "border-primary" : "border-gray-200 hover:border-gray-400"}`}
+                                                    >
+                                                        <div className="w-full h-full rounded-full" style={{ backgroundColor: hex }}></div>
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    ) : (
+                                        // Standard buttons for other attributes (Size, etc)
+                                        <div className="grid grid-cols-4 gap-3 w-full">
+                                            {values.map((val) => {
+                                                const isSelected = selectedAttributes[attrName] === val.slug;
+                                                return (
+                                                    <button
+                                                        key={val.slug}
+                                                        onClick={() => handleAttributeSelect(attrName, val.slug)}
+                                                        className={`py-3 border text-xs font-bold rounded-lg transition-all ${isSelected
+                                                            ? "border-primary bg-primary text-white"
+                                                            : "border-gray-200 hover:border-gray-400 text-gray-400"}`}
+                                                    >
+                                                        {val.value}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -211,58 +226,91 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     {/* Actions */}
                     <div className="flex gap-4 pt-4">
                         <button
+                            disabled={isOutOfStock}
                             className="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={selectedVariant?.stock === 0}
                         >
                             <span className="material-symbols-outlined text-xl">shopping_bag</span>
-                            {selectedVariant?.stock === 0 ? "Tükendi" : "Sepete Ekle"}
+                            {isOutOfStock ? "Tükendi" : "Sepete Ekle"}
                         </button>
                         <button className="size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
                             <span className="material-symbols-outlined text-2xl">favorite</span>
                         </button>
                     </div>
 
-                    {/* Description & Details */}
+                    {/* Accordions */}
                     <div className="pt-8 space-y-px">
                         <details className="group border-t border-gray-100" open>
                             <summary className="flex justify-between items-center py-6 cursor-pointer list-none">
-                                <span className="text-xs font-bold uppercase tracking-widest">Ürün Detayları</span>
+                                <span className="text-xs font-bold uppercase tracking-widest">Ürün Açıklaması</span>
                                 <span className="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
                             </summary>
-                            <div className="pb-8 text-sm leading-relaxed text-gray-600" dangerouslySetInnerHTML={{ __html: product.description || "" }}></div>
+                            <div
+                                className="pb-8 text-sm leading-relaxed text-gray-600"
+                                dangerouslySetInnerHTML={{ __html: product.description || "Açıklama bulunmuyor." }}
+                            />
                         </details>
-                        {/* Static placeholders for now, could be dynamic later */}
                         <details className="group border-t border-gray-100">
                             <summary className="flex justify-between items-center py-6 cursor-pointer list-none">
-                                <span className="text-xs font-bold uppercase tracking-widest">Kargo &amp; İade</span>
+                                <span className="text-xs font-bold uppercase tracking-widest">Materyal & Bakım</span>
                                 <span className="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
                             </summary>
-                            <div className="pb-8 text-sm leading-relaxed text-gray-600">Ücretsiz kargo ve 14 gün içinde iade garantisi.</div>
+                            <div className="pb-8 text-sm leading-relaxed text-gray-600">
+                                Profesyonel deri temizliği önerilir. Doğrudan güneş ışığına ve neme maruz bırakmayınız.
+                            </div>
+                        </details>
+                        <details className="group border-t border-b border-gray-100">
+                            <summary className="flex justify-between items-center py-6 cursor-pointer list-none">
+                                <span className="text-xs font-bold uppercase tracking-widest">Teslimat & İade</span>
+                                <span className="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div className="pb-8 text-sm leading-relaxed text-gray-600">
+                                5.000₺ üzeri siparişlerde ücretsiz kargo. 14 gün içinde koşulsuz iade hakkı.
+                            </div>
                         </details>
                     </div>
                 </div>
             </div>
 
+            {/* You May Also Like Section */}
             <section className="mt-32 pt-20 border-t border-gray-100">
                 <div className="flex justify-between items-end mb-12">
                     <div className="space-y-2">
                         <h3 className="text-2xl font-bold tracking-tight">Stili Tamamla</h3>
                         <p className="text-sm text-gray-500">Tarzınızı tamamlayacak özenle seçilmiş parçalar.</p>
                     </div>
+                    <div className="flex gap-2">
+                        <button className="size-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all">
+                            <span className="material-symbols-outlined text-lg">chevron_left</span>
+                        </button>
+                        <button className="size-10 rounded-full border border-primary flex items-center justify-center bg-primary text-white hover:bg-black transition-all">
+                            <span className="material-symbols-outlined text-lg">chevron_right</span>
+                        </button>
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    {RELATED.map((r) => (
-                        <div key={r.name} className="group cursor-pointer">
-                            <div className="aspect-[3/4] bg-gray-50 rounded-xl overflow-hidden mb-4 relative">
-                                <img alt={r.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src={r.img} />
-                                <button className="absolute bottom-4 right-4 size-10 bg-white rounded-lg shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
-                                    <span className="material-symbols-outlined text-xl">add</span>
+                    {RELATED.map((r, i) => (
+                        <div key={i} className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md cursor-pointer">
+                            <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">
+                                <img
+                                    alt={r.name}
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    src={r.img}
+                                />
+                                <button className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500">
+                                    <span className="material-symbols-outlined fill text-lg">favorite</span>
                                 </button>
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{r.brand}</p>
-                                <h4 className="text-sm font-semibold group-hover:underline">{r.name}</h4>
-                                <p className="text-sm font-medium text-gray-900">{r.price}</p>
+                            <div className="flex flex-1 flex-col p-4">
+                                <div className="mb-2">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary/40 text-gray-400">{r.brand}</p>
+                                    <h4 className="text-sm font-semibold">{r.name}</h4>
+                                </div>
+                                <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
+                                    <span className="text-base font-bold text-gray-900">{r.price}</span>
+                                    <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
+                                        Sepete Ekle
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

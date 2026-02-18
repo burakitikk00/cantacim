@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import { deleteProduct } from "./actions";
@@ -90,9 +90,8 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                                 const hasVariants = product.variants.length > 0;
 
                                 return (
-                                    <>
+                                    <Fragment key={product.id}>
                                         <tr
-                                            key={product.id}
                                             className={`transition-colors group ${isExpanded ? "bg-gray-50" : "hover:bg-gray-50/80"
                                                 }`}
                                         >
@@ -220,99 +219,95 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody className="divide-y divide-gray-50">
-                                                                    {product.variants.map((variant) => (
-                                                                        <tr key={variant.id} className="hover:bg-gray-50/50">
-                                                                            <td className="px-4 py-2 text-gray-600 font-mono text-xs">{variant.sku}</td>
-                                                                            <td className="px-4 py-2 text-gray-900">
-                                                                                <div className="flex gap-2">
-                                                                                    {(() => {
-                                                                                        // Try to extract attributes
-                                                                                        const colorAttr = variant.attributes.find(a => a.attributeValue.attribute.name === "Renk");
-                                                                                        const sizeAttr = variant.attributes.find(a => a.attributeValue.attribute.name === "Beden");
+                                                                    {product.variants.map((variant) => {
+                                                                        // Try to extract attributes
+                                                                        const colorAttr = variant.attributes.find(a => a.attributeValue.attribute.name === "Renk");
+                                                                        const sizeAttr = variant.attributes.find(a => a.attributeValue.attribute.name === "Beden");
 
-                                                                                        let color = colorAttr?.attributeValue.value;
-                                                                                        let size = sizeAttr?.attributeValue.value;
+                                                                        let color = colorAttr?.attributeValue.value;
+                                                                        let size = sizeAttr?.attributeValue.value;
 
-                                                                                        // Enhanced list of common colors in Turkish
-                                                                                        const commonColors = [
-                                                                                            "Siyah", "Beyaz", "Kırmızı", "Mavi", "Yeşil", "Pembe",
-                                                                                            "Altın", "Gold", "Gümüş", "Silver", "Gri", "Bej",
-                                                                                            "Lacivert", "Bordo", "Kahve", "Kahverengi", "Turuncu",
-                                                                                            "Sarı", "Mor", "Krem", "Vizon", "Taba", "Haki",
-                                                                                            "Pudra", "Lila", "Mercan", "Turkuaz", "Fuşya", "Somon",
-                                                                                            "Hardal", "Kiremit", "Petrol", "Antrasit", "Bronz", "Bakır"
-                                                                                        ];
+                                                                        // Enhanced list of common colors in Turkish
+                                                                        const commonColors = [
+                                                                            "Siyah", "Beyaz", "Kırmızı", "Mavi", "Yeşil", "Pembe",
+                                                                            "Altın", "Gold", "Gümüş", "Silver", "Gri", "Bej",
+                                                                            "Lacivert", "Bordo", "Kahve", "Kahverengi", "Turuncu",
+                                                                            "Sarı", "Mor", "Krem", "Vizon", "Taba", "Haki",
+                                                                            "Pudra", "Lila", "Mercan", "Turkuaz", "Fuşya", "Somon",
+                                                                            "Hardal", "Kiremit", "Petrol", "Antrasit", "Bronz", "Bakır"
+                                                                        ];
 
-                                                                                        // Fallback to SKU parsing if missing
-                                                                                        if (!color && !size && variant.sku) {
-                                                                                            const parts = variant.sku.split('-');
-                                                                                            if (parts.length > 1) {
-                                                                                                const foundColor = commonColors.find(c => variant.sku.toLowerCase().includes(c.toLowerCase()));
-                                                                                                if (foundColor) color = foundColor;
-                                                                                            }
-                                                                                        }
+                                                                        // Fallback to SKU parsing if missing
+                                                                        if (!color && !size && variant.sku) {
+                                                                            const parts = variant.sku.split('-');
+                                                                            if (parts.length > 1) {
+                                                                                const foundColor = commonColors.find(c => variant.sku.toLowerCase().includes(c.toLowerCase()));
+                                                                                if (foundColor) color = foundColor;
+                                                                            }
+                                                                        }
 
-                                                                                        // Clean up "Renk" suffix if present
-                                                                                        if (color && color.toLowerCase().endsWith(" renk")) {
-                                                                                            color = color.substring(0, color.length - 5).trim();
-                                                                                            color = color.charAt(0).toUpperCase() + color.slice(1);
-                                                                                        }
+                                                                        // Clean up "Renk" suffix if present
+                                                                        if (color && color.toLowerCase().endsWith(" renk")) {
+                                                                            color = color.substring(0, color.length - 5).trim();
+                                                                            color = color.charAt(0).toUpperCase() + color.slice(1);
+                                                                        }
 
-                                                                                        // Color style mapping
-                                                                                        const getColorStyle = (c: string) => {
-                                                                                            if (!c) return "bg-gray-100 text-gray-800 border-gray-200";
-                                                                                            const normalized = c.toLowerCase()
-                                                                                                .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c");
+                                                                        // Color style mapping
+                                                                        const getColorStyle = (c: string) => {
+                                                                            if (!c) return "bg-gray-100 text-gray-800 border-gray-200";
+                                                                            const normalized = c.toLowerCase()
+                                                                                .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c");
 
-                                                                                            if (normalized.includes("siyah")) return "bg-gray-900 text-white border-gray-700";
-                                                                                            if (normalized.includes("beyaz")) return "bg-white text-gray-900 border-gray-300 shadow-sm";
-                                                                                            if (normalized.includes("kirmizi") || normalized.includes("bordo")) return "bg-red-100 text-red-800 border-red-200";
-                                                                                            if (normalized.includes("mavi") || normalized.includes("lacivert") || normalized.includes("turkuaz") || normalized.includes("petrol")) return "bg-blue-100 text-blue-800 border-blue-200";
-                                                                                            if (normalized.includes("yesil") || normalized.includes("haki") || normalized.includes("zumbut")) return "bg-green-100 text-green-800 border-green-200";
-                                                                                            if (normalized.includes("sari") || normalized.includes("altin") || normalized.includes("gold") || normalized.includes("hardal")) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-                                                                                            if (normalized.includes("turuncu") || normalized.includes("kiremit") || normalized.includes("somon") || normalized.includes("mercan") || normalized.includes("bakir") || normalized.includes("taba")) return "bg-orange-100 text-orange-800 border-orange-200";
-                                                                                            if (normalized.includes("mor") || normalized.includes("lila") || normalized.includes("fusya")) return "bg-purple-100 text-purple-800 border-purple-200";
-                                                                                            if (normalized.includes("pembe") || normalized.includes("pudra")) return "bg-pink-100 text-pink-800 border-pink-200";
-                                                                                            if (normalized.includes("gri") || normalized.includes("gumus") || normalized.includes("silver") || normalized.includes("antrasit")) return "bg-gray-200 text-gray-800 border-gray-300";
-                                                                                            if (normalized.includes("kahve") || normalized.includes("vizon") || normalized.includes("bej") || normalized.includes("krem") || normalized.includes("bronz")) return "bg-[#D7CCC8] text-[#5D4037] border-[#BCAAA4]";
+                                                                            if (normalized.includes("siyah")) return "bg-gray-900 text-white border-gray-700";
+                                                                            if (normalized.includes("beyaz")) return "bg-white text-gray-900 border-gray-300 shadow-sm";
+                                                                            if (normalized.includes("kirmizi") || normalized.includes("bordo")) return "bg-red-100 text-red-800 border-red-200";
+                                                                            if (normalized.includes("mavi") || normalized.includes("lacivert") || normalized.includes("turkuaz") || normalized.includes("petrol")) return "bg-blue-100 text-blue-800 border-blue-200";
+                                                                            if (normalized.includes("yesil") || normalized.includes("haki") || normalized.includes("zumbut")) return "bg-green-100 text-green-800 border-green-200";
+                                                                            if (normalized.includes("sari") || normalized.includes("altin") || normalized.includes("gold") || normalized.includes("hardal")) return "bg-yellow-100 text-yellow-800 border-yellow-200";
+                                                                            if (normalized.includes("turuncu") || normalized.includes("kiremit") || normalized.includes("somon") || normalized.includes("mercan") || normalized.includes("bakir") || normalized.includes("taba")) return "bg-orange-100 text-orange-800 border-orange-200";
+                                                                            if (normalized.includes("mor") || normalized.includes("lila") || normalized.includes("fusya")) return "bg-purple-100 text-purple-800 border-purple-200";
+                                                                            if (normalized.includes("pembe") || normalized.includes("pudra")) return "bg-pink-100 text-pink-800 border-pink-200";
+                                                                            if (normalized.includes("gri") || normalized.includes("gumus") || normalized.includes("silver") || normalized.includes("antrasit")) return "bg-gray-200 text-gray-800 border-gray-300";
+                                                                            if (normalized.includes("kahve") || normalized.includes("vizon") || normalized.includes("bej") || normalized.includes("krem") || normalized.includes("bronz")) return "bg-[#D7CCC8] text-[#5D4037] border-[#BCAAA4]";
 
-                                                                                            return "bg-gray-100 text-gray-800 border-gray-200";
-                                                                                        };
+                                                                            return "bg-gray-100 text-gray-800 border-gray-200";
+                                                                        };
 
-                                                                                        const colorStyle = color ? getColorStyle(color) : "";
+                                                                        const colorStyle = color ? getColorStyle(color) : "";
 
-                                                                                        return (
-                                                                                            <>
-                                                                                                {color && (
-                                                                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs border ${colorStyle}`}>
-                                                                                                        <span className="opacity-70 mr-1.5 font-normal">Renk:</span>
-                                                                                                        {color}
-                                                                                                    </span>
-                                                                                                )}
-                                                                                                {size && (
-                                                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-600 border border-gray-200 font-medium">
-                                                                                                        <span className="opacity-50 mr-1">Beden:</span>
-                                                                                                        {size}
-                                                                                                    </span>
-                                                                                                )}
-                                                                                                {!color && !size && variant.sku}
-                                                                                            </>
-                                                                                        );
-                                                                                    })()}
-                                                                                </div>
-                                                                            </td>
-                                                                            <td className="px-4 py-2 text-right text-gray-900 font-medium">
-                                                                                {formatPrice(Number(variant.price))}
-                                                                            </td>
-                                                                            <td className="px-4 py-2 text-right">
-                                                                                {variant.stock > 0 ? (
-                                                                                    <span className="text-emerald-600 font-medium text-xs">{variant.stock} Adet</span>
-                                                                                ) : (
-                                                                                    <span className="text-red-500 font-medium text-xs">Tükendi</span>
-                                                                                )}
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))}
+                                                                        return (
+                                                                            <tr key={variant.id} className="hover:bg-gray-50/50">
+                                                                                <td className="px-4 py-2 text-gray-600 font-mono text-xs">{variant.sku}</td>
+                                                                                <td className="px-4 py-2 text-gray-900">
+                                                                                    <div className="flex gap-2">
+                                                                                        {color && (
+                                                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs border ${colorStyle}`}>
+                                                                                                <span className="opacity-70 mr-1.5 font-normal">Renk:</span>
+                                                                                                {color}
+                                                                                            </span>
+                                                                                        )}
+                                                                                        {size && (
+                                                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-50 text-gray-600 border border-gray-200 font-medium">
+                                                                                                <span className="opacity-50 mr-1">Beden:</span>
+                                                                                                {size}
+                                                                                            </span>
+                                                                                        )}
+                                                                                        {!color && !size && variant.sku}
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="px-4 py-2 text-right text-gray-900 font-medium">
+                                                                                    {formatPrice(Number(variant.price))}
+                                                                                </td>
+                                                                                <td className="px-4 py-2 text-right">
+                                                                                    {variant.stock > 0 ? (
+                                                                                        <span className="text-emerald-600 font-medium text-xs">{variant.stock} Adet</span>
+                                                                                    ) : (
+                                                                                        <span className="text-red-500 font-medium text-xs">Tükendi</span>
+                                                                                    )}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    })}
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -320,7 +315,7 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                                                 </td>
                                             </tr>
                                         )}
-                                    </>
+                                    </Fragment>
                                 );
                             })
                         )}

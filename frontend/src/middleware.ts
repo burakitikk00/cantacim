@@ -36,8 +36,8 @@ export async function middleware(request: NextRequest) {
 
     /* ── Rate Limit ── */
     if (pathname.startsWith("/api/auth") && request.method === "POST") {
-        if (!rateLimit(ip, 5, 15 * 60 * 1000)) {
-            return addSecurityHeaders(NextResponse.json({ error: "Çok fazla deneme. 15 dakika bekleyin." }, { status: 429 }));
+        if (!rateLimit(ip, 20, 15 * 60 * 1000)) {
+            return addSecurityHeaders(NextResponse.json({ error: "Çok fazla deneme yaptınız. Güvenliğiniz için 15 dakika bekledikten sonra tekrar deneyiniz." }, { status: 429 }));
         }
     } else if (pathname.startsWith("/api/")) {
         if (!rateLimit(ip, 100, 60 * 1000)) {

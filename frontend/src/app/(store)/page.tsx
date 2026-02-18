@@ -74,17 +74,28 @@ export default function HomePage() {
                     </div>
                     <div className="flex gap-8 overflow-x-auto hide-scrollbar pb-8">
                         {PRODUCTS.map((p) => (
-                            <div key={p.name} className="product-card min-w-[320px] group cursor-pointer">
-                                <div className="relative aspect-[4/5] bg-white overflow-hidden mb-4">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img alt={p.name} className="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" src={p.img} />
-                                    <button className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-primary text-xs font-bold px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap">
-                                        HIZLI EKLE
-                                    </button>
+                            <div key={p.name} className="min-w-[320px]">
+                                <div className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md cursor-pointer h-full">
+                                    <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img alt={p.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src={p.img} />
+                                        <button className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 duration-300">
+                                            <span className="material-symbols-outlined fill text-lg">favorite</span>
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-1 flex-col p-4">
+                                        <div className="mb-2">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-primary/40 text-gray-400">{p.brand}</p>
+                                            <h3 className="text-sm font-semibold text-primary line-clamp-1">{p.name}</h3>
+                                        </div>
+                                        <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
+                                            <span className="text-base font-bold text-gray-900">{p.price}</span>
+                                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
+                                                Sepete Ekle
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p className="text-xs text-primary/40 font-bold tracking-widest mb-1">{p.brand}</p>
-                                <h3 className="font-medium mb-1">{p.name}</h3>
-                                <p className="text-sm font-bold">{p.price}</p>
                             </div>
                         ))}
                     </div>
