@@ -231,13 +231,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
                     {/* Actions */}
                     <div className="flex gap-4 pt-4">
-                        <Link
-                            href="/iletisim"
-                            className="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2"
+                        <button
+                            disabled={isOutOfStock}
+                            className="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <span className="material-symbols-outlined text-xl">chat</span>
-                            İletişime Geçin
-                        </Link>
+                            <span className="material-symbols-outlined text-xl">shopping_bag</span>
+                            {isOutOfStock ? "Tükendi" : "Sepete Ekle"}
+                        </button>
                         <button className="size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
                             <span className="material-symbols-outlined text-2xl">favorite</span>
                         </button>
