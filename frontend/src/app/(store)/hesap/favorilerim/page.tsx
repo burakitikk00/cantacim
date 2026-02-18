@@ -39,10 +39,13 @@ export default function FavoritesPage() {
                             <h3 className="text-sm font-semibold">Birkin 30 Lüks Deri</h3>
                         </div>
                         <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                            <span className="text-base font-bold">85.000 ₺</span>
-                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                Sepete Ekle
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <span className="text-base font-bold text-gray-900">68.000 ₺</span>
+                                <span className="text-xs text-gray-400 line-through">85.000 ₺</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                %20 İndirim
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -66,10 +69,13 @@ export default function FavoritesPage() {
                             <h3 className="text-sm font-semibold">Klasik Flap Kuzu Derisi</h3>
                         </div>
                         <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                            <span className="text-base font-bold">120.000 ₺</span>
-                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                Sepete Ekle
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <span className="text-base font-bold text-gray-900">80.000 ₺</span>
+                                <span className="text-xs text-gray-400 line-through">120.000 ₺</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                3 Al 2 Öde
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -94,9 +100,7 @@ export default function FavoritesPage() {
                         </div>
                         <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
                             <span className="text-base font-bold">12.500 ₺</span>
-                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                Sepete Ekle
-                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -121,9 +125,7 @@ export default function FavoritesPage() {
                         </div>
                         <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
                             <span className="text-base font-bold">95.000 ₺</span>
-                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                Sepete Ekle
-                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -147,10 +149,13 @@ export default function FavoritesPage() {
                             <h3 className="text-sm font-semibold">Capucines BB Bag</h3>
                         </div>
                         <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                            <span className="text-base font-bold">112.000 ₺</span>
-                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                Sepete Ekle
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <span className="text-base font-bold text-gray-900">100.800 ₺</span>
+                                <span className="text-xs text-gray-400 line-through">112.000 ₺</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                Sepette %10
+                            </span>
                         </div>
                     </div>
                 </div>

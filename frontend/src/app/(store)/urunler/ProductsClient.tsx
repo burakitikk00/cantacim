@@ -13,6 +13,8 @@ interface Product {
     images: string[];
     category: { name: string; slug: string };
     variants: any[];
+    discountText?: string;
+    discountedPrice?: string; // Add this
 }
 
 interface Category {
@@ -390,13 +392,21 @@ export default function ProductsClient({
                                         <h3 className="text-sm font-semibold text-primary line-clamp-1">{product.name}</h3>
                                     </div>
                                     <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                                        <span className="text-base font-bold text-gray-900">{formatPrice(Number(product.basePrice))}</span>
-                                        <button
-                                            onClick={(e) => { e.preventDefault(); /* Add to cart logic */ }}
-                                            className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90"
-                                        >
-                                            Sepete Ekle
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-base font-bold text-gray-900">
+                                                {product.discountedPrice ? formatPrice(Number(product.discountedPrice)) : formatPrice(Number(product.basePrice))}
+                                            </span>
+                                            {product.discountedPrice && (
+                                                <span className="text-xs text-gray-400 line-through">
+                                                    {formatPrice(Number(product.basePrice))}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {product.discountText && (
+                                            <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                                {product.discountText}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </Link>

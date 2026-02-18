@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const PRODUCTS = [
-    { brand: "GUCCI", name: "Dionysus Mini Leather Bag", price: "24.500 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBwBQX8dRVkHZ2H1Gfv7OOzQm8AniVNCTWyGGjmrhY5nyRBLiBl1PMYRyFn-UfwsWbz-1WS38JCZpe53K_LGIheaxyU-6ariFK_I_u0UTgWpn_S_e7IwOhDjlu9GCdJ6DYkUSuevOvoPSFxdCmPqnd0Uyq1WoNC7fQHP5DbWraSxEpcP8hOTFIlsdQpKVT2YWG_ibtMmHgJiHJHVftQdvyCJMy4OZWaJsO6fITfMKWi1VYaU_cYYLso3ioFmpz13WEC5js5dR6KwW9g" },
-    { brand: "PRADA", name: "Cleo Brushed Leather Bag", price: "32.200 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAoVYCq_L_oyrOJVM7ehReMLap1cIDDN-ddjp1hUKO1NHHKODVGlfrV8EoXN0FL6uCH4MEfrXiMHjIEU-8BSSDvF2Qce1gsMyrtBI0jRBSqamSuVd82GFPz7A0H4B7-PoNdK2nuLVt8VZ4F6b6e4oregePiUS83Q1M1JJoR0brou6AfHv54C5A6z_C47L7R9cEeimQsG7WaCN0fMBCw1BIy9O5ISMOJa0svkxl7GxCVtqJAJwk2ilQpE7d0apl8qTxslRS2j8FQx5e5" },
+    { brand: "GUCCI", name: "Dionysus Mini Leather Bag", price: "22.050 TL", oldPrice: "24.500 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBwBQX8dRVkHZ2H1Gfv7OOzQm8AniVNCTWyGGjmrhY5nyRBLiBl1PMYRyFn-UfwsWbz-1WS38JCZpe53K_LGIheaxyU-6ariFK_I_u0UTgWpn_S_e7IwOhDjlu9GCdJ6DYkUSuevOvoPSFxdCmPqnd0Uyq1WoNC7fQHP5DbWraSxEpcP8hOTFIlsdQpKVT2YWG_ibtMmHgJiHJHVftQdvyCJMy4OZWaJsO6fITfMKWi1VYaU_cYYLso3ioFmpz13WEC5js5dR6KwW9g", discount: "%10 İndirim" },
+    { brand: "PRADA", name: "Cleo Brushed Leather Bag", price: "21.460 TL", oldPrice: "32.200 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAoVYCq_L_oyrOJVM7ehReMLap1cIDDN-ddjp1hUKO1NHHKODVGlfrV8EoXN0FL6uCH4MEfrXiMHjIEU-8BSSDvF2Qce1gsMyrtBI0jRBSqamSuVd82GFPz7A0H4B7-PoNdK2nuLVt8VZ4F6b6e4oregePiUS83Q1M1JJoR0brou6AfHv54C5A6z_C47L7R9cEeimQsG7WaCN0fMBCw1BIy9O5ISMOJa0svkxl7GxCVtqJAJwk2ilQpE7d0apl8qTxslRS2j8FQx5e5", discount: "3 Al 2 Öde" },
     { brand: "HERMES", name: "Carré 90 Silk Scarf", price: "12.800 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuApoaX37g9c3rJvioT88La0HMWzLAFoA1gm7Y4_BCkNh86jXKQF_Wctm4ckuJSCjNCmoHGp6apydz5IQsoc3TRYAY52bX5aI1iOTAXlUnPjlu32dzyiIPhM4sHBph7Zsb1IGinTg3nnvtbsoHs98f_WfVNAqe8kvTuQwKPyuM7COIRrNKuvcWIByaAt-9-Kmobl1UQP0hAp_gFl5018IZyzciAMT2NYL5fwzUv7WAggBTddVCIlHItDWVT8ZdU20gUNjOnUDJlS0yYL" },
-    { brand: "SAINT LAURENT", name: "Loulou Medium Bag", price: "45.000 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnUsTKCO1TbwzbHR1ulJ_-pFNwTB43brmxykrNtuP29ysJcpIN4oNyC8XfVNQA1seLX-hW4GlvW0s7I7gO0KzTlgzYJBVjIKtqaMTy-brSlFCrG5rlMLL2dVym3ILSH2uUjxa6Ht0Md_j23ePBCchKhAnjoQi3Jht-vuGIO_O6OmimVdZ0uQANWWTOHIrvguzwWWlkYYM0zTg-6eSuo9oRyC4nbASg1agoI2HCo7TY0A1gAiBij0eO66zEuglXXvaScCWn6CtJU7jn" },
+    { brand: "SAINT LAURENT", name: "Loulou Medium Bag", price: "38.250 TL", oldPrice: "45.000 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnUsTKCO1TbwzbHR1ulJ_-pFNwTB43brmxykrNtuP29ysJcpIN4oNyC8XfVNQA1seLX-hW4GlvW0s7I7gO0KzTlgzYJBVjIKtqaMTy-brSlFCrG5rlMLL2dVym3ILSH2uUjxa6Ht0Md_j23ePBCchKhAnjoQi3Jht-vuGIO_O6OmimVdZ0uQANWWTOHIrvguzwWWlkYYM0zTg-6eSuo9oRyC4nbASg1agoI2HCo7TY0A1gAiBij0eO66zEuglXXvaScCWn6CtJU7jn", discount: "Sepette %15" },
 ];
 
 const CATEGORIES = [
@@ -89,10 +89,17 @@ export default function HomePage() {
                                             <h3 className="text-sm font-semibold text-primary line-clamp-1">{p.name}</h3>
                                         </div>
                                         <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                                            <span className="text-base font-bold text-gray-900">{p.price}</span>
-                                            <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                                Sepete Ekle
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-base font-bold text-gray-900">{p.price}</span>
+                                                {p.oldPrice && (
+                                                    <span className="text-xs text-gray-400 line-through">{p.oldPrice}</span>
+                                                )}
+                                            </div>
+                                            {p.discount && (
+                                                <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                                    {p.discount}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

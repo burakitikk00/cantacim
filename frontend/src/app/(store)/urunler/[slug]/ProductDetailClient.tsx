@@ -30,10 +30,10 @@ interface ProductDetailClientProps {
 }
 
 const RELATED = [
-    { brand: "Saint Laurent", name: "Leather Card Case", price: "₺9.800", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1f8Dpms9DHynDNhbSgwsUb_3RwhVdq_V60H73R0aLjVya3KYUFs_2ls8ujsJ77NGvfCMlqnmVfeNQYZ8krGg3EaRZVs6gsdMhtKe89zFqwcvACwguLsqoVLBQRcqz6dWcYcfMJwVpOq6KdkYME1MfFcYFNQ8W6eGM3sibYAyshr-sflexynGFB1iafhZgjmCRrBlKtKxZyP4MPNA9XSKJfEwXGe5_r7IhUsXOplwh1KUG8vy_EkCkiSLl5UqHbeRqrXGBBd1Il838" },
-    { brand: "Saint Laurent", name: "Monogram Phone Case", price: "₺12.400", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCh3sCIeGlMAnDJ4DrPS6znDbaz6kiaNxSx7me98wK6Wb_0L4aHNd2m2W9KMXthVfmlwIcbEv3Q4ds7pFeUGO71xyqLRRQM9pwrUiu5jlQzWP3M1-uBrLgbFLR-d7Ds8yx8MxV8xXiaaVcRQM0RPVl_Mma1ER0GK3XNPa-7Hb15qK2yVXkJtHddltQQhbJymeip2XrwQhUO1jY1CWGpZ4SXOmAkEGd6i5ZOAAdj9ugh1RBZoPtWvB2j0cy2p-NmrdnCWDqubF5wlCIP" },
+    { brand: "Saint Laurent", name: "Leather Card Case", price: "₺8.820", oldPrice: "₺9.800", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1f8Dpms9DHynDNhbSgwsUb_3RwhVdq_V60H73R0aLjVya3KYUFs_2ls8ujsJ77NGvfCMlqnmVfeNQYZ8krGg3EaRZVs6gsdMhtKe89zFqwcvACwguLsqoVLBQRcqz6dWcYcfMJwVpOq6KdkYME1MfFcYFNQ8W6eGM3sibYAyshr-sflexynGFB1iafhZgjmCRrBlKtKxZyP4MPNA9XSKJfEwXGe5_r7IhUsXOplwh1KUG8vy_EkCkiSLl5UqHbeRqrXGBBd1Il838", discount: "%10 İndirim" },
+    { brand: "Saint Laurent", name: "Monogram Phone Case", price: "₺8.260", oldPrice: "₺12.400", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCh3sCIeGlMAnDJ4DrPS6znDbaz6kiaNxSx7me98wK6Wb_0L4aHNd2m2W9KMXthVfmlwIcbEv3Q4ds7pFeUGO71xyqLRRQM9pwrUiu5jlQzWP3M1-uBrLgbFLR-d7Ds8yx8MxV8xXiaaVcRQM0RPVl_Mma1ER0GK3XNPa-7Hb15qK2yVXkJtHddltQQhbJymeip2XrwQhUO1jY1CWGpZ4SXOmAkEGd6i5ZOAAdj9ugh1RBZoPtWvB2j0cy2p-NmrdnCWDqubF5wlCIP", discount: "3 Al 2 Öde" },
     { brand: "Saint Laurent", name: "SL 276 Cat-Eye", price: "₺14.200", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD0PesV603qtPymgmSWtIkSEfRErJUUe9oBtrM-wpHzSuLuh0HJvOVswK6uKWU9Sl-w6Mz9EcW36cHiWOXJos3N0dHbIwIe8lkW-Z_XdgwAMswFqWpddToyYCdJMyXnaO08wR9dsE7ZUqOiHxDxd4EQTiDXsEoUG-YU-lSjDJ3tNM6Gosz4lXeA9mGJynAdSRauNgO5jG71hH7VvNts1pAuNtIhcKuNePzHf932233Aapq-HekoD8MK3UGDGxwLbMRQz4bZo6h43tC" },
-    { brand: "Saint Laurent", name: "Opyum Leather Pumps", price: "₺34.500", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhKCVfLkeIakmDGjF8TwU23Ac72q9M8Ol74q4CN6ZU5Q8pv68uzsbq2PPqWrpSXbOLIlaFBboJE82bI7qZL8XuwvRwHhiLcSM0kMbRKau-BjPvZH1QHaYMvI4NtqvUKWAvbBzVAG2CZ1ylRXRinr7Oa-ISeeDTpmmL4lP7ByFJGbwrujLijj2MnZzTOl7LIoBwdnuLLWxC9jVTcD6-dKQOTVBGL7-4K3xMZWDvg1iiNeGpy8bevWA7af9oCFaN54voQzsJv7nthiOs" },
+    { brand: "Saint Laurent", name: "Opyum Leather Pumps", price: "₺29.325", oldPrice: "₺34.500", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhKCVfLkeIakmDGjF8TwU23Ac72q9M8Ol74q4CN6ZU5Q8pv68uzsbq2PPqWrpSXbOLIlaFBboJE82bI7qZL8XuwvRwHhiLcSM0kMbRKau-BjPvZH1QHaYMvI4NtqvUKWAvbBzVAG2CZ1ylRXRinr7Oa-ISeeDTpmmL4lP7ByFJGbwrujLijj2MnZzTOl7LIoBwdnuLLWxC9jVTcD6-dKQOTVBGL7-4K3xMZWDvg1iiNeGpy8bevWA7af9oCFaN54voQzsJv7nthiOs", discount: "Sepette %15" },
 ];
 
 const COLOR_MAP: Record<string, string> = {
@@ -166,8 +166,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 <span className="text-xs font-bold text-green-600 uppercase tracking-widest">Stokta</span>
                             )}
                         </div>
-                        <div className="pt-4">
-                            <span className="text-3xl font-bold text-primary">{formatPrice(Number(currentPrice))}</span>
+                        <div className="pt-4 flex items-center gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-3xl font-bold text-primary">{formatPrice(Number(currentPrice) * 0.8)}</span>
+                                <span className="text-sm text-gray-400 line-through">{formatPrice(Number(currentPrice))}</span>
+                            </div>
+                            <span className="text-xs font-bold text-red-600 uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                                %20 İndirim Fırsatı
+                            </span>
                         </div>
                     </div>
 
@@ -225,13 +231,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
                     {/* Actions */}
                     <div className="flex gap-4 pt-4">
-                        <button
-                            disabled={isOutOfStock}
-                            className="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        <Link
+                            href="/iletisim"
+                            className="flex-1 bg-primary text-white h-16 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors flex items-center justify-center gap-2"
                         >
-                            <span className="material-symbols-outlined text-xl">shopping_bag</span>
-                            {isOutOfStock ? "Tükendi" : "Sepete Ekle"}
-                        </button>
+                            <span className="material-symbols-outlined text-xl">chat</span>
+                            İletişime Geçin
+                        </Link>
                         <button className="size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
                             <span className="material-symbols-outlined text-2xl">favorite</span>
                         </button>
@@ -306,10 +312,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                     <h4 className="text-sm font-semibold">{r.name}</h4>
                                 </div>
                                 <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                                    <span className="text-base font-bold text-gray-900">{r.price}</span>
-                                    <button className="flex h-9 items-center justify-center rounded bg-primary px-4 text-xs font-bold text-white transition-opacity hover:opacity-90">
-                                        Sepete Ekle
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-base font-bold text-gray-900">{r.price}</span>
+                                        {r.oldPrice && (
+                                            <span className="text-xs text-gray-400 line-through">{r.oldPrice}</span>
+                                        )}
+                                    </div>
+                                    {r.discount && (
+                                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
+                                            {r.discount}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>
