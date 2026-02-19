@@ -2,9 +2,21 @@
 
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import AuthSidebar from "../auth/AuthSidebar";
 
 export default function Navbar() {
     const count = useCartStore((s) => s.items.length);
+    const { status } = useSession();
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+    const handleAuthAction = (e: React.MouseEvent) => {
+        if (status === "unauthenticated") {
+            e.preventDefault();
+            setIsAuthOpen(true);
+        }
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary/5 glass-header">
@@ -46,18 +58,30 @@ export default function Navbar() {
                         <span className="material-symbols-outlined absolute left-2 pointer-events-none text-xl">search</span>
                     </div>
 
-                    <Link href="/hesap" className="hover:opacity-60 transition-opacity">
+                    <Link
+                        href="/hesap"
+                        onClick={handleAuthAction}
+                        className="hover:opacity-60 transition-opacity"
+                    >
                         <span className="material-symbols-outlined">person</span>
                     </Link>
 
-                    <Link href="/hesap/favorilerim" className="hover:opacity-60 transition-opacity relative">
+                    <Link
+                        href="/hesap/favorilerim"
+                        onClick={handleAuthAction}
+                        className="hover:opacity-60 transition-opacity relative"
+                    >
                         <span className="material-symbols-outlined">favorite</span>
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                             2
                         </span>
                     </Link>
 
-                    <Link href="/sepet" className="hover:opacity-60 transition-opacity relative">
+                    <Link
+                        href="/sepet"
+                        onClick={handleAuthAction}
+                        className="hover:opacity-60 transition-opacity relative"
+                    >
                         <span className="material-symbols-outlined">shopping_bag</span>
                         {count > 0 && (
                             <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
@@ -67,6 +91,7 @@ export default function Navbar() {
                     </Link>
                 </div>
             </div>
+            <AuthSidebar isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
         </header>
     );
 }

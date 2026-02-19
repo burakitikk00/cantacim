@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface AddressData {
     id?: string;
@@ -22,13 +22,15 @@ interface AddressFormProps {
 
 export function AddressForm({ initialData, mode }: AddressFormProps) {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
 
     const handleSubmit = async (formData: FormData) => {
         // Here you would typically call a server action to save/update the address
         startTransition(async () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            router.push("/hesap/adreslerim");
+            const returnUrl = searchParams.get("returnUrl");
+            router.push(returnUrl || "/hesap/adreslerim");
         });
     };
 

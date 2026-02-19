@@ -1,8 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { AddressForm } from "@/components/profile/AddressForm";
 
 export default function NewAddressPage() {
-    return <AddressForm mode="create" />;
+    return (
+        <Suspense>
+            <AddressForm mode="create" />
+        </Suspense>
+    );
 }

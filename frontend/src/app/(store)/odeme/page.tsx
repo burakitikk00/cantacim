@@ -3,10 +3,74 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+const MOCK_ADDRESSES = [
+    {
+        id: 1,
+        title: "Ev Adresim",
+        address: "Harbiye Mah. Abdi İpekçi Cad. No:12/4",
+        district: "Nişantaşı, Şişli",
+        city: "34367 İstanbul, Türkiye",
+        phone: "+90 532 *** 45 67"
+    },
+    {
+        id: 2,
+        title: "İş Adresi",
+        address: "Büyükdere Cad. No:199 Levent Loft",
+        district: "Levent, Beşiktaş",
+        city: "34394 İstanbul, Türkiye",
+        phone: "+90 212 *** 88 00"
+    },
+    {
+        id: 3,
+        title: "Yazlık",
+        address: "Yat Limanı Sok. No:5",
+        district: "Bodrum, Muğla",
+        city: "48400 Muğla, Türkiye",
+        phone: "+90 532 *** 11 22"
+    },
+    {
+        id: 4,
+        title: "Aile Evi",
+        address: "Bağdat Cad. No:100",
+        district: "Kadıköy, İstanbul",
+        city: "34728 İstanbul, Türkiye",
+        phone: "+90 533 *** 99 88"
+    }
+];
 
 export default function PaymentPage() {
+    const router = useRouter();
     const [selectedShipping, setSelectedShipping] = useState("express");
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
+    const [isFlipped, setIsFlipped] = useState(false);
+    const [selectedAddressId, setSelectedAddressId] = useState(1);
+    const [addresses, setAddresses] = useState(MOCK_ADDRESSES);
+    const [isAddressExpanded, setIsAddressExpanded] = useState(false);
+
+    const handleCompleteOrder = () => {
+        router.push(`/odeme/onay?shipping=${selectedShipping}`);
+    };
+
+    const selectedAddress = addresses.find(a => a.id === selectedAddressId);
+
+
+    const handleAddressSelect = (id: number) => {
+        setSelectedAddressId(id);
+
+        // Reorder addresses: selected one goes to top
+        const newAddresses = [...addresses].sort((a, b) => {
+            if (a.id === id) return -1;
+            if (b.id === id) return 1;
+            return 0;
+        });
+
+        setAddresses(newAddresses);
+        setIsAddressExpanded(false);
+    };
+
+    const visibleAddresses = isAddressExpanded ? addresses : addresses.slice(0, 2);
 
     return (
         <main className="max-w-7xl mx-auto px-6 pb-12 pt-32 lg:px-20">
@@ -33,36 +97,52 @@ export default function PaymentPage() {
                                 <span className="size-8 flex items-center justify-center bg-primary text-white rounded-full text-sm font-bold">1</span>
                                 <h3 className="text-2xl font-bold tracking-tight">Teslimat Adresi</h3>
                             </div>
-                            <button className="text-sm font-bold underline underline-offset-4 hover:opacity-60 transition-opacity flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[18px]">add</span>
+                            <Link
+                                href="/hesap/adreslerim/yeni?returnUrl=/odeme"
+                                className="text-sm font-bold underline underline-offset-4 hover:opacity-60 transition-opacity flex items-center gap-1"
+                            >
+
                                 Yeni Adres Ekle
-                            </button>
+                            </Link>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Selected Address Card */}
-                            <div className="relative border-2 border-primary p-6 rounded-xl bg-white shadow-sm cursor-pointer group">
-                                <div className="absolute top-4 right-4 text-primary">
-                                    <span className="material-symbols-outlined fill-1">check_circle</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ease-in-out">
+                            {visibleAddresses.map((addr) => (
+                                <div
+                                    key={addr.id}
+                                    onClick={() => handleAddressSelect(addr.id)}
+                                    className={`relative border-2 ${selectedAddressId === addr.id ? 'border-primary' : 'border-zinc-200'} p-6 rounded-xl bg-white ${selectedAddressId !== addr.id ? 'hover:border-zinc-400' : ''} transition-all duration-300 cursor-pointer group shadow-sm`}
+                                >
+                                    {selectedAddressId === addr.id && (
+                                        <div className="absolute top-4 right-4 text-primary">
+                                            <span className="material-symbols-outlined fill-1">check_circle</span>
+                                        </div>
+                                    )}
+                                    <h4 className="font-bold text-lg mb-2">{addr.title}</h4>
+                                    <p className="text-zinc-500 text-sm leading-relaxed mb-4">
+                                        {addr.address}<br />
+                                        {addr.district}<br />
+                                        {addr.city}
+                                    </p>
+                                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">{addr.phone}</p>
                                 </div>
-                                <h4 className="font-bold text-lg mb-2">Ev Adresim</h4>
-                                <p className="text-zinc-500 text-sm leading-relaxed mb-4">
-                                    Harbiye Mah. Abdi İpekçi Cad. No:12/4<br />
-                                    Nişantaşı, Şişli<br />
-                                    34367 İstanbul, Türkiye
-                                </p>
-                                <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">+90 532 *** 45 67</p>
-                            </div>
-                            {/* Secondary Address Card */}
-                            <div className="border border-zinc-200 p-6 rounded-xl bg-white hover:border-zinc-400 transition-colors cursor-pointer group">
-                                <h4 className="font-bold text-lg mb-2">İş Adresi</h4>
-                                <p className="text-zinc-500 text-sm leading-relaxed mb-4">
-                                    Büyükdere Cad. No:199 Levent Loft<br />
-                                    Levent, Beşiktaş<br />
-                                    34394 İstanbul, Türkiye
-                                </p>
-                                <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">+90 212 *** 88 00</p>
-                            </div>
+                            ))}
                         </div>
+
+                        {addresses.length > 2 && (
+                            <div className="mt-4 flex justify-center">
+                                <button
+                                    onClick={() => setIsAddressExpanded(!isAddressExpanded)}
+                                    className="flex flex-col items-center gap-1 text-zinc-400 hover:text-primary transition-colors group"
+                                >
+                                    <span className="text-xs font-bold uppercase tracking-widest">
+                                        {isAddressExpanded ? 'Daha Az Göster' : 'Diğer Adresleri Göster'}
+                                    </span>
+                                    <div className={`p-1 rounded-full transition-colors ${isAddressExpanded ? 'rotate-180' : ''}`}>
+                                        <span className="material-symbols-outlined text-lg block">expand_more</span>
+                                    </div>
+                                </button>
+                            </div>
+                        )}
                     </section>
 
                     {/* 2. Shipping Method Section */}
@@ -121,30 +201,71 @@ export default function PaymentPage() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                             {/* Card Simulation */}
-                            <div className="w-full aspect-[1.58/1] bg-gradient-to-br from-zinc-800 to-black rounded-2xl p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden group">
-                                <div className="absolute inset-0 opacity-20 pointer-events-none">
-                                    <div className="absolute -right-10 -top-10 size-40 bg-white/20 rounded-full blur-3xl"></div>
-                                    <div className="absolute -left-10 -bottom-10 size-40 bg-zinc-400/20 rounded-full blur-3xl"></div>
-                                </div>
-                                <div className="flex justify-between items-start relative z-10">
-                                    <div className="size-10 bg-zinc-700/50 rounded-lg flex items-center justify-center border border-white/10">
-                                        <span className="material-symbols-outlined text-white">contactless</span>
+                            <div className="w-full aspect-[1.58/1] perspective-[1000px] group">
+                                <div className={`relative w-full h-full transition-all duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
+
+                                    {/* Front Face */}
+                                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
+                                        <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-black rounded-2xl p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden">
+                                            <div className="absolute inset-0 opacity-20 pointer-events-none">
+                                                <div className="absolute -right-10 -top-10 size-40 bg-white/20 rounded-full blur-3xl"></div>
+                                                <div className="absolute -left-10 -bottom-10 size-40 bg-zinc-400/20 rounded-full blur-3xl"></div>
+                                            </div>
+                                            <div className="flex justify-between items-start relative z-10">
+                                                <div className="size-10 bg-zinc-700/50 rounded-lg flex items-center justify-center border border-white/10">
+                                                    <span className="material-symbols-outlined text-white">contactless</span>
+                                                </div>
+                                                <div className="h-8">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img className="h-full object-contain filter brightness-200" alt="Mastercard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnmvZrl70UGwhBgooZ8aSS8oRuMIzm6bxfZFCe-eUqrn7eAsEDDbu8Gjd7G70CGVW7ZKmWS9nDcqZQ4GXY1wyY5fdeNk-LEiRtLcgilEg9MHFcXeJpjE1mpm4GPGNxu7zJ1QSBxZiC4f3uu4D2Okl_du-rDU8rWVegzlGkGxSIvGzEx_ipPGaiLSJkBg0JtmlwFkotvhMggKvf-o7aVRdhg0bWDrF66-aBa-Pq-m4KZMSFlD0zluM1hwvjB-TE3THhJ3wMy3Y4CwpF" />
+                                                </div>
+                                            </div>
+                                            <div className="relative z-10">
+                                                <p className="text-xs uppercase tracking-[0.2em] opacity-50 mb-1">Kart Sahibi</p>
+                                                <p className="text-lg font-medium tracking-widest uppercase">M**** K****</p>
+                                            </div>
+                                            <div className="flex justify-between items-end relative z-10">
+                                                <p className="text-2xl font-mono tracking-[0.15em]">**** **** **** 4242</p>
+                                                <div className="text-right">
+                                                    <p className="text-[10px] uppercase tracking-widest opacity-50">Sona Erme</p>
+                                                    <p className="font-mono">12/28</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="h-8">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img className="h-full object-contain filter brightness-200" alt="Mastercard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnmvZrl70UGwhBgooZ8aSS8oRuMIzm6bxfZFCe-eUqrn7eAsEDDbu8Gjd7G70CGVW7ZKmWS9nDcqZQ4GXY1wyY5fdeNk-LEiRtLcgilEg9MHFcXeJpjE1mpm4GPGNxu7zJ1QSBxZiC4f3uu4D2Okl_du-rDU8rWVegzlGkGxSIvGzEx_ipPGaiLSJkBg0JtmlwFkotvhMggKvf-o7aVRdhg0bWDrF66-aBa-Pq-m4KZMSFlD0zluM1hwvjB-TE3THhJ3wMy3Y4CwpF" />
+
+                                    {/* Back Face */}
+                                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                                        <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-black rounded-2xl text-white shadow-2xl relative overflow-hidden flex flex-col justify-center">
+                                            <div className="absolute inset-0 opacity-20 pointer-events-none">
+                                                <div className="absolute -right-10 -top-10 size-40 bg-white/20 rounded-full blur-3xl"></div>
+                                                <div className="absolute -left-10 -bottom-10 size-40 bg-zinc-400/20 rounded-full blur-3xl"></div>
+                                            </div>
+
+                                            {/* Magnetic Strip */}
+                                            <div className="w-full h-12 bg-black/50 absolute top-8 z-10"></div>
+
+                                            {/* CVV Area */}
+                                            <div className="mt-8 px-8 relative z-10 w-full">
+                                                <div className="w-full bg-zinc-200 h-10 rounded flex items-center justify-end px-4 relative">
+                                                    <div className="absolute inset-y-1 left-1 right-16 grid grid-cols-10 gap-0.5 opacity-20">
+                                                        {Array.from({ length: 20 }).map((_, i) => (
+                                                            <div key={i} className="-skew-x-12 bg-zinc-400 h-full w-full"></div>
+                                                        ))}
+                                                    </div>
+                                                    <span className="text-zinc-900 font-mono text-lg tracking-widest relative z-10">XXX</span>
+                                                </div>
+                                                <p className="text-right text-[10px] uppercase tracking-widest opacity-50 mt-1">CVV / CVC</p>
+                                            </div>
+
+                                            {/* Bottom Element */}
+                                            <div className="absolute bottom-6 right-6 opacity-30">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img className="h-6 filter brightness-0 invert" alt="Mastercard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnmvZrl70UGwhBgooZ8aSS8oRuMIzm6bxfZFCe-eUqrn7eAsEDDbu8Gjd7G70CGVW7ZKmWS9nDcqZQ4GXY1wyY5fdeNk-LEiRtLcgilEg9MHFcXeJpjE1mpm4GPGNxu7zJ1QSBxZiC4f3uu4D2Okl_du-rDU8rWVegzlGkGxSIvGzEx_ipPGaiLSJkBg0JtmlwFkotvhMggKvf-o7aVRdhg0bWDrF66-aBa-Pq-m4KZMSFlD0zluM1hwvjB-TE3THhJ3wMy3Y4CwpF" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="relative z-10">
-                                    <p className="text-xs uppercase tracking-[0.2em] opacity-50 mb-1">Kart Sahibi</p>
-                                    <p className="text-lg font-medium tracking-widest uppercase">M**** K****</p>
-                                </div>
-                                <div className="flex justify-between items-end relative z-10">
-                                    <p className="text-2xl font-mono tracking-[0.15em]">**** **** **** 4242</p>
-                                    <div className="text-right">
-                                        <p className="text-[10px] uppercase tracking-widest opacity-50">Sona Erme</p>
-                                        <p className="font-mono">12/28</p>
-                                    </div>
+
                                 </div>
                             </div>
 
@@ -152,12 +273,12 @@ export default function PaymentPage() {
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Kart Üzerindeki İsim</label>
-                                    <input className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Ad Soyad" type="text" />
+                                    <input onFocus={() => setIsFlipped(false)} className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Ad Soyad" type="text" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Kart Numarası</label>
                                     <div className="relative">
-                                        <input className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="0000 0000 0000 0000" type="text" />
+                                        <input onFocus={() => setIsFlipped(false)} className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="0000 0000 0000 0000" type="text" />
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2">
                                             <span className="material-symbols-outlined text-zinc-400">credit_card</span>
                                         </div>
@@ -166,11 +287,11 @@ export default function PaymentPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">SKT</label>
-                                        <input className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="AA / YY" type="text" />
+                                        <input onFocus={() => setIsFlipped(false)} className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="AA / YY" type="text" />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">CVV</label>
-                                        <input className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="123" type="text" />
+                                        <input onFocus={() => setIsFlipped(true)} onBlur={() => setIsFlipped(false)} className="w-full bg-white border border-zinc-200 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="123" type="text" />
                                     </div>
                                 </div>
                             </div>
@@ -244,23 +365,25 @@ export default function PaymentPage() {
                                     {selectedShipping === 'express' ? '₺149,00' : 'Ücretsiz'}
                                 </span>
                             </div>
-                            <div className="flex justify-between text-zinc-500">
-                                <span>KDV (%20)</span>
-                                <span>₺3.330,00</span>
-                            </div>
                             <div className="flex justify-between items-end pt-4 border-t border-zinc-100">
                                 <span className="text-lg font-bold">Toplam</span>
                                 <div className="text-right">
                                     <p className="text-2xl font-extrabold tracking-tighter text-primary">
-                                        {selectedShipping === 'express' ? '₺20.129,00' : '₺19.980,00'}
+                                        {selectedShipping === 'express' ? '₺16.799,00' : '₺16.650,00'}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         {/* Complete Order Button */}
-                        <button className="w-full bg-primary text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]">
+                        {/* Complete Order Button */}
+                        <button
+                            onClick={handleCompleteOrder}
+                            className="w-full bg-primary text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                        >
                             Siparişi Tamamla
                         </button>
+
+                        {/* Confirmation Modal Removed */}
                         {/* Trust Badges */}
                         <div className="mt-8 flex flex-col items-center gap-4">
                             <div className="flex items-center gap-4 opacity-40 grayscale hover:grayscale-0 transition-all">
