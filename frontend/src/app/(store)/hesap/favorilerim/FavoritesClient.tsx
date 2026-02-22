@@ -21,11 +21,21 @@ interface FavoriteItem {
     product: FavoriteProduct;
 }
 
-interface FavoritesClientProps {
-    favorites: FavoriteItem[];
+interface RecommendedProduct {
+    id: string;
+    name: string;
+    slug: string;
+    basePrice: string;
+    images: string[];
+    category: { name: string; slug: string };
 }
 
-export default function FavoritesClient({ favorites }: FavoritesClientProps) {
+interface FavoritesClientProps {
+    favorites: FavoriteItem[];
+    recommendations: RecommendedProduct[];
+}
+
+export default function FavoritesClient({ favorites, recommendations }: FavoritesClientProps) {
     const [items, setItems] = React.useState(favorites);
 
     // Listen for favoriteChanged events to remove unfavorited items
@@ -126,22 +136,67 @@ export default function FavoritesClient({ favorites }: FavoritesClientProps) {
                 })}
             </div>
 
-            {/* Recommendation Section */}
-            <div className="mt-16 rounded-2xl bg-primary p-8 text-white lg:p-12">
-                <div className="flex flex-col gap-8 md:flex-row md:items-center">
-                    <div className="flex-1 space-y-4">
-                        <span className="inline-block rounded-full border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">Sizin İçin Seçildi</span>
-                        <h3 className="text-2xl md:text-3xl font-bold">Yaz Koleksiyonu Önizleme</h3>
+            {/* Recommendation Section – Dinamik */}
+            <div className="mt-16">
+                <div className="rounded-2xl bg-primary p-8 text-white lg:p-12">
+                    <div className="space-y-4 mb-8">
+                        <span className="inline-block rounded-full border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                            Sizin İçin Seçildi
+                        </span>
+                        <h3 className="text-2xl md:text-3xl font-bold">Sizin İçin Seçilenler</h3>
                         <p className="max-w-md text-sm leading-relaxed text-white/70">
                             Favorilerinizdeki ürünlere dayanarak, yeni sezon koleksiyonumuzun size çok yakışacağını düşünüyoruz.
                         </p>
+                    </div>
+
+                    {recommendations.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                            {recommendations.map((product) => {
+                                const displayImage = product.images[0] || "/placeholder.jpg";
+
+                                return (
+                                    <Link
+                                        key={product.id}
+                                        href={`/urunler/${product.slug}`}
+                                        className="group relative flex flex-col overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/10 transition-all duration-300 hover:bg-white/20 hover:ring-white/25 hover:scale-[1.02] hover:shadow-xl hover:shadow-black/20"
+                                    >
+                                        <div className="relative aspect-[4/5] overflow-hidden">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                alt={product.name}
+                                                src={displayImage}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                        </div>
+                                        <div className="flex flex-1 flex-col p-4">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">
+                                                {product.category.name}
+                                            </p>
+                                            <h4 className="text-sm font-semibold text-white mb-2 line-clamp-2">
+                                                {product.name}
+                                            </h4>
+                                            <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-3">
+                                                <span className="text-base font-bold text-white">
+                                                    {formatPrice(Number(product.basePrice))}
+                                                </span>
+                                                <span className="material-symbols-outlined text-lg text-white/50 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white">
+                                                    arrow_forward
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    ) : (
                         <Link
                             href="/urunler"
                             className="inline-block rounded-lg bg-white px-8 py-3 text-sm font-bold text-primary transition-transform hover:scale-105"
                         >
                             Keşfetmeye Başla
                         </Link>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

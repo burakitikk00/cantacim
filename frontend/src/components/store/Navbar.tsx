@@ -15,7 +15,10 @@ export default function Navbar() {
     const fetchFavoriteCount = useCallback(() => {
         if (status === "authenticated") {
             fetch("/api/favorites")
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) return { count: 0 };
+                    return res.json();
+                })
                 .then(data => setFavoriteCount(data.count || 0))
                 .catch(() => setFavoriteCount(0));
         } else {
@@ -27,11 +30,18 @@ export default function Navbar() {
         fetchFavoriteCount();
     }, [fetchFavoriteCount]);
 
-    // Listen for favorite changes from FavoriteButton
+    // Listen for favorite changes from FavoriteButton (debounced)
     useEffect(() => {
-        const handler = () => fetchFavoriteCount();
+        let timeoutId: NodeJS.Timeout;
+        const handler = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fetchFavoriteCount(), 300);
+        };
         window.addEventListener("favoriteChanged", handler);
-        return () => window.removeEventListener("favoriteChanged", handler);
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener("favoriteChanged", handler);
+        };
     }, [fetchFavoriteCount]);
 
     const handleAuthAction = (e: React.MouseEvent) => {
