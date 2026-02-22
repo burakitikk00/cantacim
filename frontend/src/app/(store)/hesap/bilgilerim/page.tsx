@@ -108,10 +108,10 @@ export default function AccountInfoPage() {
     return (
         <div className="w-full">
             {/* Header Section */}
-            <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <header className="mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight mb-2">Profil Ayarları</h2>
-                    <p className="text-zinc-500">Kişisel bilgilerinizi ve hesap tercihlerinizi buradan güncelleyebilirsiniz.</p>
+                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">Profil Ayarları</h2>
+                    <p className="text-sm md:text-base text-zinc-500">Kişisel bilgilerinizi ve hesap tercihlerinizi buradan güncelleyebilirsiniz.</p>
                 </div>
 
             </header>
@@ -120,10 +120,10 @@ export default function AccountInfoPage() {
             <form action={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Personal Info Section */}
                 <div className="lg:col-span-2 space-y-8">
-                    <section className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
-                        <div className="flex items-center gap-2 mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                    <section className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 md:p-8 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 md:mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4">
                             <span className="material-symbols-outlined text-zinc-400">badge</span>
-                            <h3 className="text-lg font-bold">Kişisel Bilgiler</h3>
+                            <h3 className="text-base md:text-lg font-bold">Kişisel Bilgiler</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="flex flex-col gap-2">
@@ -135,14 +135,14 @@ export default function AccountInfoPage() {
                                 <input name="surname" className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="text" defaultValue={user.surname || ""} />
                             </div>
                             <div className="flex flex-col gap-2 md:col-span-2 relative">
-                                <div className="flex justify-between items-center mb-1">
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1 gap-1">
                                     <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">E-posta Adresi</label>
                                     <span className="text-[10px] text-zinc-400">E-postayı değiştirirseniz tekrar doğrulama yapmanız gerekmektedir.</span>
                                 </div>
-                                <div className="relative group">
+                                <div className="flex flex-col sm:relative group gap-2 sm:gap-0">
                                     <input
                                         name="email"
-                                        className={`w-full rounded-lg border focus:ring-0 py-3 px-4 text-sm transition-all pr-32
+                                        className={`w-full rounded-lg border focus:ring-0 py-3 px-4 text-sm transition-all sm:pr-40
                                             ${user.emailVerified
                                                 ? "border-emerald-200 bg-emerald-50/20 focus:border-emerald-500"
                                                 : "border-red-200 bg-red-50/20 focus:border-red-500"
@@ -150,9 +150,9 @@ export default function AccountInfoPage() {
                                         type="email"
                                         defaultValue={user.email}
                                     />
-                                    <div className="absolute right-2 top-1.5 flex items-center gap-2">
+                                    <div className="sm:absolute sm:right-2 sm:top-1.5 flex items-center gap-2 w-full sm:w-auto">
                                         {user.emailVerified ? (
-                                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold uppercase tracking-wider">
+                                            <div className="flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-md bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold uppercase tracking-wider">
                                                 <span className="material-symbols-outlined text-sm">verified</span>
                                                 Doğrulandı
                                             </div>
@@ -161,9 +161,9 @@ export default function AccountInfoPage() {
                                                 type="button"
                                                 onClick={handleVerifyEmail}
                                                 disabled={isVerifying}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[11px] font-bold uppercase tracking-wider hover:bg-red-200 transition-colors disabled:opacity-50"
+                                                className="flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[11px] font-bold uppercase tracking-wider hover:bg-red-200 transition-colors disabled:opacity-50"
                                             >
-                                                {isVerifying ? "..." : "E-posta Adresini Doğrula"}
+                                                {isVerifying ? "..." : "Doğrula"}
                                             </button>
                                         )}
                                     </div>
@@ -217,11 +217,11 @@ export default function AccountInfoPage() {
                 </div>
 
                 {/* Form Actions */}
-                <div className="lg:col-span-3 mt-4 flex items-center justify-end gap-4 border-t border-zinc-200 dark:border-zinc-800 pt-8">
-                    <button type="button" className="px-8 py-3 rounded-lg text-sm font-semibold text-zinc-500 hover:bg-zinc-100 transition-colors font-bold">
+                <div className="lg:col-span-3 mt-4 flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 border-t border-zinc-200 dark:border-zinc-800 pt-6 sm:pt-8">
+                    <button type="button" className="w-full sm:w-auto px-8 py-3 rounded-lg text-sm font-semibold text-zinc-500 hover:bg-zinc-100 transition-colors">
                         İptal
                     </button>
-                    <button disabled={isPending} className="bg-primary text-white px-12 py-3 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg disabled:opacity-70">
+                    <button disabled={isPending} className="w-full sm:w-auto bg-primary text-white px-8 sm:px-12 py-3 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg disabled:opacity-70">
                         {isPending ? "Güncelleniyor..." : "Bilgileri Kaydet"}
                     </button>
                 </div>

@@ -36,8 +36,8 @@ export default function AddressesPage() {
                         <span>/</span>
                         <span className="text-primary">Adreslerim</span>
                     </nav>
-                    <h1 className="text-4xl font-extrabold tracking-tight">Adreslerim</h1>
-                    <p className="text-primary/60 mt-2 max-w-xl">Teslimat adreslerinizi buradan güncelleyebilir veya yeni bir tane ekleyebilirsiniz.</p>
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Adreslerim</h1>
+                    <p className="text-sm md:text-base text-primary/60 mt-2 max-w-xl">Teslimat adreslerinizi buradan güncelleyebilir veya yeni bir tane ekleyebilirsiniz.</p>
                 </div>
             </div>
 

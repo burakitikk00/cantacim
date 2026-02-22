@@ -92,10 +92,10 @@ export default function OrdersPage() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
                     Siparişlerim
                 </h2>
-                <p className="text-zinc-500 dark:text-zinc-400">
+                <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400">
                     Geçmiş siparişlerinizi ve güncel durumlarını buradan takip edebilirsiniz.
                 </p>
             </div>
@@ -108,8 +108,8 @@ export default function OrdersPage() {
                         className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
                     >
                         {/* Order Header */}
-                        <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-wrap gap-6 items-center justify-between">
-                            <div className="flex flex-wrap gap-8 items-center">
+                        <div className="p-4 sm:p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 flex flex-col sm:flex-row gap-4 sm:gap-6 sm:items-center justify-between">
+                            <div className="grid grid-cols-2 md:flex flex-wrap gap-4 sm:gap-8 items-start sm:items-center">
                                 <div className="space-y-1">
                                     <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Sipariş No</span>
                                     <p className="font-semibold text-zinc-900 dark:text-white font-mono">{order.id}</p>
@@ -140,10 +140,10 @@ export default function OrdersPage() {
                                 </div>
                             </div>
 
-                            <div className={`px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 ${order.statusColor}`}>
-                                {order.status === "Teslim Edildi" && <CheckCircle2 className="w-4 h-4" />}
-                                {order.status === "Kargoda" && <Truck className="w-4 h-4" />}
-                                {order.status === "Hazırlanıyor" && <Package className="w-4 h-4" />}
+                            <div className={`px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 w-fit ${order.statusColor}`}>
+                                {order.status === "Teslim Edildi" && <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                                {order.status === "Kargoda" && <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                                {order.status === "Hazırlanıyor" && <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                                 {order.status}
                             </div>
                         </div>
@@ -162,9 +162,9 @@ export default function OrdersPage() {
                                         </div>
 
                                         <div className="flex-1 min-w-0 py-1">
-                                            <div className="flex justify-between items-start gap-4">
+                                            <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-4">
                                                 <div>
-                                                    <h4 className="font-medium text-zinc-900 dark:text-white text-lg">
+                                                    <h4 className="font-medium text-zinc-900 dark:text-white text-base sm:text-lg leading-tight">
                                                         {item.name}
                                                     </h4>
                                                     <p className="text-sm text-zinc-500 mt-1">{item.variant}</p>
@@ -188,9 +188,9 @@ export default function OrdersPage() {
                                                     )}
                                                 </div>
 
-                                                <div className="text-right">
-                                                    <div className="flex flex-col items-end">
-                                                        <p className="font-semibold text-zinc-900 dark:text-white text-lg">
+                                                <div className="text-left sm:text-right mt-2 sm:mt-0">
+                                                    <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-0">
+                                                        <p className="font-semibold text-zinc-900 dark:text-white text-base sm:text-lg">
                                                             {item.finalPrice}
                                                         </p>
                                                         {item.originalPrice !== item.finalPrice && (

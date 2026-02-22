@@ -14,8 +14,8 @@ export default function FavoritesPage() {
                     <span>/</span>
                     <span className="text-primary">Favorilerim</span>
                 </nav>
-                <h2 className="text-3xl font-extrabold tracking-tight">Favorilerim</h2>
-                <p className="text-primary/50">Koleksiyonunuzda 5 ürün bulunmaktadır.</p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Favorilerim</h2>
+                <p className="text-sm md:text-base text-primary/50">Koleksiyonunuzda 5 ürün bulunmaktadır.</p>
             </div>
 
             {/* Product Grid */}
@@ -167,7 +167,7 @@ export default function FavoritesPage() {
                 <div className="flex flex-col gap-8 md:flex-row md:items-center">
                     <div className="flex-1 space-y-4">
                         <span className="inline-block rounded-full border border-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">Sizin İçin Seçildi</span>
-                        <h3 className="text-3xl font-bold">Yaz Koleksiyonu Önizleme</h3>
+                        <h3 className="text-2xl md:text-3xl font-bold">Yaz Koleksiyonu Önizleme</h3>
                         <p className="max-w-md text-sm leading-relaxed text-white/70">
                             Favorilerinizdeki ürünlere dayanarak, yeni sezon ipek şal koleksiyonumuzun size çok yakışacağını düşünüyoruz.
                         </p>
