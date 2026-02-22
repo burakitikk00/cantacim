@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getCities, getDistrictsByCityCode } from "turkey-neighbourhoods";
 
 interface AddressData {
     id?: string;
@@ -24,6 +25,29 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
+
+    const normalizeStr = (str: string) =>
+        str.toLocaleLowerCase('tr-TR')
+            .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ü/g, 'u')
+            .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ç/g, 'c');
+
+    const [selectedCityName, setSelectedCityName] = useState(() => {
+        if (!initialData?.city) return "";
+        const c = normalizeStr(initialData.city.trim());
+        const match = getCities().find(city => normalizeStr(city.name) === c);
+        return match ? match.name : initialData.city;
+    });
+
+    const [selectedDistrict, setSelectedDistrict] = useState(() => {
+        if (!initialData?.district) return "";
+        return initialData.district;
+    });
+
+    const selectedCityObj = getCities().find(c => c.name === selectedCityName);
+    const districts = selectedCityObj ? getDistrictsByCityCode(selectedCityObj.code) : [];
+
+    const matchingDistrict = districts.find(d => normalizeStr(d) === normalizeStr(selectedDistrict.trim()));
+    const districtValue = matchingDistrict || (districts.includes(selectedDistrict) ? selectedDistrict : "");
 
     const handleSubmit = async (formData: FormData) => {
         // Here you would typically call a server action to save/update the address
@@ -77,7 +101,7 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                 <input
                                     name="title"
                                     placeholder="Örn: Evim, İş Yerim"
-                                    className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300"
+                                    className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300"
                                     type="text"
                                     required
                                     defaultValue={initialData?.title}
@@ -89,7 +113,7 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Ad Soyad</label>
                                 <input
                                     name="fullName"
-                                    className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20"
+                                    className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20"
                                     type="text"
                                     required
                                     defaultValue={initialData?.fullName}
@@ -102,53 +126,52 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                 <input
                                     name="phone"
                                     placeholder="05XX XXX XX XX"
-                                    className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300"
+                                    className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300"
                                     type="tel"
                                     required
                                     defaultValue={initialData?.phone}
                                 />
                             </div>
 
-                            {/* Select City (Mock) */}
+                            {/* Select City */}
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">İl</label>
                                 <div className="relative">
                                     <select
                                         name="city"
-                                        className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 appearance-none cursor-pointer"
-                                        defaultValue={initialData?.city || ""}
+                                        className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 appearance-none cursor-pointer"
+                                        value={selectedCityName}
+                                        onChange={(e) => {
+                                            setSelectedCityName(e.target.value);
+                                            setSelectedDistrict("");
+                                        }}
                                         required
                                     >
                                         <option value="" disabled>Seçiniz</option>
-                                        <option value="istanbul">İstanbul</option>
-                                        <option value="ankara">Ankara</option>
-                                        <option value="izmir">İzmir</option>
-                                        <option value="bursa">Bursa</option>
-                                        <option value="antalya">Antalya</option>
+                                        {getCities().sort((a, b) => a.name.localeCompare(b.name, 'tr-TR')).map((city) => (
+                                            <option key={city.code} value={city.name}>{city.name}</option>
+                                        ))}
                                     </select>
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-400 pointer-events-none text-xl">expand_more</span>
                                 </div>
                             </div>
 
-                            {/* Select District (Mock) */}
+                            {/* Select District */}
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">İlçe</label>
                                 <div className="relative">
                                     <select
                                         name="district"
-                                        className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 appearance-none cursor-pointer"
-                                        defaultValue={initialData?.district || ""}
+                                        className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                        value={districtValue}
+                                        onChange={(e) => setSelectedDistrict(e.target.value)}
                                         required
+                                        disabled={!selectedCityName || districts.length === 0}
                                     >
                                         <option value="" disabled>Seçiniz</option>
-                                        <option value="kadikoy">Kadıköy</option>
-                                        <option value="besiktas">Beşiktaş</option>
-                                        <option value="sisli">Şişli</option>
-                                        <option value="cankaya">Çankaya</option>
-                                        <option value="bornova">Bornova</option>
-                                        <option value="cesme">Çeşme</option>
-                                        <option value="bakirkoy">Bakırköy</option>
-                                        <option value="levent">Levent</option>
+                                        {districts.sort((a, b) => a.localeCompare(b, 'tr-TR')).map((district) => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
                                     </select>
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-400 pointer-events-none text-xl">expand_more</span>
                                 </div>
@@ -159,7 +182,7 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Mahalle / Cadde / Sokak</label>
                                 <input
                                     name="neighborhood"
-                                    className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20"
+                                    className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20"
                                     type="text"
                                     required
                                     defaultValue={initialData?.neighborhood}
@@ -173,7 +196,7 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                     name="fullAddress"
                                     rows={4}
                                     placeholder="Bina No, Daire No, Kat vb. detayları giriniz."
-                                    className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300 resize-none"
+                                    className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300 resize-none"
                                     required
                                     defaultValue={initialData?.fullAddress}
                                 />
@@ -221,13 +244,13 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                 <div className="lg:col-span-3 mt-4 flex items-center justify-end gap-4 border-t border-zinc-200 dark:border-zinc-800 pt-8">
                     <Link
                         href="/hesap/adreslerim"
-                        className="px-8 py-3 rounded-lg text-sm font-semibold text-zinc-500 hover:bg-zinc-100 transition-colors font-bold"
+                        className="px-8 py-3 rounded-xl text-sm font-semibold text-zinc-500 hover:bg-zinc-100 transition-colors font-bold"
                     >
                         İptal
                     </Link>
                     <button
                         disabled={isPending}
-                        className="bg-primary text-white px-12 py-3 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg disabled:opacity-70 flex items-center gap-2"
+                        className="bg-primary text-white px-12 py-3 rounded-xl text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg disabled:opacity-70 flex items-center gap-2"
                     >
                         {isPending ? (
                             <>
