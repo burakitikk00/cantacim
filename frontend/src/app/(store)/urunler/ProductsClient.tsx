@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
+import FavoriteButton from "@/components/store/FavoriteButton";
 
 interface Product {
     id: string;
@@ -379,12 +380,7 @@ export default function ProductsClient({
                                         alt={product.name}
                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
-                                    <button
-                                        onClick={(e) => { e.preventDefault(); /* Add toggle favorite logic */ }}
-                                        className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500"
-                                    >
-                                        <span className="material-symbols-outlined fill text-lg">favorite</span>
-                                    </button>
+                                    <FavoriteButton productId={product.id} variant="overlay" />
                                 </div>
                                 <div className="flex flex-1 flex-col p-4">
                                     <div className="mb-2">

@@ -3,13 +3,36 @@
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AuthSidebar from "../auth/AuthSidebar";
 
 export default function Navbar() {
     const count = useCartStore((s) => s.items.length);
     const { status } = useSession();
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [favoriteCount, setFavoriteCount] = useState(0);
+
+    const fetchFavoriteCount = useCallback(() => {
+        if (status === "authenticated") {
+            fetch("/api/favorites")
+                .then(res => res.json())
+                .then(data => setFavoriteCount(data.count || 0))
+                .catch(() => setFavoriteCount(0));
+        } else {
+            setFavoriteCount(0);
+        }
+    }, [status]);
+
+    useEffect(() => {
+        fetchFavoriteCount();
+    }, [fetchFavoriteCount]);
+
+    // Listen for favorite changes from FavoriteButton
+    useEffect(() => {
+        const handler = () => fetchFavoriteCount();
+        window.addEventListener("favoriteChanged", handler);
+        return () => window.removeEventListener("favoriteChanged", handler);
+    }, [fetchFavoriteCount]);
 
     const handleAuthAction = (e: React.MouseEvent) => {
         if (status === "unauthenticated") {
@@ -72,9 +95,11 @@ export default function Navbar() {
                         className="hover:opacity-60 transition-opacity relative"
                     >
                         <span className="material-symbols-outlined">favorite</span>
-                        <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                            2
-                        </span>
+                        {favoriteCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                                {favoriteCount}
+                            </span>
+                        )}
                     </Link>
 
                     <Link

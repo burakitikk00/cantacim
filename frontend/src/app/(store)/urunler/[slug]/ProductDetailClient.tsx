@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import FavoriteButton from "@/components/store/FavoriteButton";
 
 interface ProductVariant {
     id: string;
@@ -238,9 +239,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             <span className="material-symbols-outlined text-lg md:text-xl">shopping_bag</span>
                             {isOutOfStock ? "Tükendi" : "Sepete Ekle"}
                         </button>
-                        <button className="size-14 md:size-16 border-2 border-gray-100 rounded-lg flex items-center justify-center hover:border-gray-200 hover:bg-gray-50 transition-all">
-                            <span className="material-symbols-outlined text-xl md:text-2xl">favorite</span>
-                        </button>
+                        <FavoriteButton productId={product.id} variant="detail" iconSize="text-xl md:text-2xl" />
                     </div>
 
                     {/* Accordions */}
