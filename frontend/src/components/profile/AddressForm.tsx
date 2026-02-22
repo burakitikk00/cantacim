@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCities, getDistrictsByCityCode } from "turkey-neighbourhoods";
+import { createAddress, updateAddress } from "@/actions/address";
 
 interface AddressData {
     id?: string;
@@ -14,11 +15,92 @@ interface AddressData {
     district: string;
     neighborhood: string;
     fullAddress: string;
+    isDefault?: boolean;
 }
 
 interface AddressFormProps {
     initialData?: AddressData;
     mode: "create" | "edit";
+}
+
+function CustomSelect({
+    options,
+    value,
+    onChange,
+    placeholder,
+    disabled = false,
+    name
+}: {
+    options: string[];
+    value: string;
+    onChange: (val: string) => void;
+    placeholder: string;
+    disabled?: boolean;
+    name: string;
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (ref.current && !ref.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div className="relative min-w-0" ref={ref}>
+            <input type="hidden" name={name} value={value} />
+            <input
+                type="text"
+                required
+                value={value}
+                onChange={() => { }}
+                className="absolute opacity-0 pointer-events-none w-full h-full inset-0 z-[-1]"
+                tabIndex={-1}
+            />
+            <button
+                type="button"
+                disabled={disabled}
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                className={`w-full rounded-xl border border-zinc-200 focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 text-left flex items-center justify-between transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+                <span className={`block truncate ${!value ? "text-zinc-500" : ""}`}>
+                    {value || placeholder}
+                </span>
+                <span
+                    className="material-symbols-outlined text-zinc-400 text-xl flex-shrink-0 transition-transform duration-200"
+                    style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}
+                >
+                    expand_more
+                </span>
+            </button>
+
+            {isOpen && (
+                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                    <ul className="max-h-[30vh] md:max-h-52 overflow-y-auto overscroll-contain py-1">
+                        {options.map((opt) => (
+                            <li key={opt}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onChange(opt);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors ${value === opt ? 'bg-primary/5 text-primary font-bold' : 'text-zinc-700 dark:text-zinc-300'}`}
+                                >
+                                    {opt}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export function AddressForm({ initialData, mode }: AddressFormProps) {
@@ -30,6 +112,23 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
         str.toLocaleLowerCase('tr-TR')
             .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ü/g, 'u')
             .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ç/g, 'c');
+
+    const formatPhone = (val: string) => {
+        let num = val.replace(/\D/g, '');
+        if (num.startsWith('90')) num = num.substring(2);
+        else if (num.startsWith('0')) num = num.substring(1);
+
+        if (num.length === 0) return '';
+
+        let formatted = '+90';
+        if (num.length > 0) formatted += ' ' + num.substring(0, 3);
+        if (num.length > 3) formatted += ' ' + num.substring(3, 6);
+        if (num.length > 6) formatted += ' ' + num.substring(6, 8);
+        if (num.length > 8) formatted += ' ' + num.substring(8, 10);
+        return formatted;
+    };
+
+    const [phone, setPhone] = useState(() => formatPhone(initialData?.phone || ""));
 
     const [selectedCityName, setSelectedCityName] = useState(() => {
         if (!initialData?.city) return "";
@@ -50,9 +149,20 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
     const districtValue = matchingDistrict || (districts.includes(selectedDistrict) ? selectedDistrict : "");
 
     const handleSubmit = async (formData: FormData) => {
-        // Here you would typically call a server action to save/update the address
         startTransition(async () => {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            let res;
+            if (mode === "create") {
+                res = await createAddress(formData);
+            } else {
+                if (!initialData?.id) return;
+                res = await updateAddress(initialData.id, formData);
+            }
+
+            if (res?.error) {
+                alert(res.error);
+                return;
+            }
+
             const returnUrl = searchParams.get("returnUrl");
             router.push(returnUrl || "/hesap/adreslerim");
         });
@@ -125,56 +235,42 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Telefon Numarası</label>
                                 <input
                                     name="phone"
-                                    placeholder="05XX XXX XX XX"
+                                    placeholder="+90 5XX XXX XX XX"
                                     className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 placeholder:text-zinc-300"
                                     type="tel"
                                     required
-                                    defaultValue={initialData?.phone}
+                                    maxLength={17}
+                                    value={phone}
+                                    onChange={(e) => setPhone(formatPhone(e.target.value))}
                                 />
                             </div>
 
                             {/* Select City */}
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 min-w-0">
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">İl</label>
-                                <div className="relative">
-                                    <select
-                                        name="city"
-                                        className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 appearance-none cursor-pointer"
-                                        value={selectedCityName}
-                                        onChange={(e) => {
-                                            setSelectedCityName(e.target.value);
-                                            setSelectedDistrict("");
-                                        }}
-                                        required
-                                    >
-                                        <option value="" disabled>Seçiniz</option>
-                                        {getCities().sort((a, b) => a.name.localeCompare(b.name, 'tr-TR')).map((city) => (
-                                            <option key={city.code} value={city.name}>{city.name}</option>
-                                        ))}
-                                    </select>
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-400 pointer-events-none text-xl">expand_more</span>
-                                </div>
+                                <CustomSelect
+                                    name="city"
+                                    options={getCities().sort((a, b) => a.name.localeCompare(b.name, 'tr-TR')).map((c) => c.name)}
+                                    value={selectedCityName}
+                                    onChange={(val) => {
+                                        setSelectedCityName(val);
+                                        setSelectedDistrict("");
+                                    }}
+                                    placeholder="Seçiniz"
+                                />
                             </div>
 
                             {/* Select District */}
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 min-w-0">
                                 <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">İlçe</label>
-                                <div className="relative">
-                                    <select
-                                        name="district"
-                                        className="w-full rounded-xl border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                        value={districtValue}
-                                        onChange={(e) => setSelectedDistrict(e.target.value)}
-                                        required
-                                        disabled={!selectedCityName || districts.length === 0}
-                                    >
-                                        <option value="" disabled>Seçiniz</option>
-                                        {districts.sort((a, b) => a.localeCompare(b, 'tr-TR')).map((district) => (
-                                            <option key={district} value={district}>{district}</option>
-                                        ))}
-                                    </select>
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-400 pointer-events-none text-xl">expand_more</span>
-                                </div>
+                                <CustomSelect
+                                    name="district"
+                                    options={districts.sort((a, b) => a.localeCompare(b, 'tr-TR'))}
+                                    value={districtValue}
+                                    onChange={(val) => setSelectedDistrict(val)}
+                                    placeholder="Seçiniz"
+                                    disabled={!selectedCityName || districts.length === 0}
+                                />
                             </div>
 
                             {/* Neighborhood */}
@@ -209,6 +305,7 @@ export function AddressForm({ initialData, mode }: AddressFormProps) {
                                         type="checkbox"
                                         name="isDefault"
                                         id="isDefault"
+                                        defaultChecked={initialData?.isDefault}
                                         className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-zinc-200 bg-zinc-50 dark:bg-zinc-800/20 checked:bg-primary checked:border-primary transition-all"
                                     />
                                     <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">

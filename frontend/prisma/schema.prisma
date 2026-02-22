@@ -147,19 +147,20 @@ model AuditLog {
 
 // ─── ADDRESS ──────────────────────────────────────────
 model Address {
-  id        String    @id @default(cuid())
-  userId    String
-  title     String
-  fullName  String
-  phone     String
-  city      String
-  district  String
-  address   String
-  zipCode   String?
-  isDefault Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id           String    @id @default(cuid())
+  userId       String
+  title        String
+  fullName     String
+  phone        String
+  city         String
+  district     String
+  neighborhood String
+  fullAddress  String
+  zipCode      String?
+  isDefault    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]

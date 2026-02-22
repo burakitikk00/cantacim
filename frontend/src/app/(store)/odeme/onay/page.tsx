@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function OrderConfirmationPreviewPage() {
+function OrderConfirmationContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -155,5 +155,13 @@ export default function OrderConfirmationPreviewPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function OrderConfirmationPreviewPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold text-primary">Yükleniyor...</div>}>
+            <OrderConfirmationContent />
+        </Suspense>
     );
 }
