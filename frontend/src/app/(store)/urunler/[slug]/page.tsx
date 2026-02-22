@@ -23,7 +23,17 @@ export default async function ProductDetailPage({
                         include: {
                             attributeValue: {
                                 include: {
-                                    attribute: true
+                                    attribute: {
+                                        select: { // explicitly select to avoid type errors with recent db additions not in generated types yet
+                                            id: true,
+                                            name: true,
+                                            slug: true,
+                                            sortOrder: true,
+                                            hasColor: true,
+                                            createdAt: true,
+                                            updatedAt: true
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -50,7 +60,10 @@ export default async function ProductDetailPage({
             createdAt: v.createdAt.toISOString(),
             updatedAt: v.updatedAt.toISOString(),
             attributes: v.attributes.map((a) => ({
-                attribute: a.attributeValue.attribute,
+                attribute: {
+                    name: a.attributeValue.attribute.name,
+                    hasColor: a.attributeValue.attribute.hasColor,
+                },
                 attributeValue: a.attributeValue,
             })),
         })),

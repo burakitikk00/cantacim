@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -8,13 +9,23 @@ const NAV = [
     { icon: "inventory_2", label: "Ürünler", href: "/admin/urunler" },
     { icon: "receipt_long", label: "Siparişler", href: "/admin/siparisler" },
     { icon: "group", label: "Müşteriler", href: "/admin/musteriler" },
-    { icon: "tune", label: "Özellikler", href: "/admin/ozellikler" },
     { icon: "local_offer", label: "İndirimler", href: "/admin/indirimler" },
-    { icon: "grid_view", label: "Varyasyonlar", href: "/admin/varyasyonlar" },
+];
+
+const STORE_MANAGEMENT_ITEMS = [
+    { icon: "category", label: "Kategori Ayarları", href: "/admin/dukkan-yonetimi/kategori-ayarlari" },
+    { icon: "loyalty", label: "Marka Ayarları", href: "/admin/dukkan-yonetimi/marka-ayarlari" },
+    { icon: "tune", label: "Varyasyon Ayarları", href: "/admin/dukkan-yonetimi/varyasyon-ayarlari" },
+    { icon: "local_shipping", label: "Kargo Ayarları", href: "/admin/dukkan-yonetimi/kargo-ayarlari" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const [storeMenuOpen, setStoreMenuOpen] = useState(
+        pathname.startsWith("/admin/dukkan-yonetimi")
+    );
+
+    const isStoreSubActive = STORE_MANAGEMENT_ITEMS.some((item) => pathname === item.href);
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#F9FAFB] text-[#374151] font-[Inter,sans-serif] antialiased">
@@ -43,11 +54,54 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             </Link>
                         );
                     })}
+
+                    {/* Dükkan Yönetimi - Collapsible Group */}
+                    <div className="pt-2">
+                        <button
+                            onClick={() => setStoreMenuOpen(!storeMenuOpen)}
+                            className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isStoreSubActive
+                                ? "bg-[#FF007F]/10 text-[#FF007F]"
+                                : "text-[#6B7280] hover:bg-gray-50 hover:text-[#374151]"
+                                }`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="material-icons text-xl">storefront</span>
+                                Dükkan Yönetimi
+                            </div>
+                            <span className={`material-icons text-lg transition-transform duration-200 ${storeMenuOpen ? "rotate-180" : ""}`}>
+                                expand_more
+                            </span>
+                        </button>
+
+                        <div
+                            className={`overflow-hidden transition-all duration-200 ease-in-out ${storeMenuOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                                }`}
+                        >
+                            <div className="ml-4 pl-4 border-l-2 border-[#F3F4F6] mt-1 space-y-0.5">
+                                {STORE_MANAGEMENT_ITEMS.map((item) => {
+                                    const active = pathname === item.href;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${active
+                                                ? "text-[#FF007F] bg-[#FF007F]/5"
+                                                : "text-[#9CA3AF] hover:bg-gray-50 hover:text-[#374151]"
+                                                }`}
+                                        >
+                                            <span className="material-icons text-lg">{item.icon}</span>
+                                            {item.label}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
                 </nav>
 
                 <div className="p-4 border-t border-[#E5E7EB]">
                     <Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-[#6B7280] hover:bg-gray-50 hover:text-[#374151] transition-colors">
-                        <span className="material-icons text-xl">storefront</span>
+                        <span className="material-icons text-xl">visibility</span>
                         Mağazayı Görüntüle
                     </Link>
                 </div>

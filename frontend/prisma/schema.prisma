@@ -181,42 +181,63 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children Category[] @relation("CategoryTree")
-  products Product[]
-  discounts Discount[]
-
+  parent           Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children         Category[] @relation("CategoryTree")
+  products         Product[]
+  originalProducts Product[]  @relation("OriginalCategory")
+  discounts        Discount[]
 
   @@index([slug])
   @@index([parentId])
 }
 
-// ─── PRODUCT & VARIANTS ──────────────────────────────
-model Product {
+// ─── BRAND ────────────────────────────────────────────
+model Brand {
   id          String    @id @default(cuid())
   name        String
   slug        String    @unique
   description String?   @db.Text
-  categoryId  String
-  shopierId   String?   @unique
-  metadata    Json?
-  basePrice   Decimal   @db.Decimal(10, 2)
-  images      String[]  @default([])
+  image       String?
   isActive    Boolean   @default(true)
-  isFeatured  Boolean   @default(false)
-  sortOrder   Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
 
-  category  Category         @relation(fields: [categoryId], references: [id])
-  variants  ProductVariant[]
-  favorites Favorite[]
-  discounts Discount[]
+  products    Product[]
 
+  @@index([slug])
+}
+
+// ─── PRODUCT & VARIANTS ──────────────────────────────
+model Product {
+  id                 String    @id @default(cuid())
+  name               String
+  slug               String    @unique
+  description        String?   @db.Text
+  categoryId         String
+  originalCategoryId String?
+  brandId            String?
+  shopierId          String?   @unique
+  metadata           Json?
+  basePrice          Decimal   @db.Decimal(10, 2)
+  images             String[]  @default([])
+  isActive           Boolean   @default(true)
+  isFeatured         Boolean   @default(false)
+  sortOrder          Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  category         Category         @relation(fields: [categoryId], references: [id])
+  originalCategory Category?        @relation("OriginalCategory", fields: [originalCategoryId], references: [id])
+  brand            Brand?           @relation(fields: [brandId], references: [id])
+  variants         ProductVariant[]
+  favorites        Favorite[]
+  discounts        Discount[]
 
   @@index([slug])
   @@index([categoryId])
+  @@index([originalCategoryId])
+  @@index([brandId])
   @@index([isActive, isFeatured])
 }
 
@@ -225,6 +246,7 @@ model Attribute {
   name      String   @unique
   slug      String   @unique
   sortOrder Int      @default(0)
+  hasColor  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -238,6 +260,7 @@ model AttributeValue {
   attributeId String
   value       String
   slug        String
+  colorCode   String?
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
 

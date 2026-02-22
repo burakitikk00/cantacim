@@ -11,8 +11,8 @@ interface ProductVariant {
     stock: number;
     image: string | null;
     attributes: {
-        attribute: { name: string };
-        attributeValue: { value: string; slug: string };
+        attribute: { name: string; hasColor?: boolean };
+        attributeValue: { value: string; slug: string; colorCode?: string | null };
     }[];
 }
 
@@ -33,46 +33,27 @@ interface ProductDetailClientProps {
 const RELATED = [
     { brand: "Saint Laurent", name: "Leather Card Case", price: "₺8.820", oldPrice: "₺9.800", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1f8Dpms9DHynDNhbSgwsUb_3RwhVdq_V60H73R0aLjVya3KYUFs_2ls8ujsJ77NGvfCMlqnmVfeNQYZ8krGg3EaRZVs6gsdMhtKe89zFqwcvACwguLsqoVLBQRcqz6dWcYcfMJwVpOq6KdkYME1MfFcYFNQ8W6eGM3sibYAyshr-sflexynGFB1iafhZgjmCRrBlKtKxZyP4MPNA9XSKJfEwXGe5_r7IhUsXOplwh1KUG8vy_EkCkiSLl5UqHbeRqrXGBBd1Il838", discount: "%10 İndirim" },
     { brand: "Saint Laurent", name: "Monogram Phone Case", price: "₺8.260", oldPrice: "₺12.400", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCh3sCIeGlMAnDJ4DrPS6znDbaz6kiaNxSx7me98wK6Wb_0L4aHNd2m2W9KMXthVfmlwIcbEv3Q4ds7pFeUGO71xyqLRRQM9pwrUiu5jlQzWP3M1-uBrLgbFLR-d7Ds8yx8MxV8xXiaaVcRQM0RPVl_Mma1ER0GK3XNPa-7Hb15qK2yVXkJtHddltQQhbJymeip2XrwQhUO1jY1CWGpZ4SXOmAkEGd6i5ZOAAdj9ugh1RBZoPtWvB2j0cy2p-NmrdnCWDqubF5wlCIP", discount: "3 Al 2 Öde" },
-    { brand: "Saint Laurent", name: "SL 276 Cat-Eye", price: "₺14.200", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD0PesV603qtPymgmSWtIkSEfRErJUUe9oBtrM-wpHzSuLuh0HJvOVswK6uKWU9Sl-w6Mz9EcW36cHiWOXJos3N0dHbIwIe8lkW-Z_XdgwAMswFqWpddToyYCdJMyXnaO08wR9dsE7ZUqOiHxDxd4EQTiDXsEoUG-YU-lSjDJ3tNM6Gosz4lXeA9mGJynAdSRauNgO5jG71hH7VvNts1pAuNtIhcKuNePzHf932233Aapq-HekoD8MK3UGDGxwLbMRQz4bZo6h43tC" },
     { brand: "Saint Laurent", name: "Opyum Leather Pumps", price: "₺29.325", oldPrice: "₺34.500", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAhKCVfLkeIakmDGjF8TwU23Ac72q9M8Ol74q4CN6ZU5Q8pv68uzsbq2PPqWrpSXbOLIlaFBboJE82bI7qZL8XuwvRwHhiLcSM0kMbRKau-BjPvZH1QHaYMvI4NtqvUKWAvbBzVAG2CZ1ylRXRinr7Oa-ISeeDTpmmL4lP7ByFJGbwrujLijj2MnZzTOl7LIoBwdnuLLWxC9jVTcD6-dKQOTVBGL7-4K3xMZWDvg1iiNeGpy8bevWA7af9oCFaN54voQzsJv7nthiOs", discount: "Sepette %15" },
 ];
-
-const COLOR_MAP: Record<string, string> = {
-    "Siyah": "#1A1A1A",
-    "Beyaz": "#FFFFFF",
-    "Kırmızı": "#8B0000",
-    "Mavi": "#00008B",
-    "Yeşil": "#006400",
-    "Pembe": "#FFC0CB",
-    "Altın": "#D4AF37",
-    "Gümüş": "#C0C0C0",
-    "Gri": "#808080",
-    "Bej": "#F5F5DC",
-    "Tan": "#C19A6B",
-    "Bordo": "#800000",
-    "Lacivert": "#000080",
-    "Krem": "#FFFDD0"
-};
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
     const [selectedImgIndex, setSelectedImgIndex] = useState(0);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
 
-    // Group variants by attributes
     const allAttributes = product.variants.reduce((acc, variant) => {
         variant.attributes.forEach((attr) => {
             const attrName = attr.attribute.name;
             if (!acc[attrName]) {
-                acc[attrName] = [];
+                acc[attrName] = { hasColor: !!attr.attribute.hasColor, values: [] };
             }
-            if (!acc[attrName].find((v) => v.slug === attr.attributeValue.slug)) {
-                acc[attrName].push(attr.attributeValue);
+            if (!acc[attrName].values.find((v) => v.slug === attr.attributeValue.slug)) {
+                acc[attrName].values.push(attr.attributeValue);
             }
         });
         // Sort values (optional)
         return acc;
-    }, {} as Record<string, { value: string; slug: string }[]>);
+    }, {} as Record<string, { hasColor: boolean; values: { value: string; slug: string; colorCode?: string | null }[] }>);
 
     // Handle attribute selection
     const handleAttributeSelect = (attrName: string, valueSlug: string) => {
@@ -180,7 +161,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
                     {/* Variations */}
                     <div className="space-y-6 pt-6 border-t border-gray-100">
-                        {Object.entries(allAttributes).map(([attrName, values]) => (
+                        {Object.entries(allAttributes).map(([attrName, { hasColor, values }]) => (
                             <div key={attrName}>
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="text-xs font-bold uppercase tracking-widest text-primary">
@@ -190,10 +171,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                     {/* <button className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">Beden Tablosu</button> */}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
-                                    {attrName.toLowerCase().includes("renk") ? (
+                                    {hasColor ? (
                                         <div className="flex gap-4">
                                             {values.map((val) => {
-                                                const hex = COLOR_MAP[val.value] || "#CCCCCC";
+                                                const hex = val.colorCode || "#CCCCCC";
                                                 const isSelected = selectedAttributes[attrName] === val.slug;
                                                 return (
                                                     <button
