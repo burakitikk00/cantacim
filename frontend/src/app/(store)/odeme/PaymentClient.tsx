@@ -1,16 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Address } from "@prisma/client";
+import { useCartStore } from "@/store/cart";
+import { calculateShippingCost, StoreSettingsParams } from "@/utils/shipping";
 
-export default function PaymentClient({ initialAddresses }: { initialAddresses: Address[] }) {
+export default function PaymentClient({ initialAddresses, settings }: { initialAddresses: Address[], settings: StoreSettingsParams | null }) {
     const router = useRouter();
-    const [selectedShipping, setSelectedShipping] = useState("express");
+    const { items: cartItems, totalPrice } = useCartStore();
+    const [isMounted, setIsMounted] = useState(false);
+    const [selectedShipping, setSelectedShipping] = useState<string>("");
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
     const [isFlipped, setIsFlipped] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        if (useCartStore.getState().items.length === 0) {
+            router.push("/sepet");
+        } else {
+            if (settings?.calcMethod === "delivery_method" && settings.deliveryMethods && settings.deliveryMethods.length > 0) {
+                const defMethod = settings.deliveryMethods.find((m: any) => m.isDefault);
+                if (defMethod) {
+                    setSelectedShipping(defMethod.id.toString());
+                } else {
+                    setSelectedShipping(settings.deliveryMethods[0].id.toString());
+                }
+            } else {
+                setSelectedShipping("standard");
+            }
+        }
+    }, [router, settings]);
 
     // Sort addresses conceptually so default is first
     const defaultAddress = initialAddresses.find(a => a.isDefault) || initialAddresses[0];
@@ -24,7 +46,7 @@ export default function PaymentClient({ initialAddresses }: { initialAddresses: 
     const [isAddressExpanded, setIsAddressExpanded] = useState(false);
 
     const handleCompleteOrder = () => {
-        router.push(`/odeme/onay?shipping=${selectedShipping}`);
+        router.push(`/odeme/onay?shipping=${selectedShipping}&address=${selectedAddressId}`);
     };
 
     const handleAddressSelect = (id: string) => {
@@ -58,6 +80,17 @@ export default function PaymentClient({ initialAddresses }: { initialAddresses: 
     };
 
     const visibleAddresses = isAddressExpanded ? addresses : addresses.slice(0, 2);
+
+    // Calculate shipping 
+    const isDeliveryMethod = settings?.calcMethod === "delivery_method";
+    const parseId = parseInt(selectedShipping);
+    const shippingCost = settings ? calculateShippingCost(settings, cartItems, isNaN(parseId) ? undefined : parseId) : 0;
+
+    // Find options to display
+    let deliveryOptionsToRender: any[] = [];
+    if (isDeliveryMethod && settings?.deliveryMethods) {
+        deliveryOptionsToRender = settings.deliveryMethods;
+    }
 
     return (
         <main className="max-w-7xl mx-auto px-6 pb-12 pt-32 lg:px-20">
@@ -156,44 +189,54 @@ export default function PaymentClient({ initialAddresses }: { initialAddresses: 
                             <h3 className="text-2xl font-bold tracking-tight">Kargo Yöntemi</h3>
                         </div>
                         <div className="space-y-4">
-                            <label className={`flex items-center justify-between p-5 border-2 ${selectedShipping === 'express' ? 'border-primary' : 'border-zinc-200'} bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
-                                <div className="flex items-center gap-4">
-                                    <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-primary">local_shipping</span>
+                            {!isDeliveryMethod && (
+                                <label className={`flex items-center justify-between p-5 border-2 border-primary bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-primary">local_shipping</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-zinc-700">Standart Teslimat</p>
+                                            <p className="text-sm text-zinc-400">Belirlenen kurallara göre kargo</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-bold">Elite Express Delivery</p>
-                                        <p className="text-sm text-zinc-500">Yarın teslimat (24 saat içinde)</p>
+                                    <p className="font-extrabold text-primary">
+                                        {shippingCost === 0 ? "Ücretsiz" : `₺${new Intl.NumberFormat("tr-TR").format(shippingCost)}`}
+                                    </p>
+                                    <input
+                                        className="hidden"
+                                        name="shipping"
+                                        type="radio"
+                                        checked={true}
+                                        readOnly
+                                    />
+                                </label>
+                            )}
+
+                            {isDeliveryMethod && deliveryOptionsToRender.map((option) => (
+                                <label key={option.id} className={`flex items-center justify-between p-5 border-2 ${selectedShipping === option.id.toString() ? 'border-primary' : 'border-zinc-200'} bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-primary">local_shipping</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold">{option.name}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <p className="font-extrabold text-primary">₺149,00</p>
-                                <input
-                                    className="hidden"
-                                    name="shipping"
-                                    type="radio"
-                                    checked={selectedShipping === 'express'}
-                                    onChange={() => setSelectedShipping('express')}
-                                />
-                            </label>
-                            <label className={`flex items-center justify-between p-5 border-2 ${selectedShipping === 'standard' ? 'border-primary' : 'border-zinc-200'} bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
-                                <div className="flex items-center gap-4">
-                                    <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-zinc-400">inventory_2</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-zinc-700">Standart Kurye</p>
-                                        <p className="text-sm text-zinc-400">2-3 iş günü içinde teslimat</p>
-                                    </div>
-                                </div>
-                                <p className="font-extrabold text-primary">Ücretsiz</p>
-                                <input
-                                    className="hidden"
-                                    name="shipping"
-                                    type="radio"
-                                    checked={selectedShipping === 'standard'}
-                                    onChange={() => setSelectedShipping('standard')}
-                                />
-                            </label>
+                                    <p className="font-extrabold text-primary">
+                                        {Number(option.fee.toString().replace(",", ".")) === 0
+                                            ? "Ücretsiz"
+                                            : `₺${new Intl.NumberFormat("tr-TR").format(Number(option.fee.toString().replace(",", ".")))}`}
+                                    </p>
+                                    <input
+                                        className="hidden"
+                                        name="shipping"
+                                        type="radio"
+                                        checked={selectedShipping === option.id.toString()}
+                                        onChange={() => setSelectedShipping(option.id.toString())}
+                                    />
+                                </label>
+                            ))}
                         </div>
                     </section>
 
@@ -327,53 +370,47 @@ export default function PaymentClient({ initialAddresses }: { initialAddresses: 
                     <div className="sticky top-28 bg-white border border-zinc-200 rounded-2xl p-8 shadow-sm">
                         <h3 className="text-xl font-bold mb-6 pb-6 border-b border-zinc-100">Sipariş Özeti</h3>
                         {/* Item List Preview */}
-                        <div className="space-y-6 mb-8">
-                            <div className="flex gap-4">
-                                <div className="size-16 bg-zinc-100 rounded-lg overflow-hidden flex-shrink-0">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img className="w-full h-full object-cover" alt="Luxury red sneaker shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByL3ceVbFvW7uYEwwRmwi-UiYl5qIKes6baZ4_2034l2jgC7gYb4Tc6zfiK1hupwrJiThc5gBOiIxw-vEYy114xIMiaawj-Lcck8QdRYFAL-cMk59STDDrT9DSNp94g_2gji7c4dE2oKD-VFnJM-U_BJnI_E3yXzuaip6YLtcWgPh4D71X3RNuI-6EkSBgDZJg3-L0Avp1cYBagsM_lQ8QmzIycPPOGLQcbyPPK6wvhigszi2TXavwH8awNbf0XTlu5_kcZWRXDmw6" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-bold text-primary line-clamp-1">Velvet Nero Sneakers</p>
-                                    <p className="text-xs text-zinc-500 mt-1">Beden: 42 | Siyah</p>
-                                    <div className="flex justify-between items-center mt-2">
-                                        <span className="text-xs font-medium">1 Adet</span>
-                                        <span className="text-sm font-extrabold">₺4.250,00</span>
+                        <div className="space-y-6 mb-8 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                            {isMounted && cartItems.map((item) => (
+                                <div key={item.variantId} className="flex gap-4">
+                                    <div className="size-16 bg-zinc-100 rounded-lg overflow-hidden flex-shrink-0">
+                                        {item.image ? (
+                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                            <img className="w-full h-full object-cover" alt={item.productName} src={item.image} />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-zinc-200">
+                                                <span className="material-symbols-outlined text-zinc-400">image</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-bold text-primary line-clamp-1">{item.productName}</p>
+                                        <p className="text-xs text-zinc-500 mt-1">{item.variantLabel}</p>
+                                        <div className="flex justify-between items-center mt-2">
+                                            <span className="text-xs font-medium">{item.quantity} Adet</span>
+                                            <span className="text-sm font-extrabold">₺{new Intl.NumberFormat("tr-TR").format(item.price * item.quantity)}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="size-16 bg-zinc-100 rounded-lg overflow-hidden flex-shrink-0">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img className="w-full h-full object-cover" alt="Luxury black leather handbag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5Xsr7uS7Yt1MbwDIGRYl2hl2jQtxCD8rMT4Rhi8BR-6yxvGS8yLxvBZzd97g30UzaxJuObROa-sXfH76zPfd6q33XOHuwv1iu8wcWjFJh3OocN3GVppoAEuslGVYvnqCXcYlh8wp5JE9dv5e2v31tZqs21vs95S7vEcuRPg0xUqIsGodgcFmfQCSGT2W5BZ8bd15U8_iNG0qK1ElPcE_JHhOq6MF3t5M6auTRt6Y_GW7OlH7M7OLV594AmMTPu-KSOlRYZE2c4_I-" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-bold text-primary line-clamp-1">L'Elite Signature Bag</p>
-                                    <p className="text-xs text-zinc-500 mt-1">Tek Beden | Deri</p>
-                                    <div className="flex justify-between items-center mt-2">
-                                        <span className="text-xs font-medium">1 Adet</span>
-                                        <span className="text-sm font-extrabold">₺12.400,00</span>
-                                    </div>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                         {/* Totals */}
                         <div className="space-y-4 pt-6 border-t border-zinc-100 mb-8">
                             <div className="flex justify-between text-zinc-500">
                                 <span>Ara Toplam</span>
-                                <span>₺16.650,00</span>
+                                <span>₺{isMounted ? new Intl.NumberFormat("tr-TR").format(totalPrice()) : "0,00"}</span>
                             </div>
                             <div className="flex justify-between text-zinc-500">
                                 <span>Kargo Ücreti</span>
                                 <span className="text-primary font-medium">
-                                    {selectedShipping === 'express' ? '₺149,00' : 'Ücretsiz'}
+                                    {shippingCost === 0 ? 'Ücretsiz' : `₺${new Intl.NumberFormat("tr-TR").format(shippingCost)}`}
                                 </span>
                             </div>
                             <div className="flex justify-between items-end pt-4 border-t border-zinc-100">
                                 <span className="text-lg font-bold">Toplam</span>
                                 <div className="text-right">
                                     <p className="text-2xl font-extrabold tracking-tighter text-primary">
-                                        {selectedShipping === 'express' ? '₺16.799,00' : '₺16.650,00'}
+                                        ₺{isMounted ? new Intl.NumberFormat("tr-TR").format(totalPrice() + shippingCost) : "0,00"}
                                     </p>
                                 </div>
                             </div>

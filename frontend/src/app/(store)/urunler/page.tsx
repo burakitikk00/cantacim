@@ -94,7 +94,20 @@ export default async function ProductsPage({
     const products = await db.product.findMany({
         where,
         include: {
-            category: true,
+            category: {
+                include: {
+                    discounts: {
+                        where: {
+                            isActive: true,
+                            startDate: { lte: new Date() },
+                            OR: [
+                                { endDate: null },
+                                { endDate: { gte: new Date() } }
+                            ]
+                        }
+                    }
+                }
+            },
             variants: {
                 include: {
                     attributes: {
@@ -104,29 +117,70 @@ export default async function ProductsPage({
                     }
                 }
             },
+            discounts: {
+                where: {
+                    isActive: true,
+                    startDate: { lte: new Date() },
+                    OR: [
+                        { endDate: null },
+                        { endDate: { gte: new Date() } }
+                    ]
+                }
+            }
         },
         orderBy,
         skip: (currentPage - 1) * itemsPerPage,
         take: itemsPerPage,
     });
 
-    const serializedProducts = products.map(p => ({
-        ...p,
-        basePrice: p.basePrice.toString(),
-        createdAt: p.createdAt.toISOString(),
-        updatedAt: p.updatedAt.toISOString(),
-        category: {
-            ...p.category,
-            createdAt: p.category.createdAt.toISOString(),
-            updatedAt: p.category.updatedAt.toISOString(),
-        },
-        variants: p.variants.map(v => ({
-            ...v,
-            price: v.price.toString(),
-            createdAt: v.createdAt.toISOString(),
-            updatedAt: v.updatedAt.toISOString(),
-        }))
-    }));
+    const serializedProducts = products.map(p => {
+        let discountText: string | undefined = undefined;
+        let discountedPrice: number | undefined = undefined;
+
+        // Check product-specific discount first
+        const activeDiscount = p.discounts[0];
+        if (activeDiscount) {
+            if (activeDiscount.discountType === "PERCENTAGE") {
+                discountedPrice = Number(p.basePrice) * (1 - Number(activeDiscount.value) / 100);
+                discountText = `%${Number(activeDiscount.value)} İndirim`;
+            } else {
+                discountedPrice = Number(p.basePrice) - Number(activeDiscount.value);
+                discountText = `${Number(activeDiscount.value)}₺ İndirim`;
+            }
+        } else {
+            // Fallback to category discount
+            const categoryDiscount = p.category.discounts[0];
+            if (categoryDiscount) {
+                if (categoryDiscount.discountType === "PERCENTAGE") {
+                    discountedPrice = Number(p.basePrice) * (1 - Number(categoryDiscount.value) / 100);
+                    discountText = `%${Number(categoryDiscount.value)} İndirim`;
+                } else {
+                    discountedPrice = Number(p.basePrice) - Number(categoryDiscount.value);
+                    discountText = `${Number(categoryDiscount.value)}₺ İndirim`;
+                }
+            }
+        }
+
+        return {
+            ...p,
+            basePrice: p.basePrice.toString(),
+            createdAt: p.createdAt.toISOString(),
+            updatedAt: p.updatedAt.toISOString(),
+            discountText,
+            discountedPrice: discountedPrice?.toString() || undefined,
+            category: {
+                ...p.category,
+                createdAt: p.category.createdAt.toISOString(),
+                updatedAt: p.category.updatedAt.toISOString(),
+            },
+            variants: p.variants.map(v => ({
+                ...v,
+                price: v.price.toString(),
+                createdAt: v.createdAt.toISOString(),
+                updatedAt: v.updatedAt.toISOString(),
+            }))
+        };
+    });
 
     const categories = await db.category.findMany({
         where: { isActive: true },

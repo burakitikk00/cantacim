@@ -10,6 +10,7 @@ const NAV = [
     { icon: "receipt_long", label: "Siparişler", href: "/admin/siparisler" },
     { icon: "group", label: "Müşteriler", href: "/admin/musteriler" },
     { icon: "local_offer", label: "İndirimler", href: "/admin/indirimler" },
+    { icon: "rate_review", label: "Yorumlar", href: "/admin/yorumlar" },
 ];
 
 const STORE_MANAGEMENT_ITEMS = [

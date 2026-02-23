@@ -4,6 +4,8 @@ import { db as prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { getStoreSettings } from "@/app/actions/settings";
+import { StoreSettingsParams } from "@/utils/shipping";
 
 export default async function PaymentPage() {
     const session = await getServerSession(authOptions);
@@ -28,5 +30,8 @@ export default async function PaymentPage() {
         ]
     });
 
-    return <PaymentClient initialAddresses={addresses} />;
+    const settingsRes = await getStoreSettings();
+    const settings = (settingsRes.success ? settingsRes.data : null) as StoreSettingsParams | null;
+
+    return <PaymentClient initialAddresses={addresses} settings={settings} />;
 }

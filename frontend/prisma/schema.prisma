@@ -22,6 +22,25 @@ enum OrderStatus {
   REFUNDED
 }
 
+// ─── STORE SETTINGS ───────────────────────────────────
+model StoreSettings {
+  id                  String   @id @default("default")
+  shippingFee         Decimal  @default(90) @db.Decimal(10, 2)
+  applyToFree         Boolean  @default(false)
+  calcMethod          String   @default("single")
+  freeShippingActive  Boolean  @default(false)
+  internationalActive Boolean  @default(false)
+  
+  firstPlusExtra      Decimal  @default(0) @db.Decimal(10, 2)
+  thresholdValue      Decimal  @default(500) @db.Decimal(10, 2)
+  belowThresholdFee   Decimal  @default(90) @db.Decimal(10, 2)
+  aboveThresholdFee   Decimal  @default(0) @db.Decimal(10, 2)
+  deliveryMethods     Json?
+
+  currency            String   @default("TL")
+  updatedAt           DateTime @updatedAt
+}
+
 // ─── AUTH & SECURITY ──────────────────────────────────
 model User {
   id             String    @id @default(cuid())
@@ -54,8 +73,10 @@ model User {
   totalSpent     Decimal        @default(0) @db.Decimal(10, 2)
   customerGroupId String?
 
-  customerGroup  CustomerGroup? @relation(fields: [customerGroupId], references: [id])
-  accounts       Account[]
+  customerGroup      CustomerGroup? @relation(fields: [customerGroupId], references: [id])
+  accounts           Account[]
+  reviews            ProductReview[]
+  stockNotifications StockNotification[]
 
 
   @@index([email])
@@ -236,6 +257,7 @@ model Product {
   favorites        Favorite[]
   discounts        Discount[]
   coupons          Coupon[]
+  reviews          ProductReview[]
 
   @@index([slug])
   @@index([categoryId])
@@ -287,8 +309,9 @@ model ProductVariant {
 
   product    Product                        @relation(fields: [productId], references: [id], onDelete: Cascade)
   attributes ProductVariantAttributeValue[]
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  cartItems          CartItem[]
+  orderItems         OrderItem[]
+  stockNotifications StockNotification[]
 
   @@index([productId])
   @@index([sku])
@@ -356,6 +379,7 @@ model Order {
   address Address     @relation(fields: [addressId], references: [id])
   coupon  Coupon?     @relation(fields: [couponId], references: [id])
   items   OrderItem[]
+  reviews ProductReview[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -457,4 +481,39 @@ model Discount {
   categories     Category[]
 
   @@index([isActive])
+}
+
+// ─── PRODUCT REVIEWS ──────────────────────────────────
+model ProductReview {
+  id         String   @id @default(cuid())
+  productId  String
+  userId     String
+  orderId    String
+  rating     Int      // 1-5
+  comment    String?  @db.Text
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId, orderId])
+  @@index([productId])
+  @@index([isApproved])
+}
+
+// ─── STOCK NOTIFICATIONS ──────────────────────────────
+model StockNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  variantId String
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, variantId])
 }
