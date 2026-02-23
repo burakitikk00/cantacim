@@ -33,9 +33,12 @@ interface ProductTableProps {
     products: Product[];
     currentPage: number;
     totalPages: number;
+    selectedIds?: string[];
+    onSelect?: (id: string, checked: boolean) => void;
+    onSelectAll?: (checked: boolean) => void;
 }
 
-export default function ProductTable({ products, currentPage, totalPages }: ProductTableProps) {
+export default function ProductTable({ products, currentPage, totalPages, selectedIds = [], onSelect, onSelectAll }: ProductTableProps) {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const router = useRouter();
@@ -64,6 +67,16 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                 <table className="w-full text-left">
                     <thead className="bg-gray-50/50 border-b border-gray-100">
                         <tr>
+                            {onSelectAll && (
+                                <th className="px-6 py-4 text-xs font-bold text-gray-400">
+                                    <input
+                                        type="checkbox"
+                                        className="rounded border-gray-300 text-[#FF007F] focus:ring-[#FF007F]"
+                                        checked={products.length > 0 && selectedIds.length === products.length}
+                                        onChange={(e) => onSelectAll(e.target.checked)}
+                                    />
+                                </th>
+                            )}
                             <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ürün</th>
                             <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Kategori</th>
                             <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Fiyat</th>
@@ -75,7 +88,7 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                     <tbody className="divide-y divide-gray-50">
                         {products.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center">
+                                <td colSpan={onSelectAll ? 7 : 6} className="px-6 py-12 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray-400">
                                         <span className="material-icons text-4xl mb-2">inventory_2</span>
                                         <p className="text-sm">Henüz hiç ürün eklenmemiş.</p>
@@ -93,8 +106,18 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                                     <Fragment key={product.id}>
                                         <tr
                                             className={`transition-colors group ${isExpanded ? "bg-gray-50" : "hover:bg-gray-50/80"
-                                                }`}
+                                                } ${selectedIds.includes(product.id) ? "bg-[#FF007F]/5 hover:bg-[#FF007F]/10" : ""}`}
                                         >
+                                            {onSelect && (
+                                                <td className="px-6 py-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-gray-300 text-[#FF007F] focus:ring-[#FF007F]"
+                                                        checked={selectedIds.includes(product.id)}
+                                                        onChange={(e) => onSelect(product.id, e.target.checked)}
+                                                    />
+                                                </td>
+                                            )}
                                             <td className="px-6 py-4 cursor-pointer" onClick={() => hasVariants && toggleExpand(product.id)}>
                                                 <div className="flex items-center gap-4">
                                                     <div className="h-12 w-12 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0 relative group-hover:border-[#FF007F]/20 transition-colors">
@@ -202,7 +225,7 @@ export default function ProductTable({ products, currentPage, totalPages }: Prod
                                         </tr>
                                         {isExpanded && (
                                             <tr className="bg-gray-50/50">
-                                                <td colSpan={6} className="px-6 py-4 shadow-inner">
+                                                <td colSpan={onSelectAll ? 7 : 6} className="px-6 py-4 shadow-inner">
                                                     <div className="pl-16">
                                                         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                                                             <span className="material-icons text-sm">style</span>
