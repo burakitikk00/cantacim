@@ -121,6 +121,10 @@ export default async function ProductDetailPage({
         },
         include: {
             category: true,
+            variants: {
+                where: { isActive: true },
+                select: { image: true }
+            },
             discounts: {
                 where: {
                     isActive: true,
@@ -217,7 +221,7 @@ export default async function ProductDetailPage({
             name: p.name,
             slug: p.slug,
             basePrice: p.basePrice.toString(),
-            images: p.images,
+            images: p.images.length > 0 ? p.images : p.variants.map((v) => v.image).filter(Boolean) as string[],
             category: { name: p.category.name, slug: p.category.slug },
             discountedPrice: discountedPrice?.toString() || null,
             discountText,

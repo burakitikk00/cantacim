@@ -314,9 +314,9 @@ export default function ProductDetailClient({
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-5xl mx-auto">
                 {/* Left Column: Image Gallery */}
-                <div className="flex gap-6 h-fit lg:sticky lg:top-28">
+                <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-6 h-fit lg:sticky lg:top-28">
                     {/* Thumbnails */}
-                    <div className="flex flex-col gap-4 w-16 shrink-0 no-scrollbar overflow-y-auto max-h-[500px]">
+                    <div className="flex flex-row md:flex-col gap-3 md:gap-4 w-full md:w-16 shrink-0 no-scrollbar overflow-x-auto md:overflow-y-auto snap-x max-h-none md:max-h-[500px]">
                         {displayImages.map((img, i) => (
                             <div
                                 key={i}
@@ -335,7 +335,7 @@ export default function ProductDetailClient({
                                         }
                                     }
                                 }}
-                                className={`aspect-[3/4] w-full bg-gray-50 rounded-lg overflow-hidden cursor-pointer transition-all ${selectedImgIndex === i ? "ring-1 ring-primary" : "hover:ring-1 hover:ring-gray-300"}`}
+                                className={`aspect-[3/4] w-[4.5rem] md:w-full shrink-0 snap-start bg-gray-50 rounded-lg overflow-hidden cursor-pointer transition-all ${selectedImgIndex === i ? "ring-1 ring-primary" : "hover:ring-1 hover:ring-gray-300"}`}
                             >
                                 <img
                                     alt={`${product.name} thumbnail ${i + 1}`}
@@ -347,10 +347,10 @@ export default function ProductDetailClient({
                     </div>
 
                     {/* Main Image */}
-                    <div className="flex-1 aspect-[3/4] max-h-[600px] bg-[#f9fafb] rounded-xl overflow-hidden group">
+                    <div className="flex-1 aspect-[3/4] max-h-[600px] w-full bg-[#f9fafb] rounded-xl overflow-hidden group">
                         <img
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 cursor-pointer"
                             src={mainImage}
                         />
                     </div>

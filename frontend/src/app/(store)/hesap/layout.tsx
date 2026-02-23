@@ -7,7 +7,7 @@ export default function ProfileLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-background-light dark:bg-background-dark text-primary flex items-start">
+        <div className="min-h-screen bg-background-light text-primary flex items-start">
             {/* Main Layout containing Mobile & Desktop Sidebars */}
             <div className="flex-1 px-4 lg:px-12 pb-6 lg:pb-12 pt-24 lg:pt-32 max-w-7xl mx-auto w-full flex flex-col lg:flex-row gap-0 lg:gap-12">
 
