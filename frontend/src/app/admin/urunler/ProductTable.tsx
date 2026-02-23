@@ -3,6 +3,7 @@
 import { useState, Fragment } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image-helpers";
 import { deleteProduct } from "./actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
@@ -124,7 +125,7 @@ export default function ProductTable({ products, currentPage, totalPages, select
                                                         {(product.images[0] || product.variants[0]?.image) ? (
                                                             // eslint-disable-next-line @next/next/no-img-element
                                                             <img
-                                                                src={product.images[0] || product.variants[0]?.image || ''}
+                                                                src={getImageSrc(product.images[0] || product.variants[0]?.image || '')}
                                                                 alt={product.name}
                                                                 className="w-full h-full object-cover"
                                                                 onError={(e) => {

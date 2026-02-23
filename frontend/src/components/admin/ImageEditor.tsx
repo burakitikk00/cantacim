@@ -71,18 +71,45 @@ export default function ImageEditor({ imageSrc, onSave, onCancel }: ImageEditorP
         ctx.restore();
     }, [image, rotation, scale]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!canvasRef.current) return;
         setIsProcessing(true);
         try {
-            const dataUrl = canvasRef.current.toDataURL("image/jpeg", 0.9);
-            onSave(dataUrl);
+            // Canvas'ı Blob'a çevir
+            const blob = await new Promise<Blob | null>((resolve) => {
+                canvasRef.current!.toBlob(resolve, "image/jpeg", 0.9);
+            });
+
+            if (!blob) {
+                console.error("Canvas to blob failed");
+                return;
+            }
+
+            // FormData ile upload API'sine gönder
+            const formData = new FormData();
+            formData.append("file", blob, `edited-${Date.now()}.jpg`);
+
+            const response = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (result.success && result.url) {
+                onSave(result.url);
+            } else {
+                console.error("Upload failed:", result.error);
+                alert("Görsel kaydedilirken bir hata oluştu: " + (result.error || "Bilinmeyen hata"));
+            }
         } catch (e) {
             console.error("Save error:", e);
+            alert("Görsel kaydedilirken bir hata oluştu.");
         } finally {
             setIsProcessing(false);
         }
     };
+
 
     return (
         <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4">

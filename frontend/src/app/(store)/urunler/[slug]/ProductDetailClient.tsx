@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image-helpers";
 import FavoriteButton from "@/components/store/FavoriteButton";
 
 interface ProductVariant {
@@ -82,7 +83,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     const uniqueVariantImages = Array.from(new Set(variantImages));
     const displayImages = [...product.images, ...uniqueVariantImages];
 
-    const mainImage = selectedVariant?.image || displayImages[selectedImgIndex] || "/placeholder.jpg";
+    const mainImage = getImageSrc(selectedVariant?.image || displayImages[selectedImgIndex] || null);
     const isOutOfStock = selectedVariant ? selectedVariant.stock === 0 : false;
 
     return (
@@ -112,7 +113,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 <img
                                     alt={`${product.name} thumbnail ${i + 1}`}
                                     className="w-full h-full object-cover"
-                                    src={img}
+                                    src={getImageSrc(img)}
                                 />
                             </div>
                         ))}

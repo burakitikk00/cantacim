@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image-helpers";
 import FavoriteButton from "@/components/store/FavoriteButton";
 
 interface Product {
@@ -370,7 +371,7 @@ export default function ProductsClient({
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
                     {products.map((product) => {
-                        const displayImage = product.images[0] || product.variants.find((v: any) => v.image)?.image || "/placeholder.jpg";
+                        const displayImage = getImageSrc(product.images[0] || product.variants.find((v: any) => v.image)?.image || null);
                         return (
                             <Link key={product.id} href={`/urunler/${product.slug}`} className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md">
                                 <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">

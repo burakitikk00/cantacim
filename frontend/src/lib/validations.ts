@@ -67,14 +67,23 @@ export const orderStatusSchema = z.object({
 
 /* ─── COUPON ────────────────────────────────────────── */
 export const couponSchema = z.object({
-    code: z.string().min(3).max(30).toUpperCase(),
+    name: z.string().min(1).max(100),
+    code: z.string().min(2).max(30).toUpperCase(),
     description: z.string().optional(),
-    discountType: z.enum(["PERCENTAGE", "FIXED"]),
-    discountValue: z.number().positive(),
+    discountType: z.enum(["PERCENTAGE", "FIXED", "BUY_X_GET_Y", "FREE_SHIPPING"]),
+    discountValue: z.number().min(0),
+    discountMethod: z.enum(["AUTO", "CODE", "TIER", "USER"]),
+    scope: z.enum(["ALL", "CATEGORIES", "PRODUCTS", "CATEGORIES_AND_PRODUCTS"]),
     minOrderTotal: z.number().positive().optional(),
     maxUses: z.number().int().positive().optional(),
     validFrom: z.string().datetime().optional(),
     validUntil: z.string().datetime().optional(),
+    buyX: z.number().int().min(1).optional(),
+    getY: z.number().int().min(1).optional(),
+    targetTier: z.enum(["STANDARD", "ELITE", "PLATINUM"]).optional(),
+    targetUserId: z.string().optional(),
+    minRequirement: z.enum(["MIN_TOTAL", "MIN_QUANTITY"]).optional(),
+    minReqValue: z.number().min(0).optional(),
 });
 
 /* ─── ATTRIBUTE ─────────────────────────────────────── */

@@ -20,9 +20,67 @@ export async function deleteProduct(id: string) {
     }
 }
 
+export async function createProduct(data: any) {
+    try {
+        const { name, description, price, status, categoryId, brandId, images, variants, sku } = data;
+
+        const slug = name.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim() + '-' + Math.random().toString(36).substr(2, 6);
+
+        const product = await db.product.create({
+            data: {
+                name,
+                slug,
+                description: description || null,
+                basePrice: price ? Number(price) : 0,
+                isActive: status === 'Aktif',
+                categoryId,
+                brandId: brandId || null,
+                images: images || [],
+            }
+        });
+
+        if (variants && variants.length > 0) {
+            for (const v of variants) {
+                const variantSku = v.sku || sku || `SKU-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+                const newVariant = await db.productVariant.create({
+                    data: {
+                        sku: variantSku + '-' + Math.random().toString(36).substr(2, 3).toUpperCase(),
+                        price: v.price ? Number(v.price) : Number(price) || 0,
+                        stock: v.stock ? Number(v.stock) : 0,
+                        image: v.image || null,
+                        productId: product.id
+                    }
+                });
+
+                // Connect attribute values by ID
+                if (v.attributeValueIds && v.attributeValueIds.length > 0) {
+                    for (const avId of v.attributeValueIds) {
+                        await db.productVariantAttributeValue.create({
+                            data: {
+                                variantId: newVariant.id,
+                                attributeValueId: avId
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        revalidatePath("/admin/urunler");
+        return { success: true, id: product.id };
+    } catch (error) {
+        console.error("Failed to create product:", error);
+        return { success: false, error: "Ürün oluşturulurken bir hata oluştu." };
+    }
+}
+
 export async function updateProduct(id: string, data: any) {
     try {
-        const { name, description, price, status, categoryId, images, variants } = data;
+        const { name, description, price, status, categoryId, brandId, images, variants } = data;
 
         await db.product.update({
             where: { id },
@@ -32,6 +90,7 @@ export async function updateProduct(id: string, data: any) {
                 basePrice: price ? Number(price) : 0,
                 isActive: status === 'Aktif',
                 categoryId,
+                brandId: brandId || null,
                 images: images || [],
             }
         });
@@ -41,7 +100,7 @@ export async function updateProduct(id: string, data: any) {
             select: { id: true }
         });
         const existingIds = existingVariants.map(v => v.id);
-        const incomingIds = variants.map((v: any) => v.id).filter((vid: any) => typeof vid === 'string');
+        const incomingIds = (variants || []).map((v: any) => v.id).filter((vid: any) => typeof vid === 'string' && !vid.startsWith('temp-'));
 
         const toDelete = existingIds.filter(eid => !incomingIds.includes(eid));
         if (toDelete.length > 0) {
@@ -50,16 +109,16 @@ export async function updateProduct(id: string, data: any) {
             });
         }
 
-        for (const v of variants) {
+        for (const v of (variants || [])) {
             const variantData = {
                 sku: v.sku || `SKU-${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
                 price: v.price ? Number(v.price) : Number(price),
                 stock: v.stock ? Number(v.stock) : 0,
-                image: v.image,
+                image: v.image || null,
                 productId: id
             };
 
-            let variantId = typeof v.id === 'string' ? v.id : undefined;
+            let variantId = (typeof v.id === 'string' && !v.id.startsWith('temp-')) ? v.id : undefined;
 
             if (variantId) {
                 await db.productVariant.update({
@@ -73,12 +132,22 @@ export async function updateProduct(id: string, data: any) {
                 variantId = newVariant.id;
             }
 
+            // Clear old attribute connections
             await db.productVariantAttributeValue.deleteMany({
                 where: { variantId: variantId }
             });
 
-            if (v.color) await connectAttribute(variantId, "Renk", v.color);
-            if (v.size) await connectAttribute(variantId, "Beden", v.size);
+            // Connect attribute values by ID
+            if (v.attributeValueIds && v.attributeValueIds.length > 0) {
+                for (const avId of v.attributeValueIds) {
+                    await db.productVariantAttributeValue.create({
+                        data: {
+                            variantId: variantId,
+                            attributeValueId: avId
+                        }
+                    });
+                }
+            }
         }
 
         revalidatePath("/admin/urunler");
@@ -88,33 +157,6 @@ export async function updateProduct(id: string, data: any) {
         console.error("Failed to update product:", error);
         return { success: false, error: "Ürün güncellenirken bir hata oluştu." };
     }
-}
-
-async function connectAttribute(variantId: string, attributeName: string, value: string) {
-    const attribute = await db.attribute.findFirst({ where: { name: attributeName } });
-    if (!attribute) return;
-
-    let attrValue = await db.attributeValue.findFirst({
-        where: { attributeId: attribute.id, value: value }
-    });
-
-    if (!attrValue) {
-        const slug = value.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000);
-        attrValue = await db.attributeValue.create({
-            data: {
-                attributeId: attribute.id,
-                value: value,
-                slug: slug
-            }
-        });
-    }
-
-    await db.productVariantAttributeValue.create({
-        data: {
-            variantId: variantId,
-            attributeValueId: attrValue.id
-        }
-    });
 }
 
 // ─── GET ALL PRODUCT IDS (with filter support) ─────────────

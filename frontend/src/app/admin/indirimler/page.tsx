@@ -1,69 +1,314 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import {
+    getCoupons,
+    createCoupon,
+    updateCoupon,
+    toggleCouponStatus,
+    deleteCoupon,
+    getCategoriesForSelect,
+    getProductsForSelect,
+    getUsersForSelect,
+} from "./actions";
 
-// Mock Data
-const DISCOUNTS = [
-    { id: 1, name: "LİNA EFSANE KASIM", method: "Otomatik İndirim", type: "Yüzdesel İndirim", period: "21/11/2025 - 30/11/2025", usage: 55, status: "Aktif" },
-    { id: 2, name: "Hoşgeldin200", method: "İndirim Kodu", type: "Sabit Tutar İndirimi", period: "01/01/2025 - 31/12/2025", usage: 12, status: "Aktif" },
-    { id: 3, name: "3AL2ODE", method: "Otomatik İndirim", type: "3 Al 2 Öde", period: "10/10/2025 - 20/10/2025", usage: 120, status: "Pasif" },
+/* ─── TYPES ──────────────────────────────────────────── */
+interface CategoryOption { id: string; name: string }
+interface ProductOption { id: string; name: string; price: number; image: string | null }
+interface UserOption { id: string; name: string | null; surname: string | null; email: string; tier: string }
+interface CouponRow {
+    id: string; name: string; code: string; description: string | null;
+    discountType: string; discountValue: number; discountMethod: string;
+    scope: string; minOrderTotal: number | null; maxUses: number | null;
+    usedCount: number; isActive: boolean; validFrom: string; validUntil: string | null;
+    buyX: number | null; getY: number | null; targetTier: string | null;
+    targetUserId: string | null; targetUser: { id: string; name: string | null; surname: string | null; email: string } | null;
+    minRequirement: string | null; minReqValue: number | null;
+    categories: { id: string; name: string }[]; products: { id: string; name: string }[];
+    createdAt: string;
+}
+
+const DISCOUNT_METHODS = [
+    { value: "AUTO", label: "Otomatik İndirim" },
+    { value: "CODE", label: "İndirim Kodu" },
+    { value: "TIER", label: "Müşteri Çeşidi Seçimi" },
+    { value: "USER", label: "Müşteri Seçimi" },
 ];
 
-const CATEGORIES = [
-    { id: "c1", name: "Çantalar" },
-    { id: "c2", name: "Cüzdanlar" },
-    { id: "c3", name: "Gözlükler" },
-    { id: "c4", name: "Ayakkabılar" },
-    { id: "c5", name: "Aksesuarlar" },
+const DISCOUNT_TYPES_MAP: Record<string, { value: string; label: string }[]> = {
+    AUTO: [
+        { value: "PERCENTAGE", label: "Yüzdesel İndirim" },
+        { value: "FIXED", label: "Sabit Tutar İndirimi" },
+        { value: "BUY_X_GET_Y", label: "X Al Y Edin" },
+        { value: "FREE_SHIPPING", label: "Ücretsiz Kargo" },
+    ],
+    CODE: [
+        { value: "PERCENTAGE", label: "Yüzdesel İndirim" },
+        { value: "FIXED", label: "Sabit Tutar İndirimi" },
+        { value: "FREE_SHIPPING", label: "Ücretsiz Kargo" },
+    ],
+    TIER: [
+        { value: "PERCENTAGE", label: "Yüzdesel İndirim" },
+        { value: "FIXED", label: "Sabit Tutar İndirimi" },
+        { value: "BUY_X_GET_Y", label: "X Al Y Edin" },
+        { value: "FREE_SHIPPING", label: "Ücretsiz Kargo" },
+    ],
+    USER: [
+        { value: "PERCENTAGE", label: "Yüzdesel İndirim" },
+        { value: "FIXED", label: "Sabit Tutar İndirimi" },
+        { value: "BUY_X_GET_Y", label: "X Al Y Edin" },
+        { value: "FREE_SHIPPING", label: "Ücretsiz Kargo" },
+    ],
+};
+
+const TIER_LABELS: Record<string, string> = {
+    STANDARD: "Standart",
+    ELITE: "Elit",
+    PLATINUM: "Platinum",
+};
+
+const SCOPE_OPTIONS = [
+    { value: "ALL", label: "Tüm Ürünler" },
+    { value: "CATEGORIES", label: "Belirli Kategoriler" },
+    { value: "PRODUCTS", label: "Belirli Ürünler" },
+    { value: "CATEGORIES_AND_PRODUCTS", label: "Belirli Kategori ve Ürünler" },
 ];
 
-const PRODUCTS = [
-    { id: "p1", name: "Coach El ve Omuz Çantası", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAWkYNZTXDSMUJZste_RUGTXE_eNGk1-e-RZgvIfr2G0_Oszf_NZDotET0eB3Na5B5VKaF0VjY4sjbhFm4_FObfU968z0IT1_ijc67QlWQkdWIWVxgOeOmg7Z5w8jQyMroGWkrwlZggIdii1nSWC9vhK3iQiPTpJME6bIjNcMeHb1OAYeC06UG2cF_6dF2Nrn4cNJCkOv0yNKVPQDZprKdZJnFhUuSWet-xKGbzs0_aO55oAMcex7TO9954atJxRYZN-GfQe3k1P3cl", price: "4,480 TL" },
-    { id: "p2", name: "Versace Güneş Gözlüğü", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC-dt8Aavkwzw5kXpmQ0WTv5H6k14yC5JgJydPYHirb_gcU0ZyJ9pXMW5UYO-LztnM8tmbKpGXGIbmpXbylOn5Tsw40x1MiuAWTR9CfSEE5M85pLHkEGaMIAZOXUFxNSx50FYVYptItRL0NCwo6AUMYCDGixhrS5DG18j0KHlZVaJXTduUBS8rA0pJkkgxssHpDNCBQpGBGkN5ob5Nu_EcfoQZoU6MLXaP0CBYDtXlLI8PcKmFaYXdmsyKuiaLquRaT9NDDZCwGnnVZ", price: "3,830 TL" },
-    { id: "p3", name: "Miu Miu Güneş Gözlüğü", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBFkjNeTxXySPiQs35cnGZ66BcMoMLvWe710u51s2zOGz3vb7obnLMDrkGbQVUmTpCjeI0wksSTj03FchsJczAsaVTPXPp6MMpi6pXBaXJMIvKGG5NTqfqva67U_92f-giJS-fte1tQFcdUm4DjvFTi65_ep2-FLxUS5Xqw9NQjtHMWzRD6JqA7qKi71BC6kIAAhaOtshZ5VTBAYzDbEWdq9nlWPkrZuiKtntF8NKquU2fhUCEkAu--lwfsiz43ztRTxUusslsEaXZN", price: "3,130 TL" },
-    { id: "p4", name: "Saint Laurent Çanta", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDN7alVJYJImA_YeB77T8ihi8RpAgmepzTlPWfQ8qjShEHjRzuq_xHEZnWTxhC5yJ_-Cjm_aS4hyU_qrFwlqXwDVoAJOgwe1BiyluKCBsIWLRxcyF9bH3Bq8UTuXqu-CJr6p8REWkuLLIAscHN8NB-_OoOKOnjgd1tGAjaD-_cE-Ykvf-pHY5TFh3sfu5vY01Z2jKesMB_bPFkNj1tjJyc0Ru3ySq1jJUHU9QU6NL-5YNpeodii6aD5h3yoLTVqPmTtOFpEfCzvh7e2", price: "5,200 TL" },
-    { id: "p5", name: "Gucci Cüzdan", image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d2FsbGV0fGVufDB8fDB8fHww", price: "2,100 TL" },
-];
+/* ─── DEFAULT FORM STATE ─────────────────────────────── */
+const defaultForm = {
+    name: "", code: "", description: "", discountType: "PERCENTAGE",
+    discountValue: "", discountMethod: "AUTO", scope: "ALL",
+    minOrderTotal: "", maxUses: "", validFrom: "", validUntil: "",
+    isActive: true, buyX: "", getY: "", targetTier: "",
+    targetUserId: "", minRequirement: "", minReqValue: "",
+};
 
 export default function DiscountsPage() {
-    // Form State
-    const [method, setMethod] = useState("Otomatik İndirim");
-    const [type, setType] = useState("Yüzdesel İndirim");
-    const [code, setCode] = useState("");
-    const [amount, setAmount] = useState("");
-    const [minRequirement, setMinRequirement] = useState("Yok");
-    const [minReqValue, setMinReqValue] = useState("");
-    const [scope, setScope] = useState("Tüm Ürünler");
-    const [isActive, setIsActive] = useState(true);
+    // ── Data State
+    const [coupons, setCoupons] = useState<CouponRow[]>([]);
+    const [categories, setCategories] = useState<CategoryOption[]>([]);
+    const [products, setProducts] = useState<ProductOption[]>([]);
+    const [users, setUsers] = useState<UserOption[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Selection States
+    // ── Form State
+    const [form, setForm] = useState(defaultForm);
+    const [editId, setEditId] = useState<string | null>(null);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
     const [productSearch, setProductSearch] = useState("");
+    const [userSearch, setUserSearch] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    // Logic Variables
-    const typeOptions = method === "İndirim Kodu"
-        ? ["Yüzdesel İndirim", "Sabit Tutar İndirimi", "Ücretsiz Kargo"]
-        : ["Yüzdesel İndirim", "Sabit Tutar İndirimi", "3 Al 2 Öde", "X Alana Y %50 İndirimli"];
+    // ── Table State
+    const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "PASSIVE">("ALL");
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-    const showCodeInput = method === "İndirim Kodu";
-    const showAmountInput = type === "Yüzdesel İndirim" || type === "Sabit Tutar İndirimi";
-    const showMinReqValue = minRequirement !== "Yok";
+    // ── Fetch Data
+    const loadData = useCallback(async () => {
+        setLoading(true);
+        const [cRes, catRes, prodRes, userRes] = await Promise.all([
+            getCoupons(),
+            getCategoriesForSelect(),
+            getProductsForSelect(),
+            getUsersForSelect(),
+        ]);
+        if (cRes.success) setCoupons(cRes.data as CouponRow[]);
+        if (catRes.success) setCategories(catRes.data as CategoryOption[]);
+        if (prodRes.success) setProducts(prodRes.data as ProductOption[]);
+        if (userRes.success) setUsers(userRes.data as UserOption[]);
+        setLoading(false);
+    }, []);
 
-    const showCategorySelection = scope === "Belirli Kategoriler" || scope === "Belirli Kategori ve Ürünler";
-    const showProductSelection = scope === "Belirli Ürünler" || scope === "Belirli Kategori ve Ürünler";
+    useEffect(() => { loadData(); }, [loadData]);
 
-    const filteredProducts = PRODUCTS.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()));
+    // ── Product search
+    useEffect(() => {
+        const t = setTimeout(async () => {
+            const res = await getProductsForSelect(productSearch || undefined);
+            if (res.success) setProducts(res.data as ProductOption[]);
+        }, 300);
+        return () => clearTimeout(t);
+    }, [productSearch]);
+
+    // ── User search
+    useEffect(() => {
+        const t = setTimeout(async () => {
+            const res = await getUsersForSelect(userSearch || undefined);
+            if (res.success) setUsers(res.data as UserOption[]);
+        }, 300);
+        return () => clearTimeout(t);
+    }, [userSearch]);
+
+    // ── Form Helpers
+    const updateField = (field: string, value: string | boolean) => {
+        setForm((prev) => {
+            const next = { ...prev, [field]: value };
+            // Reset type when method changes
+            if (field === "discountMethod") {
+                const types = DISCOUNT_TYPES_MAP[value as string] || [];
+                next.discountType = types[0]?.value || "PERCENTAGE";
+                if (value !== "TIER") next.targetTier = "";
+                if (value !== "USER") next.targetUserId = "";
+            }
+            // Reset BUY_X_GET_Y fields when type changes
+            if (field === "discountType") {
+                if (value !== "BUY_X_GET_Y") { next.buyX = ""; next.getY = ""; }
+                if (value === "FREE_SHIPPING" || value === "BUY_X_GET_Y") next.discountValue = "";
+            }
+            if (field === "scope") {
+                if (value === "ALL") { setSelectedCategories([]); setSelectedProducts([]); }
+            }
+            return next;
+        });
+    };
+
+    const resetForm = () => {
+        setForm(defaultForm);
+        setEditId(null);
+        setSelectedCategories([]);
+        setSelectedProducts([]);
+        setMessage(null);
+    };
+
+    const loadEdit = (c: CouponRow) => {
+        setEditId(c.id);
+        setForm({
+            name: c.name, code: c.code, description: c.description || "",
+            discountType: c.discountType, discountValue: c.discountValue ? String(c.discountValue) : "",
+            discountMethod: c.discountMethod, scope: c.scope,
+            minOrderTotal: c.minOrderTotal ? String(c.minOrderTotal) : "",
+            maxUses: c.maxUses ? String(c.maxUses) : "",
+            validFrom: c.validFrom ? c.validFrom.slice(0, 16) : "",
+            validUntil: c.validUntil ? c.validUntil.slice(0, 16) : "",
+            isActive: c.isActive,
+            buyX: c.buyX ? String(c.buyX) : "", getY: c.getY ? String(c.getY) : "",
+            targetTier: c.targetTier || "", targetUserId: c.targetUserId || "",
+            minRequirement: c.minRequirement || "", minReqValue: c.minReqValue ? String(c.minReqValue) : "",
+        });
+        setSelectedCategories(c.categories.map((x) => x.id));
+        setSelectedProducts(c.products.map((x) => x.id));
+        setOpenMenuId(null);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // ── Submit
+    const handleSubmit = async () => {
+        setSubmitting(true);
+        setMessage(null);
+        const payload = {
+            name: form.name,
+            code: form.code.toUpperCase(),
+            description: form.description || undefined,
+            discountType: form.discountType as "PERCENTAGE" | "FIXED" | "BUY_X_GET_Y" | "FREE_SHIPPING",
+            discountValue: form.discountValue ? Number(form.discountValue) : 0,
+            discountMethod: form.discountMethod as "AUTO" | "CODE" | "TIER" | "USER",
+            scope: form.scope as "ALL" | "CATEGORIES" | "PRODUCTS" | "CATEGORIES_AND_PRODUCTS",
+            minOrderTotal: form.minOrderTotal ? Number(form.minOrderTotal) : null,
+            maxUses: form.maxUses ? Number(form.maxUses) : null,
+            validFrom: form.validFrom || undefined,
+            validUntil: form.validUntil || null,
+            isActive: form.isActive,
+            buyX: form.buyX ? Number(form.buyX) : null,
+            getY: form.getY ? Number(form.getY) : null,
+            targetTier: (form.targetTier || null) as "STANDARD" | "ELITE" | "PLATINUM" | null,
+            targetUserId: form.targetUserId || null,
+            minRequirement: (form.minRequirement || null) as "MIN_TOTAL" | "MIN_QUANTITY" | null,
+            minReqValue: form.minReqValue ? Number(form.minReqValue) : null,
+            categoryIds: selectedCategories,
+            productIds: selectedProducts,
+        };
+
+        const res = editId
+            ? await updateCoupon(editId, payload)
+            : await createCoupon(payload);
+
+        if (res.success) {
+            setMessage({ type: "success", text: editId ? "Kupon güncellendi!" : "Kupon oluşturuldu!" });
+            resetForm();
+            await loadData();
+        } else {
+            setMessage({ type: "error", text: res.error || "Bir hata oluştu." });
+        }
+        setSubmitting(false);
+    };
+
+    // ── Toggle / Delete
+    const handleToggle = async (id: string) => {
+        const res = await toggleCouponStatus(id);
+        if (res.success) await loadData();
+        setOpenMenuId(null);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Bu kuponu silmek istediğinize emin misiniz?")) return;
+        const res = await deleteCoupon(id);
+        if (res.success) {
+            await loadData();
+        } else {
+            setMessage({ type: "error", text: res.error || "Silinemedi." });
+        }
+        setOpenMenuId(null);
+    };
+
+    // ── Derived
+    const typeOptions = DISCOUNT_TYPES_MAP[form.discountMethod] || [];
+    const showCodeInput = form.discountMethod === "CODE";
+    const showAmountInput = form.discountType === "PERCENTAGE" || form.discountType === "FIXED";
+    const showBuyXGetY = form.discountType === "BUY_X_GET_Y";
+    const showTierSelect = form.discountMethod === "TIER";
+    const showUserSelect = form.discountMethod === "USER";
+    const showCategorySelection = form.scope === "CATEGORIES" || form.scope === "CATEGORIES_AND_PRODUCTS";
+    const showProductSelection = form.scope === "PRODUCTS" || form.scope === "CATEGORIES_AND_PRODUCTS";
+    const showMinReqValue = form.minRequirement !== "" && form.minRequirement !== null;
+
+    const filteredProducts = products.filter((p) =>
+        p.name.toLowerCase().includes(productSearch.toLowerCase())
+    );
+
+    const filteredCoupons = coupons.filter((c) => {
+        if (filter === "ACTIVE") return c.isActive;
+        if (filter === "PASSIVE") return !c.isActive;
+        return true;
+    });
 
     const toggleCategory = (id: string) => {
-        if (selectedCategories.includes(id)) setSelectedCategories(selectedCategories.filter(c => c !== id));
-        else setSelectedCategories([...selectedCategories, id]);
+        setSelectedCategories((prev) =>
+            prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+        );
+    };
+    const toggleProduct = (id: string) => {
+        setSelectedProducts((prev) =>
+            prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+        );
     };
 
-    const toggleProduct = (id: string) => {
-        if (selectedProducts.includes(id)) setSelectedProducts(selectedProducts.filter(p => p !== id));
-        else setSelectedProducts([...selectedProducts, id]);
+    const fmtDate = (iso: string) => {
+        const d = new Date(iso);
+        return d.toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" });
     };
+
+    const discountLabel = (c: CouponRow) => {
+        if (c.discountType === "BUY_X_GET_Y") return `${c.buyX} Al ${c.getY} Edin`;
+        if (c.discountType === "FREE_SHIPPING") return "Ücretsiz Kargo";
+        if (c.discountType === "PERCENTAGE") return `%${c.discountValue} İndirim`;
+        return `₺${c.discountValue} İndirim`;
+    };
+
+    const methodLabel = (m: string) => DISCOUNT_METHODS.find((dm) => dm.value === m)?.label || m;
+
+    /* ═══════════════════════════════════════════════════ */
+    /*                      RENDER                       */
+    /* ═══════════════════════════════════════════════════ */
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#FF007F] border-t-transparent" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 pb-12">
@@ -74,110 +319,296 @@ export default function DiscountsPage() {
                 </div>
             </div>
 
-            {/* Main Grid: Form + Preview */}
+            {/* Message */}
+            {message && (
+                <div className={`px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2 ${message.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-700 border border-red-200"
+                    }`}>
+                    <span className="material-icons text-lg">{message.type === "success" ? "check_circle" : "error"}</span>
+                    {message.text}
+                    <button onClick={() => setMessage(null)} className="ml-auto text-current opacity-60 hover:opacity-100">
+                        <span className="material-icons text-sm">close</span>
+                    </button>
+                </div>
+            )}
+
+            {/* Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* Left: Definition Form */}
+                {/* ── Left: Form ── */}
                 <div className="lg:col-span-2 space-y-8">
                     <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-6">
-                        <h2 className="text-lg font-bold text-[#111827] border-b border-gray-100 pb-4">İndirim Tanımla</h2>
+                        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                            <h2 className="text-lg font-bold text-[#111827]">
+                                {editId ? "İndirim Düzenle" : "İndirim Tanımla"}
+                            </h2>
+                            {editId && (
+                                <button onClick={resetForm} className="text-sm text-[#6B7280] hover:text-[#FF007F] flex items-center gap-1 transition-colors">
+                                    <span className="material-icons text-sm">add</span>
+                                    Yeni Oluştur
+                                </button>
+                            )}
+                        </div>
+
+                        {/* İndirim Adı */}
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">İndirim Adı</label>
+                            <input
+                                value={form.name}
+                                onChange={(e) => updateField("name", e.target.value)}
+                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                placeholder="Örn: Yaz Kampanyası 2024"
+                            />
+                        </div>
 
                         {/* Method & Type */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">İndirim Yöntemi</label>
                                 <select
-                                    value={method}
-                                    onChange={(e) => { setMethod(e.target.value); setType(typeOptions[0]); }}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                    value={form.discountMethod}
+                                    onChange={(e) => updateField("discountMethod", e.target.value)}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all appearance-none cursor-pointer"
                                 >
-                                    <option>Otomatik İndirim</option>
-                                    <option>İndirim Kodu</option>
+                                    {DISCOUNT_METHODS.map((m) => (
+                                        <option key={m.value} value={m.value}>{m.label}</option>
+                                    ))}
                                 </select>
                                 <p className="text-xs text-gray-400 mt-1">
-                                    {method === "Otomatik İndirim" ? "Müşterilerin sepetine otomatik uygulanır." : "Müşteriler ödeme ekranında kodu girmelidir."}
+                                    {form.discountMethod === "AUTO" && "Müşterilerin sepetine otomatik uygulanır."}
+                                    {form.discountMethod === "CODE" && "Müşteriler ödeme ekranında kodu girmelidir."}
+                                    {form.discountMethod === "TIER" && "Belirli müşteri seviyesine özel uygulanır."}
+                                    {form.discountMethod === "USER" && "Seçilen müşteriye özel uygulanır."}
                                 </p>
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">İndirim Tipi</label>
                                 <select
-                                    value={type}
-                                    onChange={(e) => setType(e.target.value)}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                    value={form.discountType}
+                                    onChange={(e) => updateField("discountType", e.target.value)}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all appearance-none cursor-pointer"
                                 >
-                                    {typeOptions.map(opt => <option key={opt}>{opt}</option>)}
+                                    {typeOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
 
-                        {/* Conditional Inputs */}
+                        {/* Tier Selection */}
+                        {showTierSelect && (
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <label className="block text-sm font-bold text-gray-700 mb-3">Müşteri Seviyesi</label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {(["STANDARD", "ELITE", "PLATINUM"] as const).map((tier) => (
+                                        <div
+                                            key={tier}
+                                            onClick={() => updateField("targetTier", tier)}
+                                            className={`cursor-pointer px-4 py-3 rounded-lg border text-sm font-medium transition-all flex items-center justify-center gap-2 ${form.targetTier === tier
+                                                ? "bg-[#FF007F] text-white border-[#FF007F] shadow-lg shadow-pink-200"
+                                                : "bg-white text-gray-600 border-gray-200 hover:border-[#FF007F] hover:text-[#FF007F]"
+                                                }`}
+                                        >
+                                            <span className="material-icons text-sm">
+                                                {tier === "STANDARD" ? "person" : tier === "ELITE" ? "star" : "diamond"}
+                                            </span>
+                                            {TIER_LABELS[tier]}
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-gray-400 mt-2">
+                                    Sadece seçili seviyedeki müşteriler bu indirimi görecek.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* User Selection */}
+                        {showUserSelect && (
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <label className="block text-sm font-bold text-gray-700 mb-3">Müşteri Seçin</label>
+                                <div className="relative mb-3">
+                                    <span className="material-icons absolute left-3 top-2.5 text-gray-400 text-lg">search</span>
+                                    <input
+                                        type="text"
+                                        value={userSearch}
+                                        onChange={(e) => setUserSearch(e.target.value)}
+                                        placeholder="Müşteri ara (isim, e-posta)..."
+                                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="max-h-48 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                                    {users.map((u) => (
+                                        <div
+                                            key={u.id}
+                                            onClick={() => updateField("targetUserId", u.id)}
+                                            className={`cursor-pointer p-3 rounded-lg border transition-all flex items-center gap-3 ${form.targetUserId === u.id
+                                                ? "bg-white border-[#FF007F] ring-2 ring-[#FF007F]/20"
+                                                : "bg-white border-gray-200 hover:border-gray-300"
+                                                }`}
+                                        >
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${form.targetUserId === u.id ? "bg-[#FF007F] text-white" : "bg-gray-100 text-gray-500"}`}>
+                                                {(u.name || u.email)[0].toUpperCase()}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-gray-900 truncate">
+                                                    {u.name} {u.surname}
+                                                </p>
+                                                <p className="text-xs text-gray-500">{u.email}</p>
+                                            </div>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${u.tier === "ELITE" ? "bg-[#FF007F]/10 text-[#FF007F]" : u.tier === "PLATINUM" ? "bg-purple-50 text-purple-700" : "bg-gray-100 text-gray-500"}`}>
+                                                {TIER_LABELS[u.tier] || u.tier}
+                                            </span>
+                                        </div>
+                                    ))}
+                                    {users.length === 0 && (
+                                        <p className="text-sm text-gray-500 text-center py-4">Müşteri bulunamadı.</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Code Input */}
                         {showCodeInput && (
                             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <label className="block text-sm font-bold text-gray-700 mb-2">İndirim Kodu</label>
                                 <input
-                                    value={code}
-                                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-mono uppercase tracking-wider focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                    value={form.code}
+                                    onChange={(e) => updateField("code", e.target.value.toUpperCase())}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-mono uppercase tracking-wider bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
                                     placeholder="Örn: YAZ2024"
                                 />
-                                <button type="button" onClick={() => setCode("CODE-" + Math.random().toString(36).substring(7).toUpperCase())} className="text-xs text-[#FF007F] mt-2 font-medium hover:underline">
+                                <button
+                                    type="button"
+                                    onClick={() => updateField("code", "CODE-" + Math.random().toString(36).substring(2, 8).toUpperCase())}
+                                    className="text-xs text-[#FF007F] mt-2 font-medium hover:underline"
+                                >
                                     Rastgele Kod Oluştur
                                 </button>
                             </div>
                         )}
 
-                        {/* Amount & Value */}
+                        {/* Auto-generate code for non-CODE methods */}
+                        {!showCodeInput && (
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Kupon Kodu</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        value={form.code}
+                                        onChange={(e) => updateField("code", e.target.value.toUpperCase())}
+                                        className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-mono uppercase tracking-wider bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                        placeholder="Otomatik oluştur veya gir"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => updateField("code", "AUTO-" + Math.random().toString(36).substring(2, 8).toUpperCase())}
+                                        className="px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors whitespace-nowrap"
+                                    >
+                                        Otomatik
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Amount Input */}
                         {showAmountInput && (
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">İndirim Değeri</label>
                                 <div className="relative">
                                     <input
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
+                                        value={form.discountValue}
+                                        onChange={(e) => updateField("discountValue", e.target.value)}
                                         type="number"
-                                        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
-                                        placeholder={type === "Yüzdesel İndirim" ? "Örn: 20" : "Örn: 100"}
+                                        min="0"
+                                        max={form.discountType === "PERCENTAGE" ? "100" : undefined}
+                                        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all pr-12"
+                                        placeholder={form.discountType === "PERCENTAGE" ? "Örn: 20" : "Örn: 100"}
                                     />
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <span className="text-gray-500 font-bold sm:text-sm">
-                                            {type === "Yüzdesel İndirim" ? "%" : "TL"}
+                                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                        <span className="text-gray-500 font-bold text-sm">
+                                            {form.discountType === "PERCENTAGE" ? "%" : "TL"}
                                         </span>
                                     </div>
                                 </div>
                             </div>
                         )}
 
+                        {/* BUY X GET Y */}
+                        {showBuyXGetY && (
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <label className="block text-sm font-bold text-gray-700 mb-3">X Al Y Edin</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1.5 font-medium">X (Al)</label>
+                                        <input
+                                            value={form.buyX}
+                                            onChange={(e) => updateField("buyX", e.target.value)}
+                                            type="number"
+                                            min="2"
+                                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                            placeholder="Örn: 3"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1.5 font-medium">Y (Öde)</label>
+                                        <input
+                                            value={form.getY}
+                                            onChange={(e) => updateField("getY", e.target.value)}
+                                            type="number"
+                                            min="1"
+                                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                            placeholder="Örn: 2"
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-2">
+                                    {form.buyX && form.getY
+                                        ? `Müşteri ${form.buyX} ürün alınca ${form.getY} ürün öder, ${Number(form.buyX) - Number(form.getY)} ürün hediye!`
+                                        : "Adet değerlerini girin."}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Kupon Adeti */}
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Kupon Adeti (Kullanım Limiti)</label>
+                            <input
+                                value={form.maxUses}
+                                onChange={(e) => updateField("maxUses", e.target.value)}
+                                type="number"
+                                min="1"
+                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                placeholder="Boş bırakırsanız sınırsız"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">Toplam kaç kez kullanılabilir.</p>
+                        </div>
+
                         {/* Scope */}
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Uygulanacak Ürünler</label>
                             <select
-                                value={scope}
-                                onChange={(e) => {
-                                    setScope(e.target.value);
-                                    setSelectedCategories([]);
-                                    setSelectedProducts([]);
-                                }}
-                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                value={form.scope}
+                                onChange={(e) => updateField("scope", e.target.value)}
+                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all appearance-none cursor-pointer"
                             >
-                                <option>Tüm Ürünler</option>
-                                <option>Belirli Kategoriler</option>
-                                <option>Belirli Ürünler</option>
-                                <option>Belirli Kategori ve Ürünler</option>
+                                {SCOPE_OPTIONS.map((s) => (
+                                    <option key={s.value} value={s.value}>{s.label}</option>
+                                ))}
                             </select>
                         </div>
 
-                        {/* Category Selection UI */}
+                        {/* Category Selection */}
                         {showCategorySelection && (
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                                 <label className="block text-sm font-bold text-gray-700 mb-3">Kategorileri Seçin</label>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                    {CATEGORIES.map(cat => (
+                                    {categories.map((cat) => (
                                         <div
                                             key={cat.id}
                                             onClick={() => toggleCategory(cat.id)}
                                             className={`cursor-pointer px-4 py-3 rounded-lg border text-sm font-medium transition-all flex items-center justify-between ${selectedCategories.includes(cat.id)
-                                                    ? "bg-[#FF007F] text-white border-[#FF007F]"
-                                                    : "bg-white text-gray-600 border-gray-200 hover:border-[#FF007F]"
+                                                ? "bg-[#FF007F] text-white border-[#FF007F]"
+                                                : "bg-white text-gray-600 border-gray-200 hover:border-[#FF007F]"
                                                 }`}
                                         >
                                             {cat.name}
@@ -188,12 +619,10 @@ export default function DiscountsPage() {
                             </div>
                         )}
 
-                        {/* Product Selection UI */}
+                        {/* Product Selection */}
                         {showProductSelection && (
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                                 <label className="block text-sm font-bold text-gray-700 mb-3">Ürünleri Seçin</label>
-
-                                {/* Search Bar */}
                                 <div className="relative mb-4">
                                     <span className="material-icons absolute left-3 top-2.5 text-gray-400 text-lg">search</span>
                                     <input
@@ -201,31 +630,31 @@ export default function DiscountsPage() {
                                         value={productSearch}
                                         onChange={(e) => setProductSearch(e.target.value)}
                                         placeholder="Ürün ara..."
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
                                     />
                                 </div>
-
-                                {/* Searchable List */}
                                 <div className="max-h-64 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-                                    {filteredProducts.map(product => (
+                                    {filteredProducts.map((product) => (
                                         <div
                                             key={product.id}
                                             onClick={() => toggleProduct(product.id)}
                                             className={`cursor-pointer p-3 rounded-lg border transition-all flex items-center gap-4 ${selectedProducts.includes(product.id)
-                                                    ? "bg-white border-[#FF007F] ring-1 ring-[#FF007F]"
-                                                    : "bg-white border-gray-200 hover:border-gray-300"
+                                                ? "bg-white border-[#FF007F] ring-2 ring-[#FF007F]/20"
+                                                : "bg-white border-gray-200 hover:border-gray-300"
                                                 }`}
                                         >
                                             <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedProducts.includes(product.id) ? "bg-[#FF007F] border-[#FF007F]" : "border-gray-300"}`}>
                                                 {selectedProducts.includes(product.id) && <span className="material-icons text-white text-xs">check</span>}
                                             </div>
                                             <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
+                                                {product.image && (
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
+                                                )}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                                                <p className="text-xs text-gray-500">{product.price}</p>
+                                                <p className="text-xs text-gray-500">{product.price.toLocaleString("tr-TR")} TL</p>
                                             </div>
                                         </div>
                                     ))}
@@ -241,24 +670,25 @@ export default function DiscountsPage() {
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Minimum Koşul</label>
                                 <select
-                                    value={minRequirement}
-                                    onChange={(e) => setMinRequirement(e.target.value)}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
+                                    value={form.minRequirement}
+                                    onChange={(e) => updateField("minRequirement", e.target.value)}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all appearance-none cursor-pointer"
                                 >
-                                    <option>Yok</option>
-                                    <option>Minimum Alışveriş Tutarı</option>
-                                    <option>Minimum Ürün Adedi</option>
+                                    <option value="">Yok</option>
+                                    <option value="MIN_TOTAL">Minimum Alışveriş Tutarı</option>
+                                    <option value="MIN_QUANTITY">Minimum Ürün Adedi</option>
                                 </select>
                             </div>
                             {showMinReqValue && (
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-2">Koşul Değeri</label>
                                     <input
-                                        value={minReqValue}
-                                        onChange={(e) => setMinReqValue(e.target.value)}
+                                        value={form.minReqValue}
+                                        onChange={(e) => updateField("minReqValue", e.target.value)}
                                         type="number"
-                                        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]"
-                                        placeholder={minRequirement === "Minimum Alışveriş Tutarı" ? "TL Tutar" : "Adet"}
+                                        min="0"
+                                        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                        placeholder={form.minRequirement === "MIN_TOTAL" ? "TL Tutar" : "Adet"}
                                     />
                                 </div>
                             )}
@@ -268,84 +698,138 @@ export default function DiscountsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Başlangıç Tarihi</label>
-                                <input type="datetime-local" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]" />
+                                <input
+                                    type="datetime-local"
+                                    value={form.validFrom}
+                                    onChange={(e) => updateField("validFrom", e.target.value)}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Bitiş Tarihi</label>
-                                <input type="datetime-local" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-[#FF007F] focus:border-[#FF007F]" />
+                                <input
+                                    type="datetime-local"
+                                    value={form.validUntil}
+                                    onChange={(e) => updateField("validUntil", e.target.value)}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] outline-none transition-all"
+                                />
                             </div>
                         </div>
 
+                        {/* Submit */}
                         <div className="flex items-center justify-between pt-4">
                             <div className="flex items-center gap-3">
-                                <div className={`relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in`}>
-                                    <input
-                                        type="checkbox"
-                                        name="toggle"
-                                        id="status"
-                                        checked={isActive}
-                                        onChange={() => setIsActive(!isActive)}
-                                        className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-[#FF007F]"
-                                    />
-                                    <label htmlFor="status" className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${isActive ? "bg-[#FF007F]" : "bg-gray-300"}`}></label>
-                                </div>
-                                <span className="text-sm font-medium text-gray-700">{isActive ? "Aktif" : "Pasif"}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => updateField("isActive", !form.isActive)}
+                                    className={`relative w-12 h-6 rounded-full transition-colors ${form.isActive ? "bg-[#FF007F]" : "bg-gray-300"}`}
+                                >
+                                    <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${form.isActive ? "left-[26px]" : "left-0.5"}`} />
+                                </button>
+                                <span className="text-sm font-medium text-gray-700">{form.isActive ? "Aktif" : "Pasif"}</span>
                             </div>
 
-                            <button className="bg-[#FF007F] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#D6006B] transition-colors shadow-lg shadow-pink-200">
-                                İNDİRİM TANIMLA
-                            </button>
+                            <div className="flex gap-3">
+                                {editId && (
+                                    <button onClick={resetForm} className="px-6 py-3 border border-gray-200 text-gray-600 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors">
+                                        İptal
+                                    </button>
+                                )}
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={submitting}
+                                    className="bg-[#FF007F] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#D6006B] transition-colors shadow-lg shadow-pink-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {submitting && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />}
+                                    {editId ? "GÜNCELLE" : "İNDİRİM TANIMLA"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right: Summary Card */}
+                {/* ── Right: Summary Card ── */}
                 <div className="space-y-6">
                     <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 sticky top-6">
                         <h2 className="text-lg font-bold text-[#111827] border-b border-gray-100 pb-4 mb-4">İNDİRİM DETAYI</h2>
                         <div className="space-y-4 text-sm">
-                            {showCodeInput && (
+                            {form.name && (
+                                <div>
+                                    <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Ad</span>
+                                    <div className="font-bold text-gray-900">{form.name}</div>
+                                </div>
+                            )}
+                            {form.code && (
                                 <div>
                                     <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Kod</span>
-                                    <span className="font-mono font-bold text-lg text-[#FF007F] bg-[#FF007F]/10 px-2 py-1 rounded">{code || "..."}</span>
+                                    <span className="font-mono font-bold text-lg text-[#FF007F] bg-[#FF007F]/10 px-2 py-1 rounded">{form.code}</span>
                                 </div>
                             )}
                             <div>
                                 <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Yöntem / Tip</span>
-                                <div className="font-medium text-gray-800">{method}</div>
-                                <div className="text-gray-600">{type}</div>
+                                <div className="font-medium text-gray-800">{methodLabel(form.discountMethod)}</div>
+                                <div className="text-gray-600">{typeOptions.find((t) => t.value === form.discountType)?.label}</div>
                             </div>
-                            {showAmountInput && amount && (
+                            {showAmountInput && form.discountValue && (
                                 <div>
                                     <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Değer</span>
                                     <div className="font-bold text-xl text-gray-900">
-                                        {type === "Yüzdesel İndirim" ? `%${amount}` : `₺${amount}`}
+                                        {form.discountType === "PERCENTAGE" ? `%${form.discountValue}` : `₺${form.discountValue}`}
                                     </div>
+                                </div>
+                            )}
+                            {showBuyXGetY && form.buyX && form.getY && (
+                                <div>
+                                    <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Kampanya</span>
+                                    <div className="font-bold text-xl text-gray-900">{form.buyX} Al {form.getY} Öde</div>
+                                </div>
+                            )}
+                            {showTierSelect && form.targetTier && (
+                                <div>
+                                    <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Hedef Müşteri</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-icons text-[#FF007F] text-sm">
+                                            {form.targetTier === "STANDARD" ? "person" : form.targetTier === "ELITE" ? "star" : "diamond"}
+                                        </span>
+                                        <span className="font-medium text-gray-800">{TIER_LABELS[form.targetTier]}</span>
+                                    </div>
+                                </div>
+                            )}
+                            {showUserSelect && form.targetUserId && (
+                                <div>
+                                    <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Hedef Müşteri</span>
+                                    <div className="text-gray-800 font-medium">
+                                        {users.find((u) => u.id === form.targetUserId)?.email || "Seçili müşteri"}
+                                    </div>
+                                </div>
+                            )}
+                            {form.maxUses && (
+                                <div>
+                                    <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Kupon Adeti</span>
+                                    <div className="text-gray-800">{form.maxUses} kullanım</div>
                                 </div>
                             )}
                             <div>
                                 <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Kapsam</span>
-                                <div className="text-gray-800">{scope}</div>
-                                {showCategorySelection && selectedCategories.length > 0 && (
+                                <div className="text-gray-800">{SCOPE_OPTIONS.find((s) => s.value === form.scope)?.label}</div>
+                                {selectedCategories.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-1">
-                                        {selectedCategories.map(cid => (
+                                        {selectedCategories.map((cid) => (
                                             <span key={cid} className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-                                                {CATEGORIES.find(c => c.id === cid)?.name}
+                                                {categories.find((c) => c.id === cid)?.name}
                                             </span>
                                         ))}
                                     </div>
                                 )}
-                                {showProductSelection && selectedProducts.length > 0 && (
-                                    <div className="text-xs text-gray-500 mt-1">
-                                        {selectedProducts.length} ürün seçildi
-                                    </div>
+                                {selectedProducts.length > 0 && (
+                                    <div className="text-xs text-gray-500 mt-1">{selectedProducts.length} ürün seçildi</div>
                                 )}
                             </div>
-                            {showMinReqValue && (
+                            {showMinReqValue && form.minReqValue && (
                                 <div>
                                     <span className="text-gray-500 block text-xs uppercase tracking-wider mb-1">Koşul</span>
                                     <div className="text-gray-800">
-                                        {minRequirement === "Minimum Alışveriş Tutarı" ? `Minimum ${minReqValue} TL` : `Minimum ${minReqValue} Adet`}
+                                        {form.minRequirement === "MIN_TOTAL" ? `Minimum ${form.minReqValue} TL` : `Minimum ${form.minReqValue} Adet`}
                                     </div>
                                 </div>
                             )}
@@ -360,84 +844,129 @@ export default function DiscountsPage() {
                 </div>
             </div>
 
-            {/* Existing Discounts Table */}
+            {/* ── Existing Discounts Table ── */}
             <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden mt-12">
                 <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
                     <h2 className="text-lg font-bold text-[#111827]">MEVCUT İNDİRİMLER</h2>
                     <div className="flex gap-2">
-                        <button className="px-4 py-2 text-sm font-medium rounded-lg bg-[#FF007F] text-white">Tümü</button>
-                        <button className="px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100">Aktif</button>
-                        <button className="px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100">Pasif</button>
+                        {(["ALL", "ACTIVE", "PASSIVE"] as const).map((f) => (
+                            <button
+                                key={f}
+                                onClick={() => setFilter(f)}
+                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${filter === f
+                                    ? "bg-[#FF007F] text-white"
+                                    : "text-gray-600 hover:bg-gray-100"
+                                    }`}
+                            >
+                                {f === "ALL" ? "Tümü" : f === "ACTIVE" ? "Aktif" : "Pasif"}
+                            </button>
+                        ))}
                     </div>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 text-gray-500 uppercase font-bold text-xs">
-                            <tr>
-                                <th className="px-6 py-3">İndirim Adı</th>
-                                <th className="px-6 py-3">Durum</th>
-                                <th className="px-6 py-3">Yöntem</th>
-                                <th className="px-6 py-3">Tip</th>
-                                <th className="px-6 py-3">Dönem</th>
-                                <th className="px-6 py-3">Kullanılan</th>
-                                <th className="px-6 py-3 text-right">İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {DISCOUNTS.map(d => (
-                                <tr key={d.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 font-bold text-[#111827]">{d.name}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded text-xs font-bold ${d.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                                            {d.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-600">{d.method}</td>
-                                    <td className="px-6 py-4 text-gray-600">{d.type}</td>
-                                    <td className="px-6 py-4 text-gray-500 text-xs">{d.period}</td>
-                                    <td className="px-6 py-4 text-gray-600">{d.usage} Adet</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="px-3 py-1.5 bg-[#FF007F] text-white text-xs font-bold rounded hover:bg-[#D6006B] transition-colors">
-                                            İŞLEMLER
-                                        </button>
-                                    </td>
+
+                {filteredCoupons.length === 0 ? (
+                    <div className="px-6 py-12 text-center">
+                        <span className="material-icons text-4xl text-gray-300 mb-3 block">local_offer</span>
+                        <p className="text-gray-500 text-sm">Henüz indirim tanımlanmamış.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-gray-50 text-gray-500 uppercase font-bold text-xs">
+                                <tr>
+                                    <th className="px-6 py-3">İndirim Adı</th>
+                                    <th className="px-6 py-3">Durum</th>
+                                    <th className="px-6 py-3">Yöntem</th>
+                                    <th className="px-6 py-3">Tip</th>
+                                    <th className="px-6 py-3">Dönem</th>
+                                    <th className="px-6 py-3">Kullanılan</th>
+                                    <th className="px-6 py-3 text-right">İşlemler</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {filteredCoupons.map((c) => (
+                                    <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="font-bold text-[#111827]">{c.name || c.code}</div>
+                                            <div className="text-xs text-gray-400 font-mono">{c.code}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2 py-1 rounded text-xs font-bold ${c.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                                                {c.isActive ? "Aktif" : "Pasif"}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">{methodLabel(c.discountMethod)}</td>
+                                        <td className="px-6 py-4 text-gray-600">{discountLabel(c)}</td>
+                                        <td className="px-6 py-4 text-gray-500 text-xs">
+                                            {fmtDate(c.validFrom)}
+                                            {c.validUntil ? ` - ${fmtDate(c.validUntil)}` : " - ∞"}
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">
+                                            {c.usedCount}{c.maxUses ? `/${c.maxUses}` : ""} Adet
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="relative inline-block">
+                                                <button
+                                                    onClick={() => setOpenMenuId(openMenuId === c.id ? null : c.id)}
+                                                    className="px-3 py-1.5 bg-[#FF007F] text-white text-xs font-bold rounded hover:bg-[#D6006B] transition-colors"
+                                                >
+                                                    İŞLEMLER
+                                                </button>
+                                                {openMenuId === c.id && (
+                                                    <>
+                                                        <div className="fixed inset-0 z-40" onClick={() => setOpenMenuId(null)} />
+                                                        <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                                                            <button
+                                                                onClick={() => loadEdit(c)}
+                                                                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                                                            >
+                                                                <span className="material-icons text-sm text-gray-400">edit</span>
+                                                                Düzenle
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleToggle(c.id)}
+                                                                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                                                            >
+                                                                <span className="material-icons text-sm text-gray-400">
+                                                                    {c.isActive ? "pause_circle" : "play_circle"}
+                                                                </span>
+                                                                {c.isActive ? "Pasife Çek" : "Aktife Çek"}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(c.id)}
+                                                                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors border-t border-gray-100"
+                                                            >
+                                                                <span className="material-icons text-sm">delete</span>
+                                                                Sil
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             <style jsx>{`
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #FF007F;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #FF007F;
-        }
-        .toggle-checkbox {
-            right: auto;
-            left: 0;
-            transition: all 0.3s;
-        }
-        .toggle-label {
-            width: 3rem;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #ccc;
-        }
-      `}</style>
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #ddd;
+                    border-radius: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #ccc;
+                }
+            `}</style>
         </div>
     );
 }

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image-helpers";
 import FavoriteButton from "@/components/store/FavoriteButton";
 
 interface FavoriteProduct {
@@ -103,7 +104,7 @@ export default function FavoritesClient({ favorites, recommendations }: Favorite
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((item) => {
                     const product = item.product;
-                    const displayImage = product.images[0] || product.variants.find((v: any) => v.image)?.image || "/placeholder.jpg";
+                    const displayImage = getImageSrc(product.images[0] || product.variants.find((v: any) => v.image)?.image || null);
 
                     return (
                         <div key={product.id} className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md">
@@ -152,7 +153,7 @@ export default function FavoritesClient({ favorites, recommendations }: Favorite
                     {recommendations.length > 0 ? (
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                             {recommendations.map((product) => {
-                                const displayImage = product.images[0] || "/placeholder.jpg";
+                                const displayImage = getImageSrc(product.images[0] || null);
 
                                 return (
                                     <Link

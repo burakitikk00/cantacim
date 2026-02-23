@@ -1,9 +1,58 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { getMyVisibleCoupons } from "./actions";
+
+interface CouponData {
+    id: string;
+    name: string;
+    code: string;
+    description: string | null;
+    discountType: string;
+    discountValue: number;
+    buyX: number | null;
+    getY: number | null;
+    validUntil: string | null;
+    maxUses: number | null;
+    usedCount: number;
+}
+
+function getCouponDisplay(c: CouponData) {
+    if (c.discountType === "PERCENTAGE") return { main: `%${c.discountValue}`, sub: "İndirim" };
+    if (c.discountType === "FIXED") return { main: `${c.discountValue}`, sub: "TL İndirim" };
+    if (c.discountType === "BUY_X_GET_Y") return { main: `${c.buyX} Al`, sub: `${c.getY} Öde` };
+    if (c.discountType === "FREE_SHIPPING") return { main: "Ücretsiz", sub: "Kargo" };
+    return { main: "", sub: "" };
+}
+
+function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString("tr-TR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+}
+
+function getDaysRemaining(iso: string | null) {
+    if (!iso) return null;
+    const diff = new Date(iso).getTime() - Date.now();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
 
 export default function CouponsPage() {
+    const [coupons, setCoupons] = useState<CouponData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [couponInput, setCouponInput] = useState("");
+
+    useEffect(() => {
+        (async () => {
+            const res = await getMyVisibleCoupons();
+            if (res.success) setCoupons(res.data as CouponData[]);
+            setLoading(false);
+        })();
+    }, []);
+
     return (
         <div className="flex-1">
             <div className="mb-8">
@@ -22,139 +71,93 @@ export default function CouponsPage() {
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
                         <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">sell</span>
-                        <input className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-all" placeholder="Kupon kodunuzu giriniz" type="text" />
+                        <input
+                            className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-all"
+                            placeholder="Kupon kodunuzu giriniz"
+                            type="text"
+                            value={couponInput}
+                            onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        />
                     </div>
-                    <button className="bg-primary text-white px-8 py-3 rounded-lg font-bold text-sm hover:bg-black transition-all shadow-lg shadow-black/10">Kodu Uygula</button>
+                    <button className="bg-primary text-white px-8 py-3 rounded-lg font-bold text-sm hover:bg-black transition-all shadow-lg shadow-black/10">
+                        Kodu Uygula
+                    </button>
                 </div>
             </section>
 
+            {/* Loading */}
+            {loading && (
+                <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+                </div>
+            )}
+
+            {/* Empty */}
+            {!loading && coupons.length === 0 && (
+                <div className="text-center py-20">
+                    <span className="material-symbols-outlined text-5xl text-gray-300 mb-4 block">local_offer</span>
+                    <p className="text-gray-500 text-sm">Henüz size tanımlanmış bir kupon bulunmuyor.</p>
+                </div>
+            )}
+
             {/* Coupons Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Coupon 1 */}
-                <div className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden flex shadow-sm hover:shadow-md transition-shadow">
-                    <div className="bg-primary text-white p-6 flex flex-col justify-center items-center w-32 shrink-0">
-                        <span className="text-3xl font-black">%20</span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold mt-1">İndirim</span>
-                    </div>
-                    <div className="flex-1 p-5 flex flex-col justify-between bg-white relative">
-                        {/* Decorative dots for ticket look */}
-                        <div className="absolute -left-[10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-[#f7f7f7] rounded-full border border-gray-200 z-10 box-border dark:bg-zinc-900"></div>
+            {!loading && coupons.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {coupons.map((c) => {
+                        const display = getCouponDisplay(c);
+                        const daysLeft = getDaysRemaining(c.validUntil);
+                        const isUrgent = daysLeft !== null && daysLeft <= 3;
 
-                        <div>
-                            <div className="flex justify-between items-start mb-1">
-                                <h4 className="font-bold text-primary text-sm uppercase tracking-tight">Yeni Sezon Avantajı</h4>
-                                <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Aktif</span>
+                        return (
+                            <div key={c.id} className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden flex shadow-sm hover:shadow-md transition-shadow">
+                                <div className="bg-primary text-white p-6 flex flex-col justify-center items-center w-32 shrink-0">
+                                    <span className={`font-black leading-none ${display.main.length > 5 ? "text-lg" : "text-3xl"}`}>
+                                        {display.main}
+                                    </span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold mt-1">{display.sub}</span>
+                                </div>
+                                <div className="flex-1 p-5 flex flex-col justify-between bg-white relative">
+                                    <div className="absolute -left-[10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-[#f7f7f7] rounded-full border border-gray-200 z-10 box-border" />
+                                    <div>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-bold text-primary text-sm uppercase tracking-tight">{c.name || c.code}</h4>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${isUrgent
+                                                ? "bg-orange-100 text-orange-700"
+                                                : "bg-green-100 text-green-700"
+                                                }`}>
+                                                {isUrgent ? "Az Kaldı" : "Aktif"}
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-500 text-xs leading-relaxed">{c.description || ""}</p>
+                                    </div>
+                                    <div className="mt-4 flex items-end justify-between">
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Kod:</p>
+                                            <code className="bg-gray-100 px-2 py-1 rounded text-primary font-bold text-sm tracking-widest">{c.code}</code>
+                                        </div>
+                                        <div className="text-right">
+                                            {c.validUntil ? (
+                                                <>
+                                                    <p className="text-[10px] text-gray-400 font-medium">Son Gün:</p>
+                                                    <p className={`text-[11px] font-bold ${isUrgent ? "text-red-500 italic" : "text-primary"}`}>
+                                                        {daysLeft !== null && daysLeft <= 0 ? "Bugün" : formatDate(c.validUntil)}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="text-[10px] text-gray-400 font-medium">Süresiz</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <p className="text-gray-500 text-xs leading-relaxed">Tüm yeni sezon çanta alışverişlerinizde geçerli özel indirim.</p>
-                        </div>
-                        <div className="mt-4 flex items-end justify-between">
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Kod:</p>
-                                <code className="bg-gray-100 px-2 py-1 rounded text-primary font-bold text-sm tracking-widest">ELITE2024</code>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] text-gray-400 font-medium">Son Gün:</p>
-                                <p className="text-[11px] font-bold text-primary">12.06.2024</p>
-                            </div>
-                        </div>
-                    </div>
+                        );
+                    })}
                 </div>
+            )}
 
-                {/* Coupon 2 */}
-                <div className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden flex shadow-sm hover:shadow-md transition-shadow">
-                    <div className="bg-primary text-white p-6 flex flex-col justify-center items-center w-32 shrink-0">
-                        <span className="text-xl font-black leading-none">500</span>
-                        <span className="text-sm font-bold">TL</span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold mt-1">İndirim</span>
-                    </div>
-                    <div className="flex-1 p-5 flex flex-col justify-between bg-white relative">
-                        {/* Decorative dots for ticket look */}
-                        <div className="absolute -left-[10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-[#f7f7f7] rounded-full border border-gray-200 z-10 box-border dark:bg-zinc-900"></div>
-
-                        <div>
-                            <div className="flex justify-between items-start mb-1">
-                                <h4 className="font-bold text-primary text-sm uppercase tracking-tight">Sadakat Ödülü</h4>
-                                <span className="bg-orange-100 text-orange-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Az Kaldı</span>
-                            </div>
-                            <p className="text-gray-500 text-xs leading-relaxed">5.000 TL ve üzeri takı alışverişlerinizde anında indirim.</p>
-                        </div>
-                        <div className="mt-4 flex items-end justify-between">
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Kod:</p>
-                                <code className="bg-gray-100 px-2 py-1 rounded text-primary font-bold text-sm tracking-widest">LOYAL500</code>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] text-gray-400 font-medium">Son Gün:</p>
-                                <p className="text-[11px] font-bold text-red-500 italic">Bugün</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Coupon 3 */}
-                <div className="group relative bg-gray-50 border border-gray-200 rounded-lg overflow-hidden flex shadow-sm opacity-75 grayscale">
-                    <div className="bg-gray-400 text-white p-6 flex flex-col justify-center items-center w-32 shrink-0">
-                        <span className="text-3xl font-black">%10</span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold mt-1">İndirim</span>
-                    </div>
-                    <div className="flex-1 p-5 flex flex-col justify-between relative">
-                        {/* Decorative dots for ticket look */}
-                        <div className="absolute -left-[10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-[#f7f7f7] rounded-full border border-gray-200 z-10 box-border dark:bg-zinc-900"></div>
-
-                        <div>
-                            <div className="flex justify-between items-start mb-1">
-                                <h4 className="font-bold text-gray-500 text-sm uppercase tracking-tight">Hoş Geldin Hediyesi</h4>
-                                <span className="bg-gray-200 text-gray-500 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Kullanıldı</span>
-                            </div>
-                            <p className="text-gray-400 text-xs leading-relaxed">İlk alışverişinize özel tanımlanan %10 indirim fırsatı.</p>
-                        </div>
-                        <div className="mt-4 flex items-end justify-between">
-                            <div>
-                                <p className="text-[10px] text-gray-300 font-bold uppercase mb-1">Kod:</p>
-                                <code className="bg-gray-100 px-2 py-1 rounded text-gray-400 font-bold text-sm tracking-widest line-through">WELCOME10</code>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] text-gray-300 font-medium">Tarih:</p>
-                                <p className="text-[11px] font-bold text-gray-400">15.01.2024</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Coupon 4 */}
-                <div className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden flex shadow-sm hover:shadow-md transition-shadow">
-                    <div className="bg-primary text-white p-6 flex flex-col justify-center items-center w-32 shrink-0">
-                        <span className="text-2xl font-black leading-none">Ücretsiz</span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold mt-1">Kargo</span>
-                    </div>
-                    <div className="flex-1 p-5 flex flex-col justify-between bg-white relative">
-                        {/* Decorative dots for ticket look */}
-                        <div className="absolute -left-[10px] top-1/2 -translate-y-1/2 w-5 h-5 bg-[#f7f7f7] rounded-full border border-gray-200 z-10 box-border dark:bg-zinc-900"></div>
-
-                        <div>
-                            <div className="flex justify-between items-start mb-1">
-                                <h4 className="font-bold text-primary text-sm uppercase tracking-tight">Elite Kargo</h4>
-                                <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Aktif</span>
-                            </div>
-                            <p className="text-gray-500 text-xs leading-relaxed">Limit olmaksızın tüm siparişlerinizde ücretsiz kargo.</p>
-                        </div>
-                        <div className="mt-4 flex items-end justify-between">
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Kod:</p>
-                                <code className="bg-gray-100 px-2 py-1 rounded text-primary font-bold text-sm tracking-widest">FREESHIP</code>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] text-gray-400 font-medium">Son Gün:</p>
-                                <p className="text-[11px] font-bold text-primary">31.12.2024</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Terms & Conditions Footer */}
+            {/* Terms */}
             <div className="mt-12 pt-6 border-t border-gray-100 text-gray-400 text-[11px] leading-relaxed">
-                <p>* İndirim kuponları başka kampanyalarla birleştirilemez. Her kupon tek bir siparişte kullanılabilir. L'Elite Luxury Store kampanya koşullarını değiştirme hakkını saklı tutar.</p>
+                <p>* İndirim kuponları başka kampanyalarla birleştirilemez. Her kupon tek bir siparişte kullanılabilir. Lina Butik kampanya koşullarını değiştirme hakkını saklı tutar.</p>
             </div>
         </div>
     );

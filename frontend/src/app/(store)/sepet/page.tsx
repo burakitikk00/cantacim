@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getMyVisibleCoupons } from "../hesap/kuponlarim/actions";
 
 // Mock Data
 const INITIAL_CART_ITEMS = [
@@ -9,26 +10,20 @@ const INITIAL_CART_ITEMS = [
     { id: "2", brand: "GUCCI", name: "GG Marmont Small Shoulder Bag", color: "Siyah", size: "Small", price: 62200, qty: 1, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDN7alVJYJImA_YeB77T8ihi8RpAgmepzTlPWfQ8qjShEHjRzuq_xHEZnWTxhC5yJ_-Cjm_aS4hyU_qrFwlqXwDVoAJOgwe1BiyluKCBsIWLRxcyF9bH3Bq8UTuXqu-CJr6p8REWkuLLIAscHN8NB-_OoOKOnjgd1tGAjaD-_cE-Ykvf-pHY5TFh3sfu5vY01Z2jKesMB_bPFkNj1tjJyc0Ru3ySq1jJUHU9QU6NL-5YNpeodii6aD5h3yoLTVqPmTtOFpEfCzvh7e2" },
 ];
 
-// Coupon Types
-type DiscountType = 'PERCENTAGE_TOTAL' | 'FIXED_TOTAL' | 'BUY_X_PAY_Y' | 'PRODUCT_PERCENTAGE';
-
+// Coupon Types (matching DB schema)
 interface Coupon {
+    id: string;
+    name: string;
     code: string;
-    description: string;
-    type: DiscountType;
-    value?: number;
-    minTotal?: number;
-    productIds?: string[];
-    buyQty?: number;
-    payQty?: number;
+    description: string | null;
+    discountType: string; // PERCENTAGE | FIXED | BUY_X_GET_Y | FREE_SHIPPING
+    discountValue: number;
+    buyX: number | null;
+    getY: number | null;
+    validUntil: string | null;
+    maxUses: number | null;
+    usedCount: number;
 }
-
-const AVAILABLE_COUPONS: Coupon[] = [
-    { code: "YAZ20", description: "Tüm ürünlerde %20 indirim", type: "PERCENTAGE_TOTAL", value: 20 },
-    { code: "3AL2ODE", description: "3 Al 2 Öde", type: "BUY_X_PAY_Y", buyQty: 3, payQty: 2 },
-    { code: "GUCCI50", description: "Gucci çantalarda %50 indirim", type: "PRODUCT_PERCENTAGE", value: 50, productIds: ["2"] },
-    { code: "INDIRIM500", description: "50.000 TL üzeri alışverişlerde 500 TL indirim", type: "FIXED_TOTAL", value: 500, minTotal: 50000 },
-];
 
 const fmt = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
 
@@ -37,6 +32,14 @@ export default function CartPage() {
     const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
     const [couponInput, setCouponInput] = useState("");
     const [error, setError] = useState("");
+    const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await getMyVisibleCoupons();
+            if (res.success) setAvailableCoupons(res.data as Coupon[]);
+        })();
+    }, []);
 
     const handleQuantityChange = (id: string, delta: number) => {
         setCartItems(prev => prev.map(item => {
@@ -54,7 +57,7 @@ export default function CartPage() {
 
     const handleApplyCoupon = () => {
         if (!couponInput) return;
-        const coupon = AVAILABLE_COUPONS.find(c => c.code === couponInput.toUpperCase());
+        const coupon = availableCoupons.find(c => c.code === couponInput.toUpperCase());
         if (coupon) {
             setSelectedCoupon(coupon);
             setError("");
@@ -84,27 +87,21 @@ export default function CartPage() {
 
         let discount = 0;
 
-        switch (selectedCoupon.type) {
-            case 'PERCENTAGE_TOTAL':
-                discount = subtotal * ((selectedCoupon.value || 0) / 100);
+        switch (selectedCoupon.discountType) {
+            case 'PERCENTAGE':
+                discount = subtotal * (selectedCoupon.discountValue / 100);
                 break;
 
-            case 'FIXED_TOTAL':
-                if (subtotal >= (selectedCoupon.minTotal || 0)) {
-                    discount = selectedCoupon.value || 0;
-                }
+            case 'FIXED':
+                discount = selectedCoupon.discountValue;
                 break;
 
-            case 'PRODUCT_PERCENTAGE':
-                cartItems.forEach(item => {
-                    if (selectedCoupon.productIds?.includes(item.id)) {
-                        discount += (item.price * item.qty) * ((selectedCoupon.value || 0) / 100);
-                    }
-                });
+            case 'FREE_SHIPPING':
+                discount = 0; // Kargo zaten ücretsiz, gerektiğinde kargo tutarını buradan düşün
                 break;
 
-            case 'BUY_X_PAY_Y':
-                if (selectedCoupon.buyQty && selectedCoupon.payQty) {
+            case 'BUY_X_GET_Y':
+                if (selectedCoupon.buyX && selectedCoupon.getY) {
                     // Flatten all items to find individual unit prices
                     const allUnitPrices: number[] = [];
                     cartItems.forEach(item => {
@@ -117,8 +114,8 @@ export default function CartPage() {
                     allUnitPrices.sort((a, b) => a - b);
 
                     const totalQty = allUnitPrices.length;
-                    const sets = Math.floor(totalQty / selectedCoupon.buyQty);
-                    const freeCountPerSet = selectedCoupon.buyQty - selectedCoupon.payQty;
+                    const freeCountPerSet = selectedCoupon.buyX - selectedCoupon.getY;
+                    const sets = Math.floor(totalQty / selectedCoupon.buyX);
                     const totalFreeCount = sets * freeCountPerSet;
 
                     // Take the first 'totalFreeCount' items (cheapest ones) as free
@@ -245,7 +242,7 @@ export default function CartPage() {
                             <div className="space-y-2">
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Kullanılabilir Kuponlar</p>
                                 <div className="space-y-2">
-                                    {AVAILABLE_COUPONS.map((coupon) => (
+                                    {availableCoupons.map((coupon: Coupon) => (
                                         <div
                                             key={coupon.code}
                                             onClick={() => handleSelectCoupon(coupon)}
@@ -266,7 +263,7 @@ export default function CartPage() {
                                                         <span className="material-symbols-outlined text-[14px] text-primary">check_circle</span>
                                                     )}
                                                 </div>
-                                                <p className="text-[10px] text-gray-500 leading-tight">{coupon.description}</p>
+                                                <p className="text-[10px] text-gray-500 leading-tight">{coupon.name || coupon.description}</p>
                                             </div>
 
                                         </div>
