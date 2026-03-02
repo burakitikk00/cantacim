@@ -29,6 +29,9 @@ export default async function OrderConfirmationPage(props: {
 
     const shipping = typeof searchParams.shipping === 'string' ? searchParams.shipping : undefined;
     const addressId = typeof searchParams.address === 'string' ? searchParams.address : undefined;
+    const last4 = typeof searchParams.last4 === 'string' ? searchParams.last4 : undefined;
+    const bank = typeof searchParams.bank === 'string' ? searchParams.bank : undefined;
+    const brand = typeof searchParams.brand === 'string' ? searchParams.brand : undefined;
 
     if (!addressId || !shipping) {
         redirect("/odeme"); // Missing necessary info
@@ -46,5 +49,5 @@ export default async function OrderConfirmationPage(props: {
     const settingsRes = await getStoreSettings();
     const settings = (settingsRes.success ? settingsRes.data : null) as StoreSettingsParams | null;
 
-    return <OnayClient address={address} settings={settings} shippingMethod={shipping} />;
+    return <OnayClient address={address} settings={settings} shippingMethod={shipping} last4={last4} bank={bank} brand={brand} />;
 }

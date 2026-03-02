@@ -1,0 +1,23 @@
+🏛️ Ziraat Bankası:
+
+5401... (Ziraat Bankası - Mastercard çıkar)
+4183... (Ziraat Bankası - Visa çıkar)
+9792... (Ziraat Bankası - Troy çıkar)
+🏛️ İş Bankası:
+
+4508... (İş Bankası - Visa)
+5451... (İş Bankası - Mastercard)
+🏛️ VakıfBank:
+
+5404... (VakıfBank - Mastercard)
+4513... (VakıfBank - Visa)
+🏛️ Halkbank:
+
+5435... (Halkbank - Mastercard)
+🏛️ Garanti BBVA:
+
+4282... (Garanti - Visa)
+5400... (Garanti - Mastercard)
+🏛️ Yapı Kredi:
+
+4504... (Yapı Kredi - Visa)
