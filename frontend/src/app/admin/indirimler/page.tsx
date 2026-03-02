@@ -106,8 +106,8 @@ export default function DiscountsPage() {
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
     // ── Fetch Data
-    const loadData = useCallback(async () => {
-        setLoading(true);
+    const loadData = useCallback(async (showLoading = true) => {
+        if (showLoading) setLoading(true);
         const [cRes, catRes, prodRes, userRes] = await Promise.all([
             getCoupons(),
             getCategoriesForSelect(),
@@ -118,10 +118,10 @@ export default function DiscountsPage() {
         if (catRes.success) setCategories(catRes.data as CategoryOption[]);
         if (prodRes.success) setProducts(prodRes.data as ProductOption[]);
         if (userRes.success) setUsers(userRes.data as UserOption[]);
-        setLoading(false);
+        if (showLoading) setLoading(false);
     }, []);
 
-    useEffect(() => { loadData(); }, [loadData]);
+    useEffect(() => { loadData(true); }, [loadData]);
 
     // ── Product search
     useEffect(() => {
@@ -227,7 +227,14 @@ export default function DiscountsPage() {
         if (res.success) {
             setMessage({ type: "success", text: editId ? "Kupon güncellendi!" : "Kupon oluşturuldu!" });
             resetForm();
-            await loadData();
+            await loadData(false);
+
+            if (!editId) {
+                setTimeout(() => {
+                    const el = document.getElementById("mevcut-indirimler");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+            }
         } else {
             setMessage({ type: "error", text: res.error || "Bir hata oluştu." });
         }
@@ -237,7 +244,7 @@ export default function DiscountsPage() {
     // ── Toggle / Delete
     const handleToggle = async (id: string) => {
         const res = await toggleCouponStatus(id);
-        if (res.success) await loadData();
+        if (res.success) await loadData(false);
         setOpenMenuId(null);
     };
 
@@ -245,7 +252,7 @@ export default function DiscountsPage() {
         if (!confirm("Bu kuponu silmek istediğinize emin misiniz?")) return;
         const res = await deleteCoupon(id);
         if (res.success) {
-            await loadData();
+            await loadData(false);
         } else {
             setMessage({ type: "error", text: res.error || "Silinemedi." });
         }
@@ -311,7 +318,7 @@ export default function DiscountsPage() {
     }
 
     return (
-        <div className="space-y-8 pb-12">
+        <div className="space-y-8 pb-32">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-[#111827]">İndirimler</h1>
@@ -845,7 +852,7 @@ export default function DiscountsPage() {
             </div>
 
             {/* ── Existing Discounts Table ── */}
-            <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden mt-12">
+            <div id="mevcut-indirimler" className="bg-white rounded-xl border border-[#E5E7EB] mt-12">
                 <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
                     <h2 className="text-lg font-bold text-[#111827]">MEVCUT İNDİRİMLER</h2>
                     <div className="flex gap-2">
@@ -870,7 +877,7 @@ export default function DiscountsPage() {
                         <p className="text-gray-500 text-sm">Henüz indirim tanımlanmamış.</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="w-full">
                         <table className="w-full text-left text-sm">
                             <thead className="bg-gray-50 text-gray-500 uppercase font-bold text-xs">
                                 <tr>
@@ -905,7 +912,7 @@ export default function DiscountsPage() {
                                             {c.usedCount}{c.maxUses ? `/${c.maxUses}` : ""} Adet
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div className="relative inline-block">
+                                            <div className={`relative inline-block ${openMenuId === c.id ? "z-50" : ""}`}>
                                                 <button
                                                     onClick={() => setOpenMenuId(openMenuId === c.id ? null : c.id)}
                                                     className="px-3 py-1.5 bg-[#FF007F] text-white text-xs font-bold rounded hover:bg-[#D6006B] transition-colors"
@@ -915,7 +922,7 @@ export default function DiscountsPage() {
                                                 {openMenuId === c.id && (
                                                     <>
                                                         <div className="fixed inset-0 z-40" onClick={() => setOpenMenuId(null)} />
-                                                        <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                                                        <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-[999] overflow-hidden">
                                                             <button
                                                                 onClick={() => loadEdit(c)}
                                                                 className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
@@ -927,7 +934,7 @@ export default function DiscountsPage() {
                                                                 onClick={() => handleToggle(c.id)}
                                                                 className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
                                                             >
-                                                                <span className="material-icons text-sm text-gray-400">
+                                                                <span className={`material-icons text-sm ${c.isActive ? 'text-red-500' : 'text-green-500'}`}>
                                                                     {c.isActive ? "pause_circle" : "play_circle"}
                                                                 </span>
                                                                 {c.isActive ? "Pasife Çek" : "Aktife Çek"}
@@ -936,7 +943,7 @@ export default function DiscountsPage() {
                                                                 onClick={() => handleDelete(c.id)}
                                                                 className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors border-t border-gray-100"
                                                             >
-                                                                <span className="material-icons text-sm">delete</span>
+                                                                <span className="material-icons text-sm text-red-500">delete</span>
                                                                 Sil
                                                             </button>
                                                         </div>
