@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
 import { calculateShippingCost, StoreSettingsParams } from "@/utils/shipping";
 import { Address } from "@prisma/client";
+import { createOrder } from "@/app/actions/order";
 
 export default function OnayClient({ address, settings, shippingMethod, last4, bank, brand }: { address: Address, settings: StoreSettingsParams | null, shippingMethod: string, last4?: string; bank?: string; brand?: string; }) {
     const router = useRouter();
@@ -101,10 +102,33 @@ export default function OnayClient({ address, settings, shippingMethod, last4, b
         return <span className="material-symbols-outlined text-zinc-400">credit_card</span>;
     };
 
-    const handleConfirmOrder = () => {
-        // Here we could call an API to create the order in the database
-        clearCart();
-        router.push("/siparis-onay");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleConfirmOrder = async () => {
+        setIsSubmitting(true);
+        try {
+            const orderData = {
+                items: cartItems.map(i => ({ variantId: i.variantId, quantity: i.quantity })),
+                addressId: address.id,
+                shippingMethod,
+                couponCode: selectedCoupon?.code || null,
+                paymentInfo: { bank, brand, last4 }
+            };
+
+            const result = await createOrder(orderData);
+
+            if (result.success) {
+                clearCart();
+                router.push("/hesap/siparisler"); // Redirect to orders page so user can see it right away
+            } else {
+                alert(result.error || "Sipariş oluşturulurken bir hata oluştu.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Bir hata oluştu.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (!isMounted) {
@@ -270,10 +294,17 @@ export default function OnayClient({ address, settings, shippingMethod, last4, b
 
                         <button
                             onClick={handleConfirmOrder}
-                            className="w-full bg-primary text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-2"
+                            disabled={isSubmitting}
+                            className="w-full bg-primary text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
                         >
-                            <span className="material-symbols-outlined text-lg">check_circle</span>
-                            Onayla ve Bitir
+                            {isSubmitting ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            ) : (
+                                <>
+                                    <span className="material-symbols-outlined text-lg">check_circle</span>
+                                    Onayla ve Bitir
+                                </>
+                            )}
                         </button>
 
                         <div className="mt-6 text-center">
