@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
 const NAV = [
     { icon: "dashboard", label: "Dashboard", href: "/admin" },
@@ -22,11 +23,41 @@ const STORE_MANAGEMENT_ITEMS = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const { data: session } = useSession();
     const [storeMenuOpen, setStoreMenuOpen] = useState(
         pathname.startsWith("/admin/dukkan-yonetimi")
     );
+    const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const adminMenuRef = useRef<HTMLDivElement>(null);
 
     const isStoreSubActive = STORE_MANAGEMENT_ITEMS.some((item) => pathname === item.href);
+
+    // Admin menü dış tıklama
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
+                setAdminMenuOpen(false);
+            }
+        };
+        if (adminMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [adminMenuOpen]);
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+        } catch {
+            // Hata olsa bile çıkışı engelleme
+        }
+        signOut({ callbackUrl: "/auth/giris" });
+    };
+
+    const adminName = session?.user?.name || "Admin";
+    const adminInitial = adminName.charAt(0).toUpperCase();
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#F9FAFB] text-[#374151] font-[Inter,sans-serif] antialiased">
@@ -100,11 +131,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
                 </nav>
 
-                <div className="p-4 border-t border-[#E5E7EB]">
+                <div className="p-4 border-t border-[#E5E7EB] space-y-1">
                     <Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-[#6B7280] hover:bg-gray-50 hover:text-[#374151] transition-colors">
                         <span className="material-icons text-xl">visibility</span>
                         Mağazayı Görüntüle
                     </Link>
+                    <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors w-full disabled:opacity-50"
+                    >
+                        <span className="material-icons text-xl">logout</span>
+                        {isLoggingOut ? "Çıkış yapılıyor..." : "Çıkış Yap"}
+                    </button>
                 </div>
             </aside>
 
@@ -121,14 +160,52 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <span className="material-icons text-[#6B7280]">notifications</span>
                             <span className="absolute top-1 right-1 w-2 h-2 bg-[#FF007F] rounded-full" />
                         </button>
-                        <div className="flex items-center gap-3 pl-4 border-l border-[#E5E7EB]">
-                            <div className="w-9 h-9 bg-[#FF007F] text-white rounded-full flex items-center justify-center text-sm font-bold">A</div>
-                            <div>
-                                <p className="text-sm font-medium">Admin</p>
-                                <p className="text-xs text-[#9CA3AF]">Yönetici</p>
-                            </div>
+                        <div className="relative" ref={adminMenuRef}>
+                            <button
+                                onClick={() => setAdminMenuOpen(!adminMenuOpen)}
+                                className="flex items-center gap-3 pl-4 border-l border-[#E5E7EB] hover:opacity-80 transition-opacity cursor-pointer"
+                            >
+                                <div className="w-9 h-9 bg-[#FF007F] text-white rounded-full flex items-center justify-center text-sm font-bold">{adminInitial}</div>
+                                <div className="text-left">
+                                    <p className="text-sm font-medium">{adminName}</p>
+                                    <p className="text-xs text-[#9CA3AF]">Yönetici</p>
+                                </div>
+                                <span className={`material-icons text-[#9CA3AF] text-lg transition-transform duration-200 ${adminMenuOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                            </button>
+
+                            {adminMenuOpen && (
+                                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50" style={{ animation: 'adminDropIn 0.15s ease-out' }}>
+                                    <div className="py-1">
+                                        <Link
+                                            href="/admin/ayarlar"
+                                            onClick={() => setAdminMenuOpen(false)}
+                                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-gray-50 transition-colors"
+                                        >
+                                            <span className="material-icons text-lg text-[#9CA3AF]">settings</span>
+                                            Ayarlar
+                                        </Link>
+                                    </div>
+                                    <div className="border-t border-gray-100">
+                                        <button
+                                            onClick={handleLogout}
+                                            disabled={isLoggingOut}
+                                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors w-full disabled:opacity-50"
+                                        >
+                                            <span className="material-icons text-lg">logout</span>
+                                            {isLoggingOut ? "Çıkılıyor..." : "Çıkış Yap"}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
+
+                    <style jsx>{`
+                        @keyframes adminDropIn {
+                            from { opacity: 0; transform: translateY(-4px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                    `}</style>
                 </header>
 
                 {/* Content */}

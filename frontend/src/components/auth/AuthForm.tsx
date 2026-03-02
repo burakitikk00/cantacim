@@ -23,7 +23,8 @@ export default function AuthForm({ onSuccess, isModal = false }: AuthFormProps) 
         name: "",
         surname: "",
         email: "",
-        password: ""
+        password: "",
+        rememberMe: false
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +41,7 @@ export default function AuthForm({ onSuccess, isModal = false }: AuthFormProps) 
                 const res = await signIn("credentials", {
                     email: formData.email,
                     password: formData.password,
+                    rememberMe: String(formData.rememberMe),
                     redirect: false,
                 });
 
@@ -110,7 +112,12 @@ export default function AuthForm({ onSuccess, isModal = false }: AuthFormProps) 
                 {isLogin && (
                     <div className="flex justify-between items-center">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" className="w-4 h-4 border-gray-300 rounded focus:ring-primary text-primary" />
+                            <input
+                                type="checkbox"
+                                checked={formData.rememberMe}
+                                onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
+                                className="w-4 h-4 border-gray-300 rounded focus:ring-primary text-primary"
+                            />
                             <span className="text-sm text-primary/60">Beni hatırla</span>
                         </label>
                         <a href="#" className="text-sm font-medium text-primary hover:text-primary/60 transition-colors">Şifremi unuttum</a>

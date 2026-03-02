@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db as prisma } from "../lib/db";
 import { authOptions } from "../lib/auth";
+import { auditLog } from "../lib/api-helpers";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
@@ -215,6 +216,9 @@ export async function changePassword(formData: FormData) {
             data: { hashedPassword },
         });
 
+        // Audit log: şifre değişikliği
+        await auditLog(user.id, "PASSWORD_CHANGE", "User", user.id);
+
         return { success: true, message: "Şifreniz başarıyla güncellendi" };
     } catch (error) {
         console.error("Password change error:", error);
@@ -246,7 +250,9 @@ export async function deactivateAccount() {
             data: { isActive: false },
         });
 
-        // In a real app, you would also sign the user out here
+        // Audit log: hesap dondurma
+        await auditLog(user.id, "ACCOUNT_DEACTIVATE", "User", user.id);
+
         return { success: true, message: "Hesabınız başarıyla donduruldu." };
     } catch (error) {
         console.error("Account deactivation error:", error);

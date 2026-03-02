@@ -10,7 +10,7 @@ import { calculateShippingCost, StoreSettingsParams } from "@/utils/shipping";
 
 export default function PaymentClient({ initialAddresses, settings }: { initialAddresses: Address[], settings: StoreSettingsParams | null }) {
     const router = useRouter();
-    const { items: cartItems, totalPrice } = useCartStore();
+    const { items: cartItems, totalPrice, selectedCoupon } = useCartStore();
     const [isMounted, setIsMounted] = useState(false);
     const [selectedShipping, setSelectedShipping] = useState<string>("");
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
@@ -81,16 +81,59 @@ export default function PaymentClient({ initialAddresses, settings }: { initialA
 
     const visibleAddresses = isAddressExpanded ? addresses : addresses.slice(0, 2);
 
+    // Determine if FREE_SHIPPING coupon is active
+    const isFreeShippingCoupon = selectedCoupon?.discountType === 'FREE_SHIPPING';
+
     // Calculate shipping 
     const isDeliveryMethod = settings?.calcMethod === "delivery_method";
     const parseId = parseInt(selectedShipping);
-    const shippingCost = settings ? calculateShippingCost(settings, cartItems, isNaN(parseId) ? undefined : parseId) : 0;
+    const shippingCost = isFreeShippingCoupon ? 0 : (settings ? calculateShippingCost(settings, cartItems, isNaN(parseId) ? undefined : parseId) : 0);
 
     // Find options to display
     let deliveryOptionsToRender: any[] = [];
     if (isDeliveryMethod && settings?.deliveryMethods) {
         deliveryOptionsToRender = settings.deliveryMethods;
     }
+
+    // Calculate coupon discount
+    const calculateCouponDiscount = () => {
+        if (!selectedCoupon) return 0;
+        const subtotal = totalPrice();
+        let discount = 0;
+        switch (selectedCoupon.discountType) {
+            case 'PERCENTAGE':
+                discount = subtotal * (selectedCoupon.discountValue / 100);
+                break;
+            case 'FIXED':
+                discount = selectedCoupon.discountValue;
+                break;
+            case 'FREE_SHIPPING':
+                discount = 0; // Shipping is already zeroed out above
+                break;
+            case 'BUY_X_GET_Y':
+                if (selectedCoupon.buyX && selectedCoupon.getY) {
+                    const allUnitPrices: number[] = [];
+                    cartItems.forEach(item => {
+                        for (let i = 0; i < item.quantity; i++) {
+                            allUnitPrices.push(item.price);
+                        }
+                    });
+                    allUnitPrices.sort((a, b) => a - b);
+                    const totalQty = allUnitPrices.length;
+                    const freeCountPerSet = selectedCoupon.buyX - selectedCoupon.getY;
+                    const sets = Math.floor(totalQty / selectedCoupon.buyX);
+                    const totalFreeCount = sets * freeCountPerSet;
+                    for (let i = 0; i < totalFreeCount; i++) {
+                        discount += allUnitPrices[i];
+                    }
+                }
+                break;
+        }
+        return Math.min(discount, subtotal);
+    };
+
+    const discountAmount = isMounted ? calculateCouponDiscount() : 0;
+    const grandTotal = isMounted ? (totalPrice() + shippingCost - discountAmount) : 0;
 
     return (
         <main className="max-w-7xl mx-auto px-6 pb-12 pt-32 lg:px-20">
@@ -188,56 +231,71 @@ export default function PaymentClient({ initialAddresses, settings }: { initialA
                             <span className="size-8 flex items-center justify-center bg-primary text-white rounded-full text-sm font-bold">2</span>
                             <h3 className="text-2xl font-bold tracking-tight">Kargo Yöntemi</h3>
                         </div>
-                        <div className="space-y-4">
-                            {!isDeliveryMethod && (
-                                <label className={`flex items-center justify-between p-5 border-2 border-primary bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
-                                            <span className="material-symbols-outlined text-primary">local_shipping</span>
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-zinc-700">Standart Teslimat</p>
-                                            <p className="text-sm text-zinc-400">Belirlenen kurallara göre kargo</p>
-                                        </div>
+                        {isFreeShippingCoupon ? (
+                            <div className="p-5 border-2 border-green-500 bg-green-50 rounded-xl">
+                                <div className="flex items-center gap-4">
+                                    <div className="size-12 bg-green-100 rounded flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-green-600">local_shipping</span>
                                     </div>
-                                    <p className="font-extrabold text-primary">
-                                        {shippingCost === 0 ? "Ücretsiz" : `₺${new Intl.NumberFormat("tr-TR").format(shippingCost)}`}
-                                    </p>
-                                    <input
-                                        className="hidden"
-                                        name="shipping"
-                                        type="radio"
-                                        checked={true}
-                                        readOnly
-                                    />
-                                </label>
-                            )}
+                                    <div className="flex-1">
+                                        <p className="font-bold text-green-700">Ücretsiz Kargo</p>
+                                        <p className="text-sm text-green-600">Kupon ile ücretsiz kargo uygulanmaktadır ({selectedCoupon?.code})</p>
+                                    </div>
+                                    <p className="font-extrabold text-green-600">Ücretsiz</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {!isDeliveryMethod && (
+                                    <label className={`flex items-center justify-between p-5 border-2 border-primary bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
+                                        <div className="flex items-center gap-4">
+                                            <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
+                                                <span className="material-symbols-outlined text-primary">local_shipping</span>
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-zinc-700">Standart Teslimat</p>
+                                                <p className="text-sm text-zinc-400">Belirlenen kurallara göre kargo</p>
+                                            </div>
+                                        </div>
+                                        <p className="font-extrabold text-primary">
+                                            {shippingCost === 0 ? "Ücretsiz" : `₺${new Intl.NumberFormat("tr-TR").format(shippingCost)}`}
+                                        </p>
+                                        <input
+                                            className="hidden"
+                                            name="shipping"
+                                            type="radio"
+                                            checked={true}
+                                            readOnly
+                                        />
+                                    </label>
+                                )}
 
-                            {isDeliveryMethod && deliveryOptionsToRender.map((option) => (
-                                <label key={option.id} className={`flex items-center justify-between p-5 border-2 ${selectedShipping === option.id.toString() ? 'border-primary' : 'border-zinc-200'} bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
-                                            <span className="material-symbols-outlined text-primary">local_shipping</span>
+                                {isDeliveryMethod && deliveryOptionsToRender.map((option) => (
+                                    <label key={option.id} className={`flex items-center justify-between p-5 border-2 ${selectedShipping === option.id.toString() ? 'border-primary' : 'border-zinc-200'} bg-white rounded-xl cursor-pointer hover:border-primary transition-colors`}>
+                                        <div className="flex items-center gap-4">
+                                            <div className="size-12 bg-zinc-100 rounded flex items-center justify-center">
+                                                <span className="material-symbols-outlined text-primary">local_shipping</span>
+                                            </div>
+                                            <div>
+                                                <p className="font-bold">{option.name}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-bold">{option.name}</p>
-                                        </div>
-                                    </div>
-                                    <p className="font-extrabold text-primary">
-                                        {Number(option.fee.toString().replace(",", ".")) === 0
-                                            ? "Ücretsiz"
-                                            : `₺${new Intl.NumberFormat("tr-TR").format(Number(option.fee.toString().replace(",", ".")))}`}
-                                    </p>
-                                    <input
-                                        className="hidden"
-                                        name="shipping"
-                                        type="radio"
-                                        checked={selectedShipping === option.id.toString()}
-                                        onChange={() => setSelectedShipping(option.id.toString())}
-                                    />
-                                </label>
-                            ))}
-                        </div>
+                                        <p className="font-extrabold text-primary">
+                                            {Number(option.fee.toString().replace(",", ".")) === 0
+                                                ? "Ücretsiz"
+                                                : `₺${new Intl.NumberFormat("tr-TR").format(Number(option.fee.toString().replace(",", ".")))}`}
+                                        </p>
+                                        <input
+                                            className="hidden"
+                                            name="shipping"
+                                            type="radio"
+                                            checked={selectedShipping === option.id.toString()}
+                                            onChange={() => setSelectedShipping(option.id.toString())}
+                                        />
+                                    </label>
+                                ))}
+                            </div>
+                        )}
                     </section>
 
                     {/* 3. Payment Method Section */}
@@ -402,15 +460,27 @@ export default function PaymentClient({ initialAddresses, settings }: { initialA
                             </div>
                             <div className="flex justify-between text-zinc-500">
                                 <span>Kargo Ücreti</span>
-                                <span className="text-primary font-medium">
+                                <span className={`font-medium ${shippingCost === 0 ? 'text-green-600' : 'text-primary'}`}>
                                     {shippingCost === 0 ? 'Ücretsiz' : `₺${new Intl.NumberFormat("tr-TR").format(shippingCost)}`}
                                 </span>
                             </div>
+                            {isMounted && discountAmount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                    <span className="font-medium">İndirim ({selectedCoupon?.code})</span>
+                                    <span className="font-bold">-₺{new Intl.NumberFormat("tr-TR").format(discountAmount)}</span>
+                                </div>
+                            )}
+                            {isMounted && isFreeShippingCoupon && (
+                                <div className="flex justify-between text-green-600">
+                                    <span className="font-medium">Ücretsiz Kargo ({selectedCoupon?.code})</span>
+                                    <span className="font-bold">Uygulandı</span>
+                                </div>
+                            )}
                             <div className="flex justify-between items-end pt-4 border-t border-zinc-100">
                                 <span className="text-lg font-bold">Toplam</span>
                                 <div className="text-right">
                                     <p className="text-2xl font-extrabold tracking-tighter text-primary">
-                                        ₺{isMounted ? new Intl.NumberFormat("tr-TR").format(totalPrice() + shippingCost) : "0,00"}
+                                        ₺{isMounted ? new Intl.NumberFormat("tr-TR").format(grandTotal) : "0,00"}
                                     </p>
                                 </div>
                             </div>

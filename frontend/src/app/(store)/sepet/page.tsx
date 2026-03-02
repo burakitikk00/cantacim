@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getMyVisibleCoupons } from "../hesap/kuponlarim/actions";
-import { useCartStore } from "@/store/cart";
+import { useCartStore, SelectedCoupon } from "@/store/cart";
 import { getStoreSettings } from "@/app/actions/settings";
 import { calculateShippingCost, StoreSettingsParams } from "@/utils/shipping";
 
@@ -25,7 +25,7 @@ interface Coupon {
 const fmt = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
 
 export default function CartPage() {
-    const { items: cartItems, updateQuantity, removeItem } = useCartStore();
+    const { items: cartItems, updateQuantity, removeItem, selectedCoupon: storedCoupon, setSelectedCoupon: setStoredCoupon } = useCartStore();
     const [isMounted, setIsMounted] = useState(false);
     const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
     const [couponInput, setCouponInput] = useState("");
@@ -40,9 +40,18 @@ export default function CartPage() {
                 getMyVisibleCoupons(),
                 getStoreSettings()
             ]);
-            if (resCoupons.success) setAvailableCoupons(resCoupons.data as Coupon[]);
+            if (resCoupons.success) {
+                const coupons = resCoupons.data as Coupon[];
+                setAvailableCoupons(coupons);
+                // Restore previously selected coupon from store
+                if (storedCoupon) {
+                    const found = coupons.find(c => c.code === storedCoupon.code);
+                    if (found) setSelectedCoupon(found);
+                }
+            }
             if (resSettings.success) setSettings(resSettings.data as any as StoreSettingsParams);
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleQuantityChange = (id: string, delta: number) => {
@@ -56,24 +65,43 @@ export default function CartPage() {
         removeItem(id);
     };
 
+    // Sync local coupon selection to store
+    const syncCouponToStore = (coupon: Coupon | null) => {
+        setSelectedCoupon(coupon);
+        if (coupon) {
+            setStoredCoupon({
+                id: coupon.id,
+                name: coupon.name,
+                code: coupon.code,
+                description: coupon.description,
+                discountType: coupon.discountType,
+                discountValue: coupon.discountValue,
+                buyX: coupon.buyX,
+                getY: coupon.getY,
+            });
+        } else {
+            setStoredCoupon(null);
+        }
+    };
+
     const handleApplyCoupon = () => {
         if (!couponInput) return;
         const coupon = availableCoupons.find(c => c.code === couponInput.toUpperCase());
         if (coupon) {
-            setSelectedCoupon(coupon);
+            syncCouponToStore(coupon);
             setError("");
             setCouponInput("");
         } else {
             setError("Geçersiz kupon kodu");
-            setSelectedCoupon(null);
+            syncCouponToStore(null);
         }
     };
 
     const handleSelectCoupon = (coupon: Coupon) => {
         if (selectedCoupon?.code === coupon.code) {
-            setSelectedCoupon(null); // Toggle off
+            syncCouponToStore(null); // Toggle off
         } else {
-            setSelectedCoupon(coupon);
+            syncCouponToStore(coupon);
             setCouponInput("");
             setError("");
         }
@@ -81,7 +109,8 @@ export default function CartPage() {
 
     // Calculation Logic
     const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const shipping = settings ? calculateShippingCost(settings, cartItems) : 0;
+    const isFreeShippingCoupon = selectedCoupon?.discountType === 'FREE_SHIPPING';
+    const shipping = isFreeShippingCoupon ? 0 : (settings ? calculateShippingCost(settings, cartItems) : 0);
 
     const calculateDiscount = () => {
         if (!selectedCoupon) return 0;

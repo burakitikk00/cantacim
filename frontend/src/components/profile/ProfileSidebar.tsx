@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { useState } from "react";
 
 const NAVIGATION_ITEMS = [
     {
@@ -12,7 +14,7 @@ const NAVIGATION_ITEMS = [
     {
         title: "Adreslerim",
         href: "/hesap/adreslerim",
-        icon: "location_on", // map in design, location_on in material symbols usually
+        icon: "location_on",
     },
     {
         title: "Hesap Bilgileri",
@@ -33,13 +35,25 @@ const NAVIGATION_ITEMS = [
 
 export function ProfileSidebar() {
     const pathname = usePathname();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            // Önce audit kaydı oluştur
+            await fetch("/api/auth/logout", { method: "POST" });
+        } catch {
+            // Hata olsa bile çıkışı engelleme
+        }
+        signOut({ callbackUrl: "/" });
+    };
 
     return (
         <aside className="w-full lg:w-72 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 flex flex-col h-full">
             <div className="p-8 flex flex-col h-full">
-                {/* Brand Logo - Optional if already in main layout, but design shows it in sidebar for desktop */}
+                {/* Brand Logo */}
                 <div className="mb-12 hidden lg:block">
-                    <h1 className="text-xl font-bold tracking-widest uppercase">L'Elite Luxury</h1>
+                    <h1 className="text-xl font-bold tracking-widest uppercase">L&apos;Elite Luxury</h1>
                     <p className="text-xs text-zinc-400 mt-1 uppercase tracking-tighter">Premium Shopping</p>
                 </div>
 
@@ -75,13 +89,14 @@ export function ProfileSidebar() {
 
                 {/* Logout */}
                 <div className="pt-8 border-t border-zinc-100 dark:border-zinc-800 mt-auto">
-                    <Link
-                        href="/auth/cikis" // Assuming logout route
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                    <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-colors w-full disabled:opacity-50"
                     >
                         <span className="material-symbols-outlined text-[22px]">logout</span>
-                        <span className="text-sm font-medium">Çıkış Yap</span>
-                    </Link>
+                        <span className="text-sm font-medium">{isLoggingOut ? "Çıkış yapılıyor..." : "Çıkış Yap"}</span>
+                    </button>
                 </div>
             </div>
         </aside>

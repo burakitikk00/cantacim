@@ -11,11 +11,24 @@ export interface CartItemState {
     sku: string;
 }
 
+export interface SelectedCoupon {
+    id: string;
+    name: string;
+    code: string;
+    description: string | null;
+    discountType: string; // PERCENTAGE | FIXED | BUY_X_GET_Y | FREE_SHIPPING
+    discountValue: number;
+    buyX: number | null;
+    getY: number | null;
+}
+
 interface CartStore {
     items: CartItemState[];
+    selectedCoupon: SelectedCoupon | null;
     addItem: (item: Omit<CartItemState, "quantity">) => void;
     removeItem: (variantId: string) => void;
     updateQuantity: (variantId: string, quantity: number) => void;
+    setSelectedCoupon: (coupon: SelectedCoupon | null) => void;
     clearCart: () => void;
     totalItems: () => number;
     totalPrice: () => number;
@@ -25,6 +38,7 @@ export const useCartStore = create<CartStore>()(
     persist(
         (set, get) => ({
             items: [],
+            selectedCoupon: null,
 
             addItem: (item) =>
                 set((state) => {
@@ -49,7 +63,9 @@ export const useCartStore = create<CartStore>()(
                         : state.items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)),
                 })),
 
-            clearCart: () => set({ items: [] }),
+            setSelectedCoupon: (coupon) => set({ selectedCoupon: coupon }),
+
+            clearCart: () => set({ items: [], selectedCoupon: null }),
 
             totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
             totalPrice: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
