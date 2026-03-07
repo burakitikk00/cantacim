@@ -10,7 +10,18 @@ export async function getReviews(page = 1, limit = 20) {
         const [reviews, total] = await Promise.all([
             db.productReview.findMany({
                 include: {
-                    product: { select: { name: true, slug: true, images: true } },
+                    product: {
+                        select: {
+                            name: true,
+                            slug: true,
+                            images: true,
+                            variants: {
+                                select: { image: true },
+                                where: { image: { not: null } },
+                                take: 1
+                            }
+                        }
+                    },
                     user: { select: { name: true, surname: true, email: true } },
                     order: { select: { orderNumber: true } }
                 },

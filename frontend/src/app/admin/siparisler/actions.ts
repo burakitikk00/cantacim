@@ -134,6 +134,7 @@ export async function getOrderDetail(orderId: string) {
                             product: {
                                 select: {
                                     name: true,
+                                    slug: true,
                                     images: true,
                                 },
                             },
@@ -205,6 +206,7 @@ export async function getOrderDetail(orderId: string) {
             return {
                 id: item.id,
                 name: item.variant.product.name,
+                slug: item.variant.product.slug,
                 variant: variantStr || "-",
                 sku: item.variant.sku,
                 price: fmt(item.unitPrice),
@@ -228,6 +230,23 @@ export async function updateOrderStatus(input: z.infer<typeof updateStatusSchema
     await requireAdmin();
 
     const parsed = updateStatusSchema.parse(input);
+
+    const currentOrder = await db.order.findUnique({
+        where: { id: parsed.orderId },
+        include: {
+            items: {
+                include: {
+                    variant: {
+                        include: {
+                            product: true
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    if (!currentOrder) throw new Error("Sipariş bulunamadı");
 
     // Kargoda durumuna geçişte kargo bilgileri zorunlu
     if (parsed.status === "SHIPPED") {
@@ -253,6 +272,40 @@ export async function updateOrderStatus(input: z.infer<typeof updateStatusSchema
         where: { id: parsed.orderId },
         data,
     });
+
+    // Create notifications if status changed
+    if (currentOrder.status !== parsed.status) {
+        // Only if changing to a valid status
+        const statusMapKey = parsed.status;
+        const mappedStatus = STATUS_MAP[statusMapKey] || statusMapKey;
+
+        // Generic status update notification
+        await db.notification.create({
+            data: {
+                userId: currentOrder.userId,
+                title: "Sipariş Durumu Güncellendi",
+                message: `#${currentOrder.orderNumber} numaralı siparişinizin durumu "${mappedStatus}" olarak güncellendi.`,
+                type: "ORDER_STATUS_CHANGED",
+                link: `/hesap/siparisler`,
+                entityId: currentOrder.id,
+            }
+        });
+
+        // Review notification if DELIVERED
+        if (parsed.status === "DELIVERED") {
+            await db.notification.create({
+                data: {
+                    userId: currentOrder.userId,
+                    title: "Siparişiniz Teslim Edildi!",
+                    message: `#${currentOrder.orderNumber} numaralı siparişiniz teslim edildi. Satın aldığınız ürünleri değerlendirebilir misiniz?`,
+                    type: "ORDER_DELIVERED",
+                    link: `/hesap/siparisler`,
+                    entityId: currentOrder.id,
+                    isModalShown: false,
+                }
+            });
+        }
+    }
 
     revalidatePath("/admin/siparisler");
     revalidatePath(`/admin/siparisler/${parsed.orderId}`);

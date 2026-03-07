@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { getMyVisibleCoupons } from "../hesap/kuponlarim/actions";
+import { useState, useEffect, useCallback } from "react";
+import { getMyVisibleCoupons, applyCouponCode } from "../hesap/kuponlarim/actions";
 import { useCartStore, SelectedCoupon } from "@/store/cart";
 import { getStoreSettings } from "@/app/actions/settings";
 import { calculateShippingCost, StoreSettingsParams } from "@/utils/shipping";
@@ -20,9 +20,43 @@ interface Coupon {
     validUntil: string | null;
     maxUses: number | null;
     usedCount: number;
+    isUsed?: boolean;
 }
 
 const fmt = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
+
+interface Toast {
+    id: number;
+    type: "success" | "error";
+    message: string;
+}
+
+function ToastNotification({ toast, onRemove }: { toast: Toast; onRemove: (id: number) => void }) {
+    useEffect(() => {
+        const timer = setTimeout(() => onRemove(toast.id), 4000);
+        return () => clearTimeout(timer);
+    }, [toast.id, onRemove]);
+
+    return (
+        <div
+            className={`flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border backdrop-blur-sm text-sm font-medium transition-all duration-500 animate-slideIn ${toast.type === "success"
+                ? "bg-emerald-50/95 border-emerald-200 text-emerald-800"
+                : "bg-red-50/95 border-red-200 text-red-800"
+                }`}
+        >
+            <span className="material-symbols-outlined text-lg">
+                {toast.type === "success" ? "check_circle" : "error"}
+            </span>
+            <span>{toast.message}</span>
+            <button
+                onClick={() => onRemove(toast.id)}
+                className="ml-2 opacity-50 hover:opacity-100 transition-opacity"
+            >
+                <span className="material-symbols-outlined text-base">close</span>
+            </button>
+        </div>
+    );
+}
 
 export default function CartPage() {
     const { items: cartItems, updateQuantity, removeItem, selectedCoupon: storedCoupon, setSelectedCoupon: setStoredCoupon } = useCartStore();
@@ -30,8 +64,19 @@ export default function CartPage() {
     const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
     const [couponInput, setCouponInput] = useState("");
     const [error, setError] = useState("");
+    const [couponApplying, setCouponApplying] = useState(false);
     const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
     const [settings, setSettings] = useState<StoreSettingsParams | null>(null);
+    const [toasts, setToasts] = useState<Toast[]>([]);
+
+    const addToast = useCallback((type: "success" | "error", message: string) => {
+        const id = Date.now() + Math.random();
+        setToasts((prev) => [...prev, { id, type, message }]);
+    }, []);
+
+    const removeToast = useCallback((id: number) => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, []);
 
     useEffect(() => {
         setIsMounted(true);
@@ -41,7 +86,8 @@ export default function CartPage() {
                 getStoreSettings()
             ]);
             if (resCoupons.success) {
-                const coupons = resCoupons.data as Coupon[];
+                // Filter out used coupons — only show available ones in the cart
+                const coupons = (resCoupons.data as Coupon[]).filter(c => !c.isUsed);
                 setAvailableCoupons(coupons);
                 // Restore previously selected coupon from store
                 if (storedCoupon) {
@@ -84,16 +130,45 @@ export default function CartPage() {
         }
     };
 
-    const handleApplyCoupon = () => {
-        if (!couponInput) return;
-        const coupon = availableCoupons.find(c => c.code === couponInput.toUpperCase());
-        if (coupon) {
-            syncCouponToStore(coupon);
+    const handleApplyCoupon = async () => {
+        if (!couponInput || couponApplying) return;
+        const code = couponInput.toUpperCase();
+
+        // First check if it's already in the local list
+        const localCoupon = availableCoupons.find(c => c.code === code);
+        if (localCoupon) {
+            syncCouponToStore(localCoupon);
             setError("");
             setCouponInput("");
-        } else {
-            setError("Geçersiz kupon kodu");
-            syncCouponToStore(null);
+            addToast("success", "Kupon başarıyla uygulandı!");
+            return;
+        }
+
+        // Otherwise, try to apply it via server action (validates + saves to UserCoupon)
+        setCouponApplying(true);
+        setError("");
+        try {
+            const res = await applyCouponCode(code);
+            if (res.success && res.data) {
+                const newCoupon = res.data as Coupon;
+                setAvailableCoupons(prev => {
+                    const exists = prev.some(c => c.code === newCoupon.code);
+                    if (exists) return prev;
+                    return [newCoupon, ...prev];
+                });
+                syncCouponToStore(newCoupon);
+                setCouponInput("");
+                setError("");
+                addToast("success", "Kupon başarıyla uygulandı!");
+            } else {
+                setError(res.error || "Geçersiz kupon kodu");
+                addToast("error", res.error || "Geçersiz kupon kodu");
+                syncCouponToStore(null);
+            }
+        } catch {
+            setError("Bir hata oluştu. Lütfen tekrar deneyin.");
+        } finally {
+            setCouponApplying(false);
         }
     };
 
@@ -163,7 +238,26 @@ export default function CartPage() {
     const total = subtotal + shipping - discountAmount;
 
     return (
-        <main className="max-w-[1440px] mx-auto px-6 lg:px-12 pt-28 pb-24">
+        <main className="max-w-[1440px] mx-auto px-6 lg:px-12 pt-28 pb-24 relative">
+            {/* Toast Container - Top Right */}
+            <div className="fixed top-24 right-6 z-[9999] flex flex-col gap-3" style={{ pointerEvents: "none" }}>
+                {toasts.map((toast) => (
+                    <div key={toast.id} style={{ pointerEvents: "auto" }}>
+                        <ToastNotification toast={toast} onRemove={removeToast} />
+                    </div>
+                ))}
+            </div>
+
+            <style jsx global>{`
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateX(100px); }
+                    to { opacity: 1; transform: translateX(0); }
+                }
+                .animate-slideIn {
+                    animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+            `}</style>
+
             <nav className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-primary/40 mb-8">
                 <Link href="/" className="hover:text-primary transition-colors">Anasayfa</Link>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
@@ -281,18 +375,33 @@ export default function CartPage() {
                                             <div className="flex gap-2">
                                                 <input
                                                     value={couponInput}
-                                                    onChange={(e) => setCouponInput(e.target.value)}
-                                                    className="flex-1 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                                                    onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); if (error) setError(""); }}
+                                                    onKeyDown={(e) => { if (e.key === "Enter") handleApplyCoupon(); }}
+                                                    className={`flex-1 border rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all ${error ? "border-red-300" : "border-gray-200"}`}
                                                     placeholder="Kupon Kodu"
+                                                    disabled={couponApplying}
                                                 />
                                                 <button
                                                     onClick={handleApplyCoupon}
-                                                    className="bg-primary text-white px-6 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors"
+                                                    disabled={couponApplying || !couponInput.trim()}
+                                                    className={`px-6 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2 ${couponApplying || !couponInput.trim()
+                                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                        : "bg-primary text-white hover:bg-black"
+                                                        }`}
                                                 >
-                                                    Uygula
+                                                    {couponApplying ? (
+                                                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" />
+                                                    ) : (
+                                                        "Uygula"
+                                                    )}
                                                 </button>
                                             </div>
-                                            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+                                            {error && (
+                                                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                                                    <span className="material-symbols-outlined text-sm">warning</span>
+                                                    {error}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Minimal Available Coupons */}

@@ -54,14 +54,20 @@ export async function middleware(request: NextRequest) {
     if (isProtected || isAdmin) {
         const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-        if (!token) {
+        if (!token || token.expired) {
             if (pathname.startsWith("/api/")) {
                 return addSecurityHeaders(NextResponse.json({ error: "Yetkilendirme gerekli" }, { status: 401 }));
             }
+            // Token süresi dolmuşsa veya yoksa → session cookie'sini sil ve ana sayfaya yönlendir
             const url = request.nextUrl.clone();
-            url.pathname = "/auth/giris";
-            url.searchParams.set("callbackUrl", pathname);
-            return addSecurityHeaders(NextResponse.redirect(url));
+            url.pathname = "/";
+            const response = NextResponse.redirect(url);
+            // next-auth session cookie'lerini sil
+            response.cookies.delete("next-auth.session-token");
+            response.cookies.delete("__Secure-next-auth.session-token");
+            response.cookies.delete("next-auth.csrf-token");
+            response.cookies.delete("__Secure-next-auth.csrf-token");
+            return addSecurityHeaders(response);
         }
 
         if (isAdmin && token.role !== "ADMIN") {
@@ -75,7 +81,7 @@ export async function middleware(request: NextRequest) {
     /* ── Auth page: redirect if logged in ── */
     if (pathname.startsWith("/auth/")) {
         const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-        if (token) {
+        if (token && !token.expired) {
             return addSecurityHeaders(NextResponse.redirect(new URL("/", request.url)));
         }
     }

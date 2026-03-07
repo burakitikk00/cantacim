@@ -80,6 +80,7 @@ export default function ProductDetailClient({
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertType, setAlertType] = useState<'success' | 'error'>('error');
     const [notifyRequested, setNotifyRequested] = useState(false);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -191,6 +192,7 @@ export default function ProductDetailClient({
     const handleAddToCart = async () => {
         // If product has variations but none selected
         if (hasVariations && !selectedVariant) {
+            setAlertType('error');
             setAlertMessage("Sepete eklenmedi! Lütfen varyasyon seçiniz.");
             return;
         }
@@ -229,8 +231,10 @@ export default function ProductDetailClient({
                 await addToCart(variantId);
             }
 
-            setAlertMessage(null);
+            setAlertType('success');
+            setAlertMessage("Ürün sepete eklendi.");
         } catch {
+            setAlertType('error');
             setAlertMessage("Sepete eklenirken bir hata oluştu.");
         } finally {
             setIsAddingToCart(false);
@@ -247,6 +251,7 @@ export default function ProductDetailClient({
             setNotifyRequested(true);
             localStorage.setItem(`stock-notify-${product.id}`, "true");
         } else {
+            setAlertType('error');
             setAlertMessage(result.error || "Bir hata oluştu.");
         }
     };
@@ -264,6 +269,7 @@ export default function ProductDetailClient({
         if (result.success) {
             setReviewSubmitted(true);
         } else {
+            setAlertType('error');
             setAlertMessage(result.error || "Yorum gönderilemedi.");
         }
     };
@@ -291,8 +297,8 @@ export default function ProductDetailClient({
             {/* Alert Toast */}
             {alertMessage && (
                 <div className="fixed top-24 right-6 z-[100] animate-slide-in-right">
-                    <div className="bg-red-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
-                        <span className="material-symbols-outlined text-xl">error</span>
+                    <div className={`${alertType === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm`}>
+                        <span className="material-symbols-outlined text-xl">{alertType === 'success' ? 'check_circle' : 'error'}</span>
                         <p className="text-sm font-medium">{alertMessage}</p>
                         <button onClick={() => setAlertMessage(null)} className="ml-2 hover:opacity-70">
                             <span className="material-symbols-outlined text-lg">close</span>
@@ -517,7 +523,7 @@ export default function ProductDetailClient({
             </div>
 
             {/* Reviews Section */}
-            <section className="mt-24 pt-16 border-t border-gray-100">
+            <section id="reviews" className="mt-24 pt-16 border-t border-gray-100">
                 <div className="max-w-5xl mx-auto">
                     <div className="flex items-center gap-4 mb-10">
                         <h3 className="text-2xl font-bold tracking-tight">Değerlendirmeler</h3>

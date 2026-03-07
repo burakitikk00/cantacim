@@ -77,6 +77,8 @@ model User {
   accounts           Account[]
   reviews            ProductReview[]
   stockNotifications StockNotification[]
+  claimedCoupons     UserCoupon[]
+  notifications      Notification[]
 
 
   @@index([email])
@@ -440,11 +442,27 @@ model Coupon {
   categories     Category[]
   products       Product[]
   orders         Order[]
+  claimedByUsers UserCoupon[]
 
   @@index([code])
   @@index([isActive])
   @@index([targetTier])
   @@index([targetUserId])
+}
+
+// ─── USER COUPONS (Claimed coupon codes) ─────────────
+model UserCoupon {
+  id        String   @id @default(cuid())
+  userId    String
+  couponId  String
+  claimedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, couponId])
+  @@index([userId])
+  @@index([couponId])
 }
 
 // ─── CUSTOMER TIERS & GROUPS ──────────────────────────
@@ -519,4 +537,25 @@ model StockNotification {
   variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   @@unique([userId, variantId])
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────────
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // e.g., "ORDER_STATUS_CHANGED", "ORDER_DELIVERED"
+  isRead    Boolean  @default(false)
+  isModalShown Boolean @default(false) // For one-time modal on first login
+  link      String?  // Optional link to redirect user when clicked
+  entityId  String?  // Reference to orderId or other entity
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
 }

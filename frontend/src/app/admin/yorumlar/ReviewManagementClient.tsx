@@ -15,6 +15,7 @@ interface Review {
         name: string;
         slug: string;
         images: string[];
+        variants?: { image: string | null }[];
     };
     user: {
         name: string | null;
@@ -80,10 +81,14 @@ export default function ReviewManagementClient({
     };
 
     const filteredReviews = reviews.filter(review => {
+        const userFullName = `${review.user.name || ''} ${review.user.surname || ''}`.trim().toLowerCase();
+        const searchLower = searchTerm.toLowerCase();
+
         const matchesSearch =
-            review.product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            review.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (review.comment && review.comment.toLowerCase().includes(searchTerm.toLowerCase()));
+            review.product.name.toLowerCase().includes(searchLower) ||
+            review.user.email.toLowerCase().includes(searchLower) ||
+            userFullName.includes(searchLower) ||
+            (review.comment && review.comment.toLowerCase().includes(searchLower));
 
         const matchesStatus =
             statusFilter === "ALL" ||
@@ -131,8 +136,8 @@ export default function ReviewManagementClient({
                             key={tab.id}
                             onClick={() => setStatusFilter(tab.id as any)}
                             className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${statusFilter === tab.id
-                                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-gray-200/50"
-                                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                                ? "bg-white text-gray-900 shadow-sm ring-1 ring-gray-200/50"
+                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             {tab.label}
@@ -169,22 +174,33 @@ export default function ReviewManagementClient({
                                 filteredReviews.map((review) => (
                                     <tr key={review.id} className="hover:bg-gray-50/50 transition-colors group">
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
+                                            <a href={`/urunler/${review.product.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group/link hover:bg-gray-50/80 rounded-lg p-1 transition-colors">
                                                 <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
                                                     <img
-                                                        src={review.product.images[0]?.startsWith('http') ? review.product.images[0] : `/uploads/${review.product.images[0]}`}
+                                                        src={review.product.images[0]
+                                                            ? (review.product.images[0].startsWith('http') ? review.product.images[0] : `/uploads/${review.product.images[0]}`)
+                                                            : (review.product.variants?.[0]?.image
+                                                                ? (review.product.variants[0].image.startsWith('http') ? review.product.variants[0].image : `/uploads/${review.product.variants[0].image}`)
+                                                                : 'https://placehold.co/100x100?text=No+Image'
+                                                            )
+                                                        }
                                                         alt={review.product.name}
-                                                        className="h-full w-full object-cover"
+                                                        className="h-full w-full object-cover group-hover/link:scale-105 transition-transform"
                                                         onError={(e) => {
                                                             (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=No+Image';
                                                         }}
                                                     />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-medium text-gray-900 line-clamp-1 max-w-[200px]" title={review.product.name}>{review.product.name}</span>
-                                                    <span className="text-xs text-gray-500">{review.product.slug}</span>
+                                                    <span className="font-medium text-gray-900 group-hover/link:text-primary transition-colors line-clamp-1 max-w-[200px]" title={review.product.name}>
+                                                        {review.product.name}
+                                                    </span>
+                                                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                                                        {review.product.slug}
+                                                        <span className="material-symbols-outlined text-[10px] opacity-0 group-hover/link:opacity-100 transition-opacity text-primary">open_in_new</span>
+                                                    </span>
                                                 </div>
-                                            </div>
+                                            </a>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
@@ -211,8 +227,8 @@ export default function ReviewManagementClient({
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase ${review.isApproved
-                                                    ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20"
-                                                    : "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20"
+                                                ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20"
+                                                : "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20"
                                                 }`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full ${review.isApproved ? "bg-green-600" : "bg-amber-600"}`}></span>
                                                 {review.isApproved ? "Onaylı" : "Beklemede"}

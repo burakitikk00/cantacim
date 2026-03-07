@@ -1,11 +1,21 @@
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { MobileSidebarWrapper } from "@/components/profile/MobileSidebarWrapper";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function ProfileLayout({
+export default async function ProfileLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const session = await getServerSession(authOptions);
+
+    // Token süresi dolmuş veya session yoksa → ana sayfaya yönlendir
+    if (!session?.user) {
+        redirect("/");
+    }
+
     return (
         <div className="min-h-screen bg-background-light text-primary flex items-start">
             {/* Main Layout containing Mobile & Desktop Sidebars */}

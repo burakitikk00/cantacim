@@ -84,28 +84,32 @@ export default async function OrdersPage() {
                                     {order.items.map((item) => (
                                         <div key={item.id} className="flex gap-4 sm:gap-6 items-start">
                                             {/* Image */}
-                                            <div className="relative w-24 h-32 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
-                                                {item.image ? (
-                                                    <Image
-                                                        src={item.image.startsWith("http") ? item.image : `/uploads/products/${item.image}`}
-                                                        alt={item.name}
-                                                        fill
-                                                        className="object-cover"
-                                                        sizes="96px"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-zinc-400">
-                                                        <Package className="w-8 h-8 opacity-20" />
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <Link href={`/urunler/${item.slug}`}>
+                                                <div className="relative w-24 h-32 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                                                    {item.image ? (
+                                                        <Image
+                                                            src={item.image.startsWith("http") ? item.image : `/uploads/products/${item.image}`}
+                                                            alt={item.name}
+                                                            fill
+                                                            className="object-cover"
+                                                            sizes="96px"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-zinc-400">
+                                                            <Package className="w-8 h-8 opacity-20" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </Link>
 
                                             <div className="flex-1 min-w-0 py-1">
                                                 <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-4">
                                                     <div>
-                                                        <h4 className="font-medium text-zinc-900 dark:text-white text-base sm:text-lg leading-tight">
-                                                            {item.name}
-                                                        </h4>
+                                                        <Link href={`/urunler/${item.slug}`} className="hover:underline">
+                                                            <h4 className="font-medium text-zinc-900 dark:text-white text-base sm:text-lg leading-tight">
+                                                                {item.name}
+                                                            </h4>
+                                                        </Link>
                                                         <p className="text-sm text-zinc-500 mt-1">{item.variant}</p>
                                                         {item.quantity > 1 && (
                                                             <p className="text-xs text-zinc-400 mt-1">Adet: {item.quantity}</p>
@@ -120,6 +124,14 @@ export default async function OrdersPage() {
                                                             <span className="text-xs text-zinc-400 mt-0.5">
                                                                 (Birim: {item.unitPrice})
                                                             </span>
+                                                        )}
+                                                        {order.status === "Teslim Edildi" && (
+                                                            <div className="mt-2 text-right">
+                                                                <Link href={`/urunler/${item.slug}#reviews`} className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline inline-flex items-center gap-1 group/evaluate">
+                                                                    Değerlendir
+                                                                    <ChevronRight className="w-3 h-3 group-hover/evaluate:translate-x-0.5 transition-transform" />
+                                                                </Link>
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </div>

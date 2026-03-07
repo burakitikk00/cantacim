@@ -5,18 +5,22 @@ import { useCartStore } from "@/store/cart";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import AuthSidebar from "../auth/AuthSidebar";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
     const count = useCartStore((s) => s.items.length);
-    const { status } = useSession();
+    const { data: session, status } = useSession();
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [favoriteCount, setFavoriteCount] = useState(0);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
 
+    // Token süresi dolmuşsa veya user yoksa "unauthenticated" gibi davran
+    const isAuthenticated = status === "authenticated" && !!session?.user;
+
     const fetchFavoriteCount = useCallback(() => {
-        if (status === "authenticated") {
+        if (isAuthenticated) {
             fetch("/api/favorites")
                 .then(res => {
                     if (!res.ok) return { count: 0 };
@@ -27,7 +31,7 @@ export default function Navbar() {
         } else {
             setFavoriteCount(0);
         }
-    }, [status]);
+    }, [isAuthenticated]);
 
     useEffect(() => {
         fetchFavoriteCount();
@@ -61,14 +65,14 @@ export default function Navbar() {
     }, [isProfileOpen]);
 
     const handleAuthAction = (e: React.MouseEvent) => {
-        if (status === "unauthenticated") {
+        if (!isAuthenticated) {
             e.preventDefault();
             setIsAuthOpen(true);
         }
     };
 
     const handleProfileClick = (e: React.MouseEvent) => {
-        if (status === "unauthenticated") {
+        if (!isAuthenticated) {
             e.preventDefault();
             setIsAuthOpen(true);
         } else {
@@ -137,7 +141,7 @@ export default function Navbar() {
                         </button>
 
                         {/* Dropdown Menu */}
-                        {isProfileOpen && status === "authenticated" && (
+                        {isProfileOpen && isAuthenticated && (
                             <div
                                 className="absolute right-0 top-full mt-3 w-56 bg-white rounded-xl shadow-xl border border-primary/5 overflow-hidden"
                                 style={{ animation: "profileDropdownIn 0.2s ease-out" }}
@@ -181,6 +185,8 @@ export default function Navbar() {
                             </div>
                         )}
                     </div>
+
+                    <NotificationBell isAuthenticated={isAuthenticated} />
 
                     <Link
                         href="/hesap/favorilerim"

@@ -201,19 +201,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         <div className="divide-y divide-gray-100">
                             {order.items.map((item) => (
                                 <div key={item.id} className="p-6 flex items-center gap-4">
-                                    {item.img ? (
-                                        <img
-                                            src={item.img.startsWith("http") ? item.img : `/uploads/products/${item.img}`}
-                                            alt={item.name}
-                                            className="w-16 h-20 object-cover rounded-lg border border-gray-100"
-                                        />
-                                    ) : (
-                                        <div className="w-16 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                                            <span className="material-icons text-gray-300">image</span>
-                                        </div>
-                                    )}
+                                    <Link href={`/urunler/${item.slug}`}>
+                                        {item.img ? (
+                                            <img
+                                                src={item.img.startsWith("http") ? item.img : `/uploads/products/${item.img}`}
+                                                alt={item.name}
+                                                className="w-16 h-20 object-cover rounded-lg border border-gray-100"
+                                            />
+                                        ) : (
+                                            <div className="w-16 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span className="material-icons text-gray-300">image</span>
+                                            </div>
+                                        )}
+                                    </Link>
                                     <div className="flex-1">
-                                        <h3 className="font-medium text-[#111827]">{item.name}</h3>
+                                        <Link href={`/urunler/${item.slug}`} className="hover:underline">
+                                            <h3 className="font-medium text-[#111827]">{item.name}</h3>
+                                        </Link>
                                         <p className="text-sm text-gray-500">{item.variant}</p>
                                         <p className="text-xs text-gray-400">SKU: {item.sku}</p>
                                     </div>

@@ -82,28 +82,32 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                 {order.items.map((item) => (
                                     <div key={item.id} className="p-6 flex flex-col sm:flex-row gap-6">
                                         {/* Image */}
-                                        <div className="relative w-24 h-32 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
-                                            {item.image ? (
-                                                <Image
-                                                    src={item.image.startsWith("http") ? item.image : `/uploads/products/${item.image}`}
-                                                    alt={item.name}
-                                                    fill
-                                                    className="object-cover"
-                                                    sizes="96px"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-zinc-400">
-                                                    <Package className="w-8 h-8 opacity-20" />
-                                                </div>
-                                            )}
-                                        </div>
+                                        <Link href={`/urunler/${item.slug}`}>
+                                            <div className="relative w-24 h-32 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                                                {item.image ? (
+                                                    <Image
+                                                        src={item.image.startsWith("http") ? item.image : `/uploads/products/${item.image}`}
+                                                        alt={item.name}
+                                                        fill
+                                                        className="object-cover"
+                                                        sizes="96px"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-zinc-400">
+                                                        <Package className="w-8 h-8 opacity-20" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Link>
 
                                         <div className="flex-1 space-y-2">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <h4 className="font-medium text-zinc-900 dark:text-white text-lg">
-                                                        {item.name}
-                                                    </h4>
+                                                    <Link href={`/urunler/${item.slug}`} className="hover:underline">
+                                                        <h4 className="font-medium text-zinc-900 dark:text-white text-lg">
+                                                            {item.name}
+                                                        </h4>
+                                                    </Link>
                                                     <p className="text-sm text-zinc-500">{item.variant}</p>
                                                 </div>
                                                 <p className="font-semibold text-zinc-900 dark:text-white text-lg">
