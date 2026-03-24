@@ -57,7 +57,16 @@ export async function PUT(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { notificationId, markAsRead, markModalShown } = body;
+        const { notificationId, markAsRead, markAllAsRead, markModalShown } = body;
+
+        // Handle bulk mark all as read
+        if (markAllAsRead) {
+            await db.notification.updateMany({
+                where: { userId: session.user.id, isRead: false },
+                data: { isRead: true }
+            });
+            return NextResponse.json({ success: true });
+        }
 
         if (!notificationId) {
             return NextResponse.json({ error: "Notification ID mandatory" }, { status: 400 });
@@ -83,6 +92,47 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ notification: updated });
     } catch (error) {
         console.error("Notification update error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const body = await req.json();
+        const { notificationId, clearAll } = body;
+
+        // Handle bulk clear all
+        if (clearAll) {
+            await db.notification.deleteMany({
+                where: { userId: session.user.id }
+            });
+            return NextResponse.json({ success: true });
+        }
+
+        if (!notificationId) {
+            return NextResponse.json({ error: "Notification ID mandatory" }, { status: 400 });
+        }
+
+        const notification = await db.notification.findUnique({
+            where: { id: notificationId }
+        });
+
+        if (!notification || notification.userId !== session.user.id) {
+            return NextResponse.json({ error: "Not found" }, { status: 404 });
+        }
+
+        await db.notification.delete({
+            where: { id: notificationId }
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("Notification delete error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

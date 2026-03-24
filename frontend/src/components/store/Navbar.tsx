@@ -24,6 +24,7 @@ export default function Navbar() {
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
+    const searchTriggerRef = useRef<HTMLButtonElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     // Token süresi dolmuşsa veya user yoksa "unauthenticated" gibi davran
@@ -74,10 +75,15 @@ export default function Navbar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isProfileOpen]);
 
-    // Oustide click for search
+    // Outside click for search
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+            if (
+                searchRef.current && 
+                !searchRef.current.contains(event.target as Node) &&
+                searchTriggerRef.current &&
+                !searchTriggerRef.current.contains(event.target as Node)
+            ) {
                 setIsSearchOpen(false);
             }
         };
@@ -140,12 +146,12 @@ export default function Navbar() {
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary/5 glass-header">
             <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Left: Logo & Navigation */}
-                <div className="flex items-center gap-12">
+                <div className="flex items-center gap-12 relative z-10">
                     <Link href="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-2">
                         <span className="material-symbols-outlined text-3xl">diamond</span>
                         L&apos;ELITE
                     </Link>
-                    <nav className="hidden lg:flex items-center gap-8">
+                    <nav className={`hidden lg:flex items-center gap-8 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                         <Link href="/urunler" className="text-sm font-medium hover:text-primary/60 transition-colors">
                             Koleksiyon
                         </Link>
@@ -164,48 +170,49 @@ export default function Navbar() {
                     </nav>
                 </div>
 
-                {/* Right: Actions */}
-                <div className="flex items-center gap-6">
-                    {/* Expanding Search */}
-                    <div className="relative flex items-center group" ref={searchRef}>
-                        <form 
+                {/* Full Width Search Overlay */}
+                <div 
+                    className={`absolute inset-0 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md z-[60] flex items-center justify-center px-4 md:px-6 transition-all duration-300 ease-in-out ${
+                        isSearchOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                    }`}
+                >
+                    <div ref={searchRef} className="relative w-full max-w-3xl flex items-center gap-3 md:gap-4">
+                        <form
                             action="/urunler" 
-                            className="flex items-center"
+                            className="flex-1 flex items-center bg-white dark:bg-zinc-900 border border-primary/10 shadow-lg rounded-full overflow-hidden h-12"
                             onSubmit={(e) => {
                                 if (!searchQuery.trim()) e.preventDefault();
                             }}
                         >
+                            <span className="material-symbols-outlined pl-4 pr-2 text-primary/50">search</span>
                             <input
                                 ref={searchInputRef}
                                 name="q"
                                 value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    setIsSearchOpen(true);
-                                }}
-                                onFocus={() => setIsSearchOpen(true)}
-                                className={`transition-all duration-300 ease-in-out border-none bg-transparent focus:ring-0 text-sm pl-10 pr-4 py-2 cursor-pointer focus:cursor-text focus:w-64 ${
-                                    searchQuery ? "w-64 cursor-text" : "w-10 group-hover:w-64 group-hover:cursor-text"
-                                }`}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="flex-1 border-none bg-transparent focus:ring-0 text-base py-0 h-full !outline-none shadow-none"
                                 placeholder="Marka, ürün ara..."
                                 type="text"
                                 autoComplete="off"
                             />
-                            <span 
-                                className={`material-symbols-outlined absolute left-2 text-xl ${searchQuery ? 'pointer-events-auto cursor-pointer hover:text-primary' : 'pointer-events-none'}`}
-                                onClick={() => {
-                                    if (searchQuery && searchInputRef.current) {
-                                        searchInputRef.current.form?.submit();
-                                    }
-                                }}
-                            >
-                                search
-                            </span>
+                            {searchQuery && (
+                                <button type="button" onClick={() => { setSearchQuery(''); searchInputRef.current?.focus(); }} className="pr-4 hover:opacity-60 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-sm bg-gray-100 rounded-full p-0.5">close</span>
+                                </button>
+                            )}
                         </form>
+                        
+                        <button 
+                            type="button" 
+                            onClick={() => setIsSearchOpen(false)}
+                            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors flex-shrink-0"
+                        >
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
 
                         {/* Search Results Dropdown */}
-                        {isSearchOpen && searchQuery.trim().length >= 2 && (
-                            <div className="absolute top-full right-0 mt-3 w-80 bg-white shadow-xl rounded-xl border border-primary/10 overflow-hidden"
+                        {searchQuery.trim().length >= 2 && (
+                            <div className="absolute top-full left-0 right-0 mt-3 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 rounded-2xl overflow-hidden z-50"
                                  style={{ animation: "profileDropdownIn 0.2s ease-out" }}>
                                 {isSearching ? (
                                     <div className="p-4 flex items-center justify-center text-sm text-primary/60">
@@ -283,7 +290,22 @@ export default function Navbar() {
                             </div>
                         )}
                     </div>
+                </div>
 
+                {/* Right: Actions */}
+                <div className="flex items-center gap-6 relative z-10">
+                    {/* Search Trigger Icon */}
+                    <button
+                        ref={searchTriggerRef}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsSearchOpen(true);
+                            setTimeout(() => searchInputRef.current?.focus(), 50);
+                        }}
+                        className="hover:opacity-60 transition-opacity flex items-center justify-center"
+                    >
+                        <span className="material-symbols-outlined">search</span>
+                    </button>
                     {/* Profile Dropdown */}
                     <div className="relative" ref={profileRef}>
                         <button
@@ -296,7 +318,7 @@ export default function Navbar() {
                         {/* Dropdown Menu */}
                         {isProfileOpen && isAuthenticated && (
                             <div
-                                className="absolute right-0 top-full mt-3 w-56 bg-white rounded-xl shadow-xl border border-primary/5 overflow-hidden"
+                                className="absolute right-0 top-full mt-4 w-56 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 overflow-hidden z-50"
                                 style={{ animation: "profileDropdownIn 0.2s ease-out" }}
                             >
                                 <div className="py-2">

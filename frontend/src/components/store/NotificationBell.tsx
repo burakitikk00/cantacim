@@ -65,14 +65,55 @@ export default function NotificationBell({ isAuthenticated }: { isAuthenticated:
 
     const markAsRead = async (id: string) => {
         try {
-            await fetch("/api/notifications", {
+            const res = await fetch("/api/notifications", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ notificationId: id, markAsRead: true })
             });
-            fetchNotifications();
+            if (res.ok) fetchNotifications();
         } catch (error) {
-            console.log(error);
+            console.error(error);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            const res = await fetch("/api/notifications", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ markAllAsRead: true })
+            });
+            if (res.ok) fetchNotifications();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const deleteNotification = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            const res = await fetch("/api/notifications", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ notificationId: id })
+            });
+            if (res.ok) fetchNotifications();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const clearAllNotifications = async () => {
+        if (!confirm("Tüm bildirimleri silmek istediğinize emin misiniz?")) return;
+        try {
+            const res = await fetch("/api/notifications", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ clearAll: true })
+            });
+            if (res.ok) fetchNotifications();
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -116,44 +157,91 @@ export default function NotificationBell({ isAuthenticated }: { isAuthenticated:
 
                 {isOpen && (
                     <div
-                        className="absolute right-0 top-full mt-3 w-80 max-h-96 overflow-y-auto bg-white rounded-xl shadow-xl border border-primary/5"
+                        className="fixed md:absolute left-4 right-4 md:left-auto md:right-0 top-20 md:top-full mt-2 md:mt-4 w-auto md:w-80 max-h-[70vh] md:max-h-96 overflow-y-auto bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 z-50 overflow-hidden"
                         style={{ animation: "profileDropdownIn 0.2s ease-out" }}
                     >
-                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10">
-                            <h3 className="font-bold text-sm tracking-wider uppercase">Bildirimler</h3>
+                        <div className="p-4 pb-2 border-b border-gray-100 bg-gray-50/50 sticky top-0 z-10 flex flex-col gap-2">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold text-sm tracking-wider uppercase">Bildirimler</h3>
+                                {unreadCount > 0 && (
+                                    <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                        {unreadCount} Okunmamış
+                                    </span>
+                                )}
+                            </div>
                             {unreadCount > 0 && (
-                                <span className="text-xs text-primary/60">{unreadCount} Okunmamış</span>
+                                <div className="flex justify-end">
+                                    <button 
+                                        onClick={markAllAsRead}
+                                        className="text-[10px] font-bold text-primary hover:text-black transition-all uppercase tracking-tighter border-b border-primary hover:border-black leading-tight"
+                                    >
+                                        Tümünü okundu işaretle
+                                    </button>
+                                </div>
                             )}
                         </div>
                         <div className="flex flex-col">
                             {notifications.length === 0 ? (
-                                <div className="p-6 text-center text-sm text-gray-500">Bildiriminiz bulunmuyor.</div>
+                                <div className="p-10 text-center flex flex-col items-center gap-3">
+                                    <span className="material-symbols-outlined text-4xl text-gray-200">notifications_off</span>
+                                    <p className="text-xs text-gray-400 font-medium">Bildiriminiz bulunmuyor.</p>
+                                </div>
                             ) : (
-                                notifications.map(n => (
-                                    <div
-                                        key={n.id}
-                                        onClick={() => {
-                                            if (!n.isRead) markAsRead(n.id);
-                                            if (n.link) {
-                                                router.push(n.link);
-                                                setIsOpen(false);
-                                            }
-                                        }}
-                                        className={`p-4 border-b border-gray-50 cursor-pointer transition-colors ${!n.isRead ? "bg-primary/[0.04] hover:bg-primary/[0.06]" : "hover:bg-gray-50"}`}
-                                    >
-                                        <div className="flex justify-between items-start mb-1 gap-2">
-                                            <h4 className={`text-xs font-bold ${!n.isRead ? "text-primary" : "text-gray-700"}`}>
-                                                {n.title}
-                                            </h4>
-                                            <span className="text-[10px] text-gray-400 whitespace-nowrap">
-                                                {new Date(n.createdAt).toLocaleDateString("tr-TR")}
-                                            </span>
+                                notifications.map(n => {
+                                    const getTypeColor = () => {
+                                        if (n.type?.includes('ORDER_DELIVERED') || n.title?.toLowerCase().includes('teslim')) return 'text-green-600 bg-green-50 px-2 py-0.5 rounded';
+                                        if (n.type?.includes('ORDER_PREPARING') || n.title?.toLowerCase().includes('hazırlan')) return 'text-amber-600 bg-amber-50 px-2 py-0.5 rounded';
+                                        if (n.type?.includes('ORDER_SHIPPED') || n.title?.toLowerCase().includes('kargo')) return 'text-blue-600 bg-blue-50 px-2 py-0.5 rounded';
+                                        return '';
+                                    };
+
+                                    return (
+                                        <div
+                                            key={n.id}
+                                            onClick={() => {
+                                                if (!n.isRead) markAsRead(n.id);
+                                                if (n.link) {
+                                                    router.push(n.link);
+                                                    setIsOpen(false);
+                                                }
+                                            }}
+                                            className={`p-4 border-b border-gray-50 cursor-pointer transition-all relative group/notif ${!n.isRead ? "bg-zinc-100/50 hover:bg-zinc-100" : "hover:bg-gray-50 opacity-80"}`}
+                                        >
+                                            <div className="flex justify-between items-start mb-1.5 gap-2 pr-8">
+                                                <h4 className={`text-xs font-bold leading-tight ${!n.isRead ? "text-primary" : "text-gray-500"} ${getTypeColor()}`}>
+                                                    {n.title}
+                                                </h4>
+                                                <span className="text-[10px] text-gray-400 whitespace-nowrap pt-0.5">
+                                                    {new Date(n.createdAt).toLocaleDateString("tr-TR")}
+                                                </span>
+                                            </div>
+                                            <p className={`text-xs leading-relaxed line-clamp-2 ${!n.isRead ? "text-primary font-medium" : "text-gray-500"}`}>
+                                                {n.message}
+                                            </p>
+                                            
+                                            <button 
+                                                onClick={(e) => deleteNotification(n.id, e)}
+                                                className="absolute top-4 right-2 size-7 flex items-center justify-center rounded-full bg-gray-100/50 md:opacity-0 group-hover/notif:opacity-100 hover:bg-red-50 hover:text-red-500 transition-all z-10"
+                                                title="Bildirimi Sil"
+                                            >
+                                                <span className="material-symbols-outlined text-[16px]">close</span>
+                                            </button>
                                         </div>
-                                        <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">{n.message}</p>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )}
                         </div>
+                        {notifications.length > 0 && (
+                            <div className="p-3 border-t border-gray-100 bg-gray-50 sticky bottom-0 z-10 flex justify-center">
+                                <button 
+                                    onClick={clearAllNotifications}
+                                    className="text-[10px] font-bold text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg transition-all uppercase tracking-widest flex items-center gap-2"
+                                >
+                                    <span className="material-symbols-outlined text-sm">delete_sweep</span>
+                                    Tüm Bildirimleri Temizle
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

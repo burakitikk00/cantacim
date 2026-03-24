@@ -348,7 +348,7 @@ export default function ProductsClient({
                 </div>
             </aside>
 
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4 md:gap-6 relative z-[50] w-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4 md:gap-6 relative z-[20] w-full">
                 <div className="space-y-2 md:space-y-4 w-full">
                     <nav className="flex items-center flex-wrap gap-2 text-[10px] md:text-[11px] uppercase tracking-widest text-primary/40">
                         <Link href="/" className="hover:text-primary transition-colors">Anasayfa</Link>
@@ -365,7 +365,7 @@ export default function ProductsClient({
                         <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">Filtrele</span>
                     </button>
 
-                    <div className="relative z-[60] flex-1 md:flex-none">
+                    <div className="relative z-[30] flex-1 md:flex-none">
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsSortOpen(!isSortOpen); }}
                             className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded hover:border-gray-300 transition-colors bg-white w-full justify-between"

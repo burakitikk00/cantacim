@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="bg-white text-primary font-display antialiased">
+      <body className="bg-white text-primary font-display antialiased" suppressHydrationWarning>
         <style dangerouslySetInnerHTML={{ __html: `
           .material-symbols-outlined { opacity: 0; }
           .fonts-loaded .material-symbols-outlined { opacity: 1; transition: opacity 0.2s ease-in; }
