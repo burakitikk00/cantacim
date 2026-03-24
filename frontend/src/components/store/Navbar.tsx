@@ -6,6 +6,8 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import AuthSidebar from "../auth/AuthSidebar";
 import NotificationBell from "./NotificationBell";
+import Image from "next/image";
+import { searchProducts } from "@/app/actions/search";
 
 export default function Navbar() {
     const count = useCartStore((s) => s.items.length);
@@ -15,6 +17,14 @@ export default function Navbar() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
+    
+    // Search states
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     // Token süresi dolmuşsa veya user yoksa "unauthenticated" gibi davran
     const isAuthenticated = status === "authenticated" && !!session?.user;
@@ -63,6 +73,41 @@ export default function Navbar() {
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isProfileOpen]);
+
+    // Oustide click for search
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setIsSearchOpen(false);
+            }
+        };
+        if (isSearchOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isSearchOpen]);
+
+    // Search debounce
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        if (searchQuery.trim().length >= 2) {
+            setIsSearching(true);
+            timeoutId = setTimeout(async () => {
+                try {
+                    const results = await searchProducts(searchQuery);
+                    setSearchResults(results);
+                } catch (error) {
+                    console.error("Search failed", error);
+                } finally {
+                    setIsSearching(false);
+                }
+            }, 300);
+        } else {
+            setSearchResults([]);
+            setIsSearching(false);
+        }
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery]);
 
     const handleAuthAction = (e: React.MouseEvent) => {
         if (!isAuthenticated) {
@@ -122,13 +167,121 @@ export default function Navbar() {
                 {/* Right: Actions */}
                 <div className="flex items-center gap-6">
                     {/* Expanding Search */}
-                    <div className="relative flex items-center group">
-                        <input
-                            className="w-10 group-hover:w-64 transition-all duration-300 ease-in-out border-none bg-transparent focus:ring-0 text-sm pl-10 pr-4 py-2 cursor-pointer group-hover:cursor-text"
-                            placeholder="Marka, ürün ara..."
-                            type="text"
-                        />
-                        <span className="material-symbols-outlined absolute left-2 pointer-events-none text-xl">search</span>
+                    <div className="relative flex items-center group" ref={searchRef}>
+                        <form 
+                            action="/urunler" 
+                            className="flex items-center"
+                            onSubmit={(e) => {
+                                if (!searchQuery.trim()) e.preventDefault();
+                            }}
+                        >
+                            <input
+                                ref={searchInputRef}
+                                name="q"
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setIsSearchOpen(true);
+                                }}
+                                onFocus={() => setIsSearchOpen(true)}
+                                className={`transition-all duration-300 ease-in-out border-none bg-transparent focus:ring-0 text-sm pl-10 pr-4 py-2 cursor-pointer focus:cursor-text focus:w-64 ${
+                                    searchQuery ? "w-64 cursor-text" : "w-10 group-hover:w-64 group-hover:cursor-text"
+                                }`}
+                                placeholder="Marka, ürün ara..."
+                                type="text"
+                                autoComplete="off"
+                            />
+                            <span 
+                                className={`material-symbols-outlined absolute left-2 text-xl ${searchQuery ? 'pointer-events-auto cursor-pointer hover:text-primary' : 'pointer-events-none'}`}
+                                onClick={() => {
+                                    if (searchQuery && searchInputRef.current) {
+                                        searchInputRef.current.form?.submit();
+                                    }
+                                }}
+                            >
+                                search
+                            </span>
+                        </form>
+
+                        {/* Search Results Dropdown */}
+                        {isSearchOpen && searchQuery.trim().length >= 2 && (
+                            <div className="absolute top-full right-0 mt-3 w-80 bg-white shadow-xl rounded-xl border border-primary/10 overflow-hidden"
+                                 style={{ animation: "profileDropdownIn 0.2s ease-out" }}>
+                                {isSearching ? (
+                                    <div className="p-4 flex items-center justify-center text-sm text-primary/60">
+                                        <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                                        <span className="ml-3">Aranıyor...</span>
+                                    </div>
+                                ) : searchResults.length > 0 ? (
+                                    <div className="max-h-[360px] overflow-y-auto custom-scrollbar">
+                                        <div className="p-2 flex flex-col gap-1">
+                                            {searchResults.map((product) => (
+                                                <Link 
+                                                    key={product.id} 
+                                                    href={`/urunler/${product.slug}`}
+                                                    onClick={() => {
+                                                        setIsSearchOpen(false);
+                                                        setSearchQuery("");
+                                                    }}
+                                                    className="flex items-start gap-3 p-2 hover:bg-primary/[0.03] rounded-lg transition-colors group/item"
+                                                >
+                                                    <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden relative flex-shrink-0">
+                                                        {product.image ? (
+                                                            <Image 
+                                                                src={product.image} 
+                                                                alt={product.name}
+                                                                fill
+                                                                className="object-cover"
+                                                                sizes="48px"
+                                                            />
+                                                        ) : (
+                                                            <span className="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">
+                                                                image
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0 pr-2">
+                                                        <h4 className="text-sm font-medium text-primary line-clamp-2 leading-tight group-hover/item:text-primary/70 transition-colors">
+                                                            {product.name}
+                                                        </h4>
+                                                        <div className="mt-1 flex items-center gap-2">
+                                                            {product.discountedPrice !== undefined ? (
+                                                                <>
+                                                                    <span className="text-xs font-semibold text-rose-500">
+                                                                        {Number(product.discountedPrice).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+                                                                    </span>
+                                                                    <span className="text-[10px] text-primary/40 line-through">
+                                                                        {Number(product.price).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-xs font-medium text-primary">
+                                                                    {Number(product.price).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                        {searchResults.length >= 5 && (
+                                            <Link 
+                                                href={`/urunler?q=${encodeURIComponent(searchQuery)}`}
+                                                onClick={() => setIsSearchOpen(false)}
+                                                className="block w-full text-center text-xs font-medium text-primary bg-primary/5 hover:bg-primary/10 transition-colors py-3 border-t border-primary/5"
+                                            >
+                                                Tüm sonuçları gör
+                                            </Link>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="p-6 text-center text-sm text-primary/60">
+                                        <span className="material-symbols-outlined text-3xl mb-2 opacity-50 block">search_off</span>
+                                        "{searchQuery}" için sonuç bulunamadı.
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Profile Dropdown */}

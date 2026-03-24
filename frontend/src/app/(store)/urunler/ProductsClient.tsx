@@ -74,6 +74,7 @@ export default function ProductsClient({
     const initialMinPrice = searchParams.get("minPrice") || "";
     const initialMaxPrice = searchParams.get("maxPrice") || "";
     const initialSort = searchParams.get("sort") || "recommended";
+    const initialQ = searchParams.get("q") || "";
 
     // Local Filter State
     const [selectedCats, setSelectedCats] = useState<string[]>([]);
@@ -81,6 +82,7 @@ export default function ProductsClient({
     const [minPrice, setMinPrice] = useState(initialMinPrice);
     const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
     const [sort, setSort] = useState(initialSort);
+    const [qParam, setQParam] = useState(initialQ);
 
     // Sync state with URL change
     useEffect(() => {
@@ -101,6 +103,7 @@ export default function ProductsClient({
         setMinPrice(searchParams.get("minPrice") || "");
         setMaxPrice(searchParams.get("maxPrice") || "");
         setSort(searchParams.get("sort") || "recommended");
+        setQParam(searchParams.get("q") || "");
     }, [searchParams, attributes]);
 
     const updateURL = (newParams: Record<string, string | string[] | null>) => {
@@ -116,6 +119,7 @@ export default function ProductsClient({
         const finalMin = "minPrice" in newParams ? newParams.minPrice : minPrice;
         const finalMax = "maxPrice" in newParams ? newParams.maxPrice : maxPrice;
         const finalSort = "sort" in newParams ? newParams.sort : sort;
+        const finalQ = "q" in newParams ? newParams.q : qParam;
 
         // Attributes
         const finalAttrs = { ...selectedAttributes };
@@ -131,6 +135,7 @@ export default function ProductsClient({
         if (finalMin) params.set("minPrice", finalMin as string);
         if (finalMax) params.set("maxPrice", finalMax as string);
         if (finalSort) params.set("sort", finalSort as string);
+        if (finalQ) params.set("q", finalQ as string);
 
         Object.entries(finalAttrs).forEach(([slug, values]) => {
             values.forEach(v => params.append(slug, v));
@@ -156,8 +161,8 @@ export default function ProductsClient({
         setSelectedAttributes({});
         setMinPrice("");
         setMaxPrice("");
-        // Direct push to clear
-        router.push("/urunler");
+        // Direct push to clear, but maintain search query if exists
+        router.push(qParam ? `/urunler?q=${qParam}` : "/urunler");
     };
 
     const toggleCategory = (slug: string) => {
@@ -190,6 +195,7 @@ export default function ProductsClient({
 
     // Derived Title
     const getPageTitle = () => {
+        if (qParam) return `"${qParam}" İçin Sonuçlar`;
         if (selectedCats.length === 0) return "Tüm Ürünler";
         const names = categories
             .filter(c => selectedCats.includes(c.slug))

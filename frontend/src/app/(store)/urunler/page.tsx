@@ -11,7 +11,7 @@ export default async function ProductsPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     const params = await searchParams;
-    const { page, minPrice, maxPrice, sort } = params;
+    const { page, minPrice, maxPrice, sort, q } = params;
 
     const rawCat = params.cat;
     // Normalize category to array
@@ -64,6 +64,14 @@ export default async function ProductsPage({
                 ...(min !== undefined && { gte: min }),
                 ...(max !== undefined && { lte: max }),
             }
+        }),
+        // Search Filter
+        ...(q && typeof q === "string" && {
+            OR: [
+                { name: { contains: q, mode: "insensitive" } },
+                { description: { contains: q, mode: "insensitive" } },
+                { category: { name: { contains: q, mode: "insensitive" } } },
+            ]
         })
     };
 
