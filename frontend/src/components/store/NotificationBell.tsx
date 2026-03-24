@@ -45,8 +45,8 @@ export default function NotificationBell({ isAuthenticated }: { isAuthenticated:
     useEffect(() => {
         fetchNotifications();
 
-        // Check every 3 seconds
-        const interval = setInterval(fetchNotifications, 3000);
+        // Check every 60 seconds (less aggressive)
+        const interval = setInterval(fetchNotifications, 60000);
         return () => clearInterval(interval);
     }, [isAuthenticated]);
 

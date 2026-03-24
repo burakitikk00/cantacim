@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 import { getImageSrc } from "@/lib/image-helpers";
 import FavoriteButton from "@/components/store/FavoriteButton";
+import ImageWithPlaceholder from "@/components/store/ImageWithPlaceholder";
 
 interface Product {
     id: string;
@@ -83,6 +84,19 @@ export default function ProductsClient({
     const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
     const [sort, setSort] = useState(initialSort);
     const [qParam, setQParam] = useState(initialQ);
+
+    // Accordion State for Filters
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+        categories: true,
+        price: false, // by default closed
+    });
+
+    const toggleSection = (section: string) => {
+        setOpenSections(prev => ({
+            ...prev,
+            [section]: prev[section] === undefined ? true : !prev[section]
+        }));
+    };
 
     // Sync state with URL change
     useEffect(() => {
@@ -213,140 +227,156 @@ export default function ProductsClient({
     }, [isSortOpen]);
 
     return (
-        <main className="max-w-[1440px] mx-auto px-6 lg:px-12 pt-28 pb-24 relative">
+        <main className="max-w-[1440px] w-full mx-auto px-2 sm:px-3 md:px-6 lg:px-12 pt-24 md:pt-28 pb-20 md:pb-24 relative overflow-x-hidden md:overflow-x-visible">
             {isFilterOpen && (
                 <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setIsFilterOpen(false)} />
             )}
 
-            <aside className={`fixed top-0 left-0 h-full w-80 bg-white z-[70] transform transition-transform duration-300 ease-in-out shadow-2xl p-6 overflow-y-auto ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}`}>
-                <div className="flex items-center justify-between mb-8">
+            <aside className={`fixed top-0 left-0 h-full w-80 bg-white z-[70] transform transition-transform duration-300 ease-in-out shadow-2xl flex flex-col ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}`}>
+                <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
                     <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Filtreler</h2>
                     <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
-                <div className="space-y-8">
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 border-transparent">
                     {/* Categories - Multi Select */}
-                    <div>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Kategoriler</h3>
-                        <div className="space-y-3">
-                            {categories.map((c) => (
-                                <label key={c.id} className="flex items-center gap-3 cursor-pointer group select-none">
-                                    <div className={`w-4 h-4 border transition-colors flex items-center justify-center ${selectedCats.includes(c.slug) ? "bg-primary border-primary" : "border-gray-300 group-hover:border-primary"}`}>
-                                        {selectedCats.includes(c.slug) && <span className="material-symbols-outlined text-white text-xs">check</span>}
-                                    </div>
-                                    <input
-                                        type="checkbox"
-                                        className="hidden"
-                                        checked={selectedCats.includes(c.slug)}
-                                        onChange={() => toggleCategory(c.slug)}
-                                    />
-                                    <span className={`text-sm ${selectedCats.includes(c.slug) ? "font-bold text-primary" : "text-gray-600 group-hover:text-primary"}`}>{c.name}</span>
-                                </label>
-                            ))}
-                        </div>
+                    <div className="border-b border-gray-100 pb-6">
+                        <button onClick={() => toggleSection("categories")} className="flex items-center justify-between w-full group">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-800 group-hover:text-primary transition-colors">Kategoriler</h3>
+                            <span className={`material-symbols-outlined text-gray-400 transition-transform ${openSections.categories !== false ? "rotate-180" : ""}`}>expand_more</span>
+                        </button>
+                        {openSections.categories !== false && (
+                            <div className="space-y-3 mt-4">
+                                {categories.map((c) => (
+                                    <label key={c.id} className="flex items-center gap-3 cursor-pointer group select-none">
+                                        <div className={`w-4 h-4 border transition-colors flex items-center justify-center ${selectedCats.includes(c.slug) ? "bg-primary border-primary" : "border-gray-300 group-hover:border-primary"}`}>
+                                            {selectedCats.includes(c.slug) && <span className="material-symbols-outlined text-white text-xs">check</span>}
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            className="hidden"
+                                            checked={selectedCats.includes(c.slug)}
+                                            onChange={() => toggleCategory(c.slug)}
+                                        />
+                                        <span className={`text-sm ${selectedCats.includes(c.slug) ? "font-bold text-primary" : "text-gray-600 group-hover:text-primary"}`}>{c.name}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Dynamic Attributes */}
-                    {attributes.map((attr) => (
-                        <div key={attr.id}>
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">{attr.name}</h3>
-                            <div className="space-y-3">
-                                {attr.values.length === 0 && <p className="text-xs text-gray-400">Seçenek yok</p>}
-                                {attr.values.map((val) => {
-                                    const isSelected = selectedAttributes[attr.slug]?.includes(val.slug);
-
-                                    // Special rendering for 'color' or 'renk' if we had hex codes, 
-                                    // for now standard checkbox but maybe grid layout for compact view
-                                    return (
-                                        <label key={val.id} className="flex items-center gap-3 cursor-pointer group select-none">
-                                            <div className={`w-4 h-4 border transition-colors flex items-center justify-center ${isSelected ? "bg-primary border-primary" : "border-gray-300 group-hover:border-primary"}`}>
-                                                {isSelected && <span className="material-symbols-outlined text-white text-xs">check</span>}
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                className="hidden"
-                                                checked={!!isSelected}
-                                                onChange={() => toggleAttribute(attr.slug, val.slug)}
-                                            />
-                                            <span className={`text-sm ${isSelected ? "font-bold text-primary" : "text-gray-600 group-hover:text-primary"}`}>{val.value}</span>
-                                        </label>
-                                    );
-                                })}
+                    {attributes.map((attr) => {
+                        const isOpen = openSections[`attr_${attr.slug}`];
+                        return (
+                            <div key={attr.id} className="border-b border-gray-100 pb-6">
+                                <button onClick={() => toggleSection(`attr_${attr.slug}`)} className="flex items-center justify-between w-full group">
+                                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-800 group-hover:text-primary transition-colors">{attr.name}</h3>
+                                    <span className={`material-symbols-outlined text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>expand_more</span>
+                                </button>
+                                {isOpen && (
+                                    <div className="space-y-3 mt-4">
+                                        {attr.values.length === 0 && <p className="text-xs text-gray-400">Seçenek yok</p>}
+                                        {attr.values.map((val) => {
+                                            const isSelected = selectedAttributes[attr.slug]?.includes(val.slug);
+                                            return (
+                                                <label key={val.id} className="flex items-center gap-3 cursor-pointer group select-none">
+                                                    <div className={`w-4 h-4 border transition-colors flex items-center justify-center ${isSelected ? "bg-primary border-primary" : "border-gray-300 group-hover:border-primary"}`}>
+                                                        {isSelected && <span className="material-symbols-outlined text-white text-xs">check</span>}
+                                                    </div>
+                                                    <input
+                                                        type="checkbox"
+                                                        className="hidden"
+                                                        checked={!!isSelected}
+                                                        onChange={() => toggleAttribute(attr.slug, val.slug)}
+                                                    />
+                                                    <span className={`text-sm ${isSelected ? "font-bold text-primary" : "text-gray-600 group-hover:text-primary"}`}>{val.value}</span>
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
 
                     {/* Price Range */}
-                    <div>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Fiyat Aralığı</h3>
-                        <div className="space-y-4">
-                            <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <label className="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Min (TL)</label>
-                                    <input
-                                        type="number"
-                                        value={minPrice}
-                                        onChange={(e) => setMinPrice(e.target.value)}
-                                        placeholder="0"
-                                        className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-primary focus:ring-0 outline-none"
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Max (TL)</label>
-                                    <input
-                                        type="number"
-                                        value={maxPrice}
-                                        onChange={(e) => setMaxPrice(e.target.value)}
-                                        placeholder="50000"
-                                        className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-primary focus:ring-0 outline-none"
-                                    />
+                    <div className="pb-6">
+                        <button onClick={() => toggleSection("price")} className="flex items-center justify-between w-full group">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-800 group-hover:text-primary transition-colors">Fiyat Aralığı</h3>
+                            <span className={`material-symbols-outlined text-gray-400 transition-transform ${openSections.price !== false ? "rotate-180" : ""}`}>expand_more</span>
+                        </button>
+                        {openSections.price !== false && (
+                            <div className="space-y-4 mt-4">
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <label className="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Min (TL)</label>
+                                        <input
+                                            type="number"
+                                            value={minPrice}
+                                            onChange={(e) => setMinPrice(e.target.value)}
+                                            placeholder="0"
+                                            className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-primary focus:ring-0 outline-none"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Max (TL)</label>
+                                        <input
+                                            type="number"
+                                            value={maxPrice}
+                                            onChange={(e) => setMaxPrice(e.target.value)}
+                                            placeholder="50000"
+                                            className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-primary focus:ring-0 outline-none"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
-                    <div className="pt-6 space-y-3">
-                        <button onClick={applyFilters} className="w-full bg-primary text-white h-12 text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors rounded">
-                            Filtreleri Uygula
-                        </button>
-                        <button onClick={clearFilters} className="w-full bg-transparent border border-gray-200 text-primary h-12 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors rounded">
-                            Temizle
-                        </button>
-                    </div>
+                </div>
+
+                <div className="p-6 border-t border-gray-100 flex-shrink-0 bg-white space-y-3">
+                    <button onClick={applyFilters} className="w-full bg-primary text-white h-12 text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors rounded">
+                        Filtreleri Uygula
+                    </button>
+                    <button onClick={clearFilters} className="w-full bg-transparent border border-gray-200 text-primary h-12 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors rounded">
+                        Temizle
+                    </button>
                 </div>
             </aside>
 
-            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 relative z-10">
-                <div className="space-y-4">
-                    <nav className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-primary/40">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-4 md:gap-6 relative z-[50] w-full">
+                <div className="space-y-2 md:space-y-4 w-full">
+                    <nav className="flex items-center flex-wrap gap-2 text-[10px] md:text-[11px] uppercase tracking-widest text-primary/40">
                         <Link href="/" className="hover:text-primary transition-colors">Anasayfa</Link>
-                        <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                        <span className="material-symbols-outlined text-[12px] md:text-[14px]">chevron_right</span>
                         <span className="text-primary font-medium">Koleksiyon</span>
                     </nav>
-                    <h1 className="text-4xl font-light tracking-tight text-primary capitalize">{getPageTitle()}</h1>
-                    <p className="text-primary/40 text-sm">Toplam {totalItems} ürün</p>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-primary capitalize break-words">{getPageTitle()}</h1>
+                    <p className="text-primary/40 text-xs md:text-sm">Toplam {totalItems} ürün</p>
                 </div>
 
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 px-6 py-3 border border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all rounded group">
-                        <span className="material-symbols-outlined text-lg">tune</span>
-                        <span className="text-xs font-bold uppercase tracking-widest">Filtrele</span>
+                <div className="flex items-center flex-wrap gap-2 sm:gap-4 w-full">
+                    <button onClick={() => setIsFilterOpen(true)} className="flex flex-1 md:flex-none items-center justify-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 border border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all rounded group">
+                        <span className="material-symbols-outlined text-base sm:text-lg">tune</span>
+                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">Filtrele</span>
                     </button>
 
-                    <div className="relative z-20">
+                    <div className="relative z-[60] flex-1 md:flex-none">
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsSortOpen(!isSortOpen); }}
-                            className="flex items-center gap-2 px-6 py-3 border border-gray-200 rounded hover:border-gray-300 transition-colors bg-white min-w-[160px] md:min-w-[200px] justify-between"
+                            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded hover:border-gray-300 transition-colors bg-white w-full justify-between"
                         >
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] uppercase tracking-widest text-gray-400">Sırala:</span>
-                                <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-400">Sırala:</span>
+                                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary truncate max-w-[80px] sm:max-w-[none]">
                                     {SORT_OPTIONS.find(o => o.value === sort)?.label || "Önerilenler"}
                                 </span>
                             </div>
-                            <span className={`material-symbols-outlined text-sm text-gray-400 transition-transform ${isSortOpen ? "rotate-180" : ""}`}>expand_more</span>
+                            <span className={`material-symbols-outlined text-xs sm:text-sm text-gray-400 transition-transform ${isSortOpen ? "rotate-180" : ""}`}>expand_more</span>
                         </button>
 
                         {isSortOpen && (
@@ -376,39 +406,40 @@ export default function ProductsClient({
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-2 sm:gap-x-3 md:gap-x-6 gap-y-6 sm:gap-y-8 md:gap-y-12 w-full">
                     {products.map((product) => {
                         const displayImage = getImageSrc(product.images[0] || product.variants.find((v: any) => v.image)?.image || null);
                         return (
-                            <Link key={product.id} href={`/urunler/${product.slug}`} className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md">
+                            <Link key={product.id} href={`/urunler/${product.slug}`} className="group relative flex flex-col overflow-hidden rounded-[8px] sm:rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md w-full">
                                 <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
+                                    <ImageWithPlaceholder
                                         src={displayImage}
                                         alt={product.name}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        loading="lazy"
+                                        decoding="async"
+                                        className="h-full w-full object-cover transition-all duration-500 group-hover:scale-105"
                                     />
                                     <FavoriteButton productId={product.id} variant="overlay" />
                                 </div>
-                                <div className="flex flex-1 flex-col p-4">
-                                    <div className="mb-2">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary/40 text-gray-400">{product.category.name}</p>
-                                        <h3 className="text-sm font-semibold text-primary line-clamp-1">{product.name}</h3>
+                                <div className="flex flex-1 flex-col p-2 sm:p-2.5 md:p-4">
+                                    <div className="mb-1 sm:mb-1.5 md:mb-2 w-full">
+                                        <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 truncate">{product.category.name}</p>
+                                        <h3 className="text-[11px] sm:text-xs md:text-sm font-semibold text-primary line-clamp-2 md:line-clamp-1 leading-tight mt-0.5">{product.name}</h3>
                                     </div>
-                                    <div className="mt-auto flex items-center justify-between border-t border-primary/5 pt-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-base font-bold text-gray-900">
+                                    <div className="mt-auto flex flex-col xl:flex-row xl:items-center justify-between border-t border-primary/5 pt-2 md:pt-4 gap-1.5 md:gap-2">
+                                        <div className="flex items-baseline flex-wrap gap-1 sm:gap-1.5 md:gap-2">
+                                            <span className="text-xs sm:text-sm md:text-base font-bold text-gray-900">
                                                 {product.discountedPrice ? formatPrice(Number(product.discountedPrice)) : formatPrice(Number(product.basePrice))}
                                             </span>
                                             {product.discountedPrice && (
-                                                <span className="text-xs text-gray-400 line-through">
+                                                <span className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 line-through">
                                                     {formatPrice(Number(product.basePrice))}
                                                 </span>
                                             )}
                                         </div>
                                         {product.discountText && (
-                                            <span className="text-[10px] font-bold text-red-600 uppercase tracking-tighter bg-red-50 px-2 py-1 rounded">
-                                                {product.discountText}
+                                            <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold text-red-600 uppercase tracking-tight bg-red-50 px-1 sm:px-1.5 md:px-2 py-0.5 md:py-1 rounded text-center leading-none mt-1 xl:mt-0 w-fit">
+                                                {product.discountText} 
                                             </span>
                                         )}
                                     </div>

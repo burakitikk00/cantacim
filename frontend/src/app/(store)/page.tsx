@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { formatPrice } from "@/lib/utils";
 import { getImageSrc } from "@/lib/image-helpers";
 import { getActiveCampaigns, getBestDiscountForProduct } from "@/lib/discounts";
+import ImageWithPlaceholder from "@/components/store/ImageWithPlaceholder";
 
 export const dynamic = "force-dynamic";
 
@@ -152,11 +153,10 @@ export default async function HomePage() {
             <section className="max-w-[1440px] mx-auto px-6 py-24">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {categories.slice(0, 3).map((cat) => (
-                        <Link key={cat.id} href={`/urunler?cat=${cat.slug}`} className="group cursor-pointer relative aspect-[3/4] overflow-hidden">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={getImageSrc(cat.image)} />
-                            <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
-                            <div className="absolute bottom-8 left-8">
+                        <Link key={cat.id} href={`/urunler?cat=${cat.slug}`} className="group cursor-pointer relative aspect-[3/4] overflow-hidden block">
+                            <ImageWithPlaceholder alt={cat.name} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110" src={getImageSrc(cat.image)} loading="lazy" decoding="async" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent z-10" />
+                            <div className="absolute bottom-8 left-8 z-20">
                                 <h3 className="text-white text-2xl font-bold mb-2">{cat.name}</h3>
                                 <p className="text-white/80 text-sm font-medium tracking-widest uppercase">Keşfet</p>
                             </div>
@@ -182,14 +182,13 @@ export default async function HomePage() {
                             </button>
                         </div>
                     </div>
-                    <div className="flex gap-8 overflow-x-auto hide-scrollbar pb-8">
+                    <div className="flex gap-4 md:gap-8 overflow-x-auto hide-scrollbar pb-8">
                         {bestSellers.map((p) => (
-                            <Link key={p.id} href={`/urunler/${p.slug}`} className="min-w-[320px]">
+                            <Link key={p.id} href={`/urunler/${p.slug}`} className="min-w-[180px] sm:min-w-[240px] md:min-w-[320px]">
                                 <div className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md cursor-pointer h-full">
                                     <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img alt={p.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src={p.img} />
-                                        <button className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 duration-300">
+                                        <ImageWithPlaceholder alt={p.name} className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105" src={p.img} loading="lazy" decoding="async" />
+                                        <button className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 duration-300">
                                             <span className="material-symbols-outlined fill text-lg">favorite</span>
                                         </button>
                                     </div>
