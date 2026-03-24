@@ -1,19 +1,129 @@
 import Link from "next/link";
+import { db } from "@/lib/db";
+import { formatPrice } from "@/lib/utils";
+import { getImageSrc } from "@/lib/image-helpers";
+import { getActiveCampaigns, getBestDiscountForProduct } from "@/lib/discounts";
 
-const PRODUCTS = [
-    { brand: "GUCCI", name: "Dionysus Mini Leather Bag", price: "22.050 TL", oldPrice: "24.500 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBwBQX8dRVkHZ2H1Gfv7OOzQm8AniVNCTWyGGjmrhY5nyRBLiBl1PMYRyFn-UfwsWbz-1WS38JCZpe53K_LGIheaxyU-6ariFK_I_u0UTgWpn_S_e7IwOhDjlu9GCdJ6DYkUSuevOvoPSFxdCmPqnd0Uyq1WoNC7fQHP5DbWraSxEpcP8hOTFIlsdQpKVT2YWG_ibtMmHgJiHJHVftQdvyCJMy4OZWaJsO6fITfMKWi1VYaU_cYYLso3ioFmpz13WEC5js5dR6KwW9g", discount: "%10 İndirim" },
-    { brand: "PRADA", name: "Cleo Brushed Leather Bag", price: "21.460 TL", oldPrice: "32.200 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAoVYCq_L_oyrOJVM7ehReMLap1cIDDN-ddjp1hUKO1NHHKODVGlfrV8EoXN0FL6uCH4MEfrXiMHjIEU-8BSSDvF2Qce1gsMyrtBI0jRBSqamSuVd82GFPz7A0H4B7-PoNdK2nuLVt8VZ4F6b6e4oregePiUS83Q1M1JJoR0brou6AfHv54C5A6z_C47L7R9cEeimQsG7WaCN0fMBCw1BIy9O5ISMOJa0svkxl7GxCVtqJAJwk2ilQpE7d0apl8qTxslRS2j8FQx5e5", discount: "3 Al 2 Öde" },
-    { brand: "HERMES", name: "Carré 90 Silk Scarf", price: "12.800 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuApoaX37g9c3rJvioT88La0HMWzLAFoA1gm7Y4_BCkNh86jXKQF_Wctm4ckuJSCjNCmoHGp6apydz5IQsoc3TRYAY52bX5aI1iOTAXlUnPjlu32dzyiIPhM4sHBph7Zsb1IGinTg3nnvtbsoHs98f_WfVNAqe8kvTuQwKPyuM7COIRrNKuvcWIByaAt-9-Kmobl1UQP0hAp_gFl5018IZyzciAMT2NYL5fwzUv7WAggBTddVCIlHItDWVT8ZdU20gUNjOnUDJlS0yYL" },
-    { brand: "SAINT LAURENT", name: "Loulou Medium Bag", price: "38.250 TL", oldPrice: "45.000 TL", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnUsTKCO1TbwzbHR1ulJ_-pFNwTB43brmxykrNtuP29ysJcpIN4oNyC8XfVNQA1seLX-hW4GlvW0s7I7gO0KzTlgzYJBVjIKtqaMTy-brSlFCrG5rlMLL2dVym3ILSH2uUjxa6Ht0Md_j23ePBCchKhAnjoQi3Jht-vuGIO_O6OmimVdZ0uQANWWTOHIrvguzwWWlkYYM0zTg-6eSuo9oRyC4nbASg1agoI2HCo7TY0A1gAiBij0eO66zEuglXXvaScCWn6CtJU7jn", discount: "Sepette %15" },
-];
+export const dynamic = "force-dynamic";
 
-const CATEGORIES = [
-    { name: "Lüks Çantalar", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBKWxe881n95ir27wFG0NfFT4TFlGz8ODP6YUcb0CsG05ufc8DO6TLs7vlhEudXNjomqf4EkW7c4jHmsj_muZYPBkMI7sZB-UeFhNaDJx_QNyiA9vpi9ZiiRCoq5XVBVDogwS6HSTVaXLeEjABcfhzPkVy_DcVTOqfPzrbiO0QsK7cmrwSZ23Yy782vjI72y4lWomYvDp0RIEzIKXTkAuT63CPcYpwi-TB_Qq_fIvJQXz05xzrgJ3a3BOYSpzzKAhdpoWExUJCLdyfV" },
-    { name: "İpek Şallar", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDEYBjQASbFdmvPOsld6PEC43ZEUy4fbcgE2hCiF1P2MfcB3FzPS80sbzAmtJY4jE2IDAY-CTNMw3SOqtG_N5_Gn0IlgWThGzbcYHZaBe7_7mxKh5ulg6pZ07ZyEyIH5q2bJsdxgA1WDMug-o3G2kmp1XjuEN-ZtZ9ziAbC2B7PCTq6dpNmoJg1NiqvEyQJWuWrRwHhBOCY26mVAMMFB1TXN_VSizEZad3KmxtHwYf-Qc3Gr-Sh_4odCNGN0mAmBvadLXsoYpM97hET" },
-    { name: "Yeni Sezon", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuACmHZ1JYZV6qzxjmMjRPYyfmBa2WRFoMDk46Pa5aqylNq7LOL2OSAoNGYgww9kw3LYeSv44fGo211emZcaxlNK28s28keCgg6knz2LVgct4GjZ6BCCbU0lUilEPvpJDeNSU6s15M5fWG6jusvzJcKM2mYJ7OIeS-rcsM7I4tfdRXSeVRSanJARJc88YAvvITrqMdYS44COeB4A2CYseQZw0m5bVf16US2FeWCKVJy59-U6zOfi5BxZD1Wj3S4yHHD7xFnzlIDOZn-u" },
-];
+export default async function HomePage() {
+    // Fetch categories from DB
+    const categories = await db.category.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+    });
 
-export default function HomePage() {
+    // Find "cantalar" category slug for the banner link
+    const bagCategory = categories.find(c => c.slug === "cantalar");
+    const bagCatSlug = bagCategory?.slug || "cantalar";
+
+    // Best Sellers: group OrderItems by productId (via variant), count total sold
+    const bestSellerData = await db.orderItem.groupBy({
+        by: ["variantId"],
+        _sum: { quantity: true },
+        orderBy: { _sum: { quantity: "desc" } },
+        take: 20,
+    });
+
+    const bestSellerVariantIds = bestSellerData.map(d => d.variantId);
+
+    // Get products for those variants
+    const bestSellerVariants = await db.productVariant.findMany({
+        where: { id: { in: bestSellerVariantIds } },
+        include: {
+            product: {
+                include: {
+                    category: true,
+                    brand: true,
+                    variants: {
+                        where: { image: { not: null } },
+                        take: 1,
+                        select: { image: true },
+                    },
+                }
+            }
+        }
+    });
+
+    // Deduplicate by product id and build best sellers list
+    const seenProductIds = new Set<string>();
+    const bestSellers: Array<{
+        id: string;
+        name: string;
+        slug: string;
+        brand: string;
+        price: string;
+        oldPrice?: string;
+        img: string;
+        discount?: string;
+    }> = [];
+
+    const activeCampaigns = await getActiveCampaigns();
+
+    for (const variantId of bestSellerVariantIds) {
+        const variant = bestSellerVariants.find(v => v.id === variantId);
+        if (!variant || !variant.product.isActive) continue;
+        if (seenProductIds.has(variant.product.id)) continue;
+        seenProductIds.add(variant.product.id);
+
+        const p = variant.product;
+        
+        const discountData = getBestDiscountForProduct(p, activeCampaigns);
+        let discountText = discountData.discountText;
+        let discountedPrice = discountData.discountedPrice;
+
+        bestSellers.push({
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            brand: p.brand?.name || p.category.name,
+            price: discountedPrice ? formatPrice(discountedPrice) : formatPrice(Number(p.basePrice)),
+            oldPrice: discountedPrice ? formatPrice(Number(p.basePrice)) : undefined,
+            img: getImageSrc(p.images[0] || p.variants?.find((v: { image: string | null }) => v.image)?.image || null),
+            discount: discountText,
+        });
+
+        if (bestSellers.length >= 8) break;
+    }
+
+    // If not enough best sellers from orders, fill with featured/recent products
+    if (bestSellers.length < 4) {
+        const fillerProducts = await db.product.findMany({
+            where: {
+                isActive: true,
+                id: { notIn: Array.from(seenProductIds) },
+            },
+            include: {
+                category: true,
+                brand: true,
+                variants: {
+                    where: { image: { not: null } },
+                    take: 1,
+                    select: { image: true },
+                },
+            },
+            orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+            take: 8 - bestSellers.length,
+        });
+
+        for (const p of fillerProducts) {
+            const discountData = getBestDiscountForProduct(p, activeCampaigns);
+            let discountText = discountData.discountText;
+            let discountedPrice = discountData.discountedPrice;
+
+            bestSellers.push({
+                id: p.id,
+                name: p.name,
+                slug: p.slug,
+                brand: p.brand?.name || p.category.name,
+                price: discountedPrice ? formatPrice(discountedPrice) : formatPrice(Number(p.basePrice)),
+                oldPrice: discountedPrice ? formatPrice(Number(p.basePrice)) : undefined,
+                img: getImageSrc(p.images[0] || null),
+                discount: discountText,
+            });
+        }
+    }
+
     return (
         <main className="pt-20">
             {/* Hero Section */}
@@ -41,10 +151,10 @@ export default function HomePage() {
             {/* Featured Categories */}
             <section className="max-w-[1440px] mx-auto px-6 py-24">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {CATEGORIES.map((cat) => (
-                        <Link key={cat.name} href="/urunler" className="group cursor-pointer relative aspect-[3/4] overflow-hidden">
+                    {categories.slice(0, 3).map((cat) => (
+                        <Link key={cat.id} href={`/urunler?cat=${cat.slug}`} className="group cursor-pointer relative aspect-[3/4] overflow-hidden">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={cat.img} />
+                            <img alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={getImageSrc(cat.image)} />
                             <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
                             <div className="absolute bottom-8 left-8">
                                 <h3 className="text-white text-2xl font-bold mb-2">{cat.name}</h3>
@@ -73,8 +183,8 @@ export default function HomePage() {
                         </div>
                     </div>
                     <div className="flex gap-8 overflow-x-auto hide-scrollbar pb-8">
-                        {PRODUCTS.map((p) => (
-                            <div key={p.name} className="min-w-[320px]">
+                        {bestSellers.map((p) => (
+                            <Link key={p.id} href={`/urunler/${p.slug}`} className="min-w-[320px]">
                                 <div className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-primary/5 transition-all hover:shadow-md cursor-pointer h-full">
                                     <div className="relative aspect-[4/5] overflow-hidden bg-primary/5">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -103,7 +213,7 @@ export default function HomePage() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
@@ -112,23 +222,23 @@ export default function HomePage() {
             {/* Promotion Banners */}
             <section className="max-w-[1440px] mx-auto px-6 py-24">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="relative group h-[500px] overflow-hidden">
+                    <Link href={`/urunler?cat=${bagCatSlug}`} className="relative group h-[500px] overflow-hidden block">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img alt="Hermes Etkisi" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb17di4d60daPHp5D8RQL-TxFLukaIfl9TLn-JmqmApYutxSVokeEaojn9JAGz6fK0IRMf8dbYr7ax6kFZgldkCshn_j2zbfMOfDlx_VLQTQFj4x7ycKCiMD3AZrpRG1qcwQTxAwq8kslXhv58iyRk8-8fGfrirUO-0Ju3ThuENiCOuEOlITa9ZJHPA60JxwlEtTEMBnmIu07sLzxROzA4EhKyT0aeGZWDHHL2LH9hhRKQIaVA4SESTY5ssrl7woy43WHGEFkZsvtJ" />
+                        <img alt="Yeni Sezon Çantalar" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb17di4d60daPHp5D8RQL-TxFLukaIfl9TLn-JmqmApYutxSVokeEaojn9JAGz6fK0IRMf8dbYr7ax6kFZgldkCshn_j2zbfMOfDlx_VLQTQFj4x7ycKCiMD3AZrpRG1qcwQTxAwq8kslXhv58iyRk8-8fGfrirUO-0Ju3ThuENiCOuEOlITa9ZJHPA60JxwlEtTEMBnmIu07sLzxROzA4EhKyT0aeGZWDHHL2LH9hhRKQIaVA4SESTY5ssrl7woy43WHGEFkZsvtJ" />
                         <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-12">
-                            <h2 className="text-white text-4xl font-extrabold mb-6 uppercase tracking-tight">Yeni Sezon:<br />Hermes Etkisi</h2>
-                            <Link href="/urunler" className="text-white border-b border-white pb-1 text-sm font-bold tracking-widest hover:text-white/70 transition-colors">İNCELE</Link>
+                            <h2 className="text-white text-4xl font-extrabold mb-6 uppercase tracking-tight">Yeni Sezon:<br />Çantalar</h2>
+                            <span className="text-white border-b border-white pb-1 text-sm font-bold tracking-widest hover:text-white/70 transition-colors">İNCELE</span>
                         </div>
-                    </div>
-                    <div className="relative group h-[500px] overflow-hidden">
+                    </Link>
+                    <Link href="/urunler?sort=discount_desc" className="relative group h-[500px] overflow-hidden block">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img alt="Özel İndirimler" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXIoLl2c9XNQsWVmvmNisaFD4XT8Lo2z6mTlgIxmfwq7Ch3r61Em6G-RUDjTz1e9G5xC55oZJAagmRne53C9t9uCI5uNAfVGfLkEdybK6J4x9nQGCyLQ3ixCb1S6DSUms53MV8iqnymviCTKabjKt74jv49MZ65Tk8GEuatZIALkqLN5HhUYnC9vQZ-VZFkwZ5bPQo5XZQ1s4IYqSM82CBLWN3MPCyFiU4-KyS_oyb515aY4-a6QIo_AsWqaSYpnda4JUf3vSFbg0H" />
                         <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-12">
                             <h2 className="text-white text-4xl font-extrabold mb-6 uppercase tracking-tight">Özel İndirimler</h2>
                             <p className="text-white/90 mb-8 max-w-xs font-medium italic">Seçili ikonik modellerde %30&apos;a varan ayrıcalıklı fiyatlar.</p>
-                            <Link href="/urunler" className="text-white border-b border-white pb-1 text-sm font-bold tracking-widest hover:text-white/70 transition-colors">ŞİMDİ AL</Link>
+                            <span className="text-white border-b border-white pb-1 text-sm font-bold tracking-widest hover:text-white/70 transition-colors">ŞİMDİ AL</span>
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </section>
 

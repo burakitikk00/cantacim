@@ -28,21 +28,40 @@ export default function OnayClient({ address, settings, shippingMethod, last4, b
 
     const calculateCouponDiscount = () => {
         if (!selectedCoupon) return 0;
+
+        // Check scope: filter cart items that the coupon applies to
+        const isItemInScope = (item: typeof cartItems[0]) => {
+            const scope = selectedCoupon.scope || 'ALL';
+            if (scope === 'ALL') return true;
+            if (scope === 'PRODUCTS') return selectedCoupon.productIds?.includes(item.productId || '') || false;
+            if (scope === 'CATEGORIES') return selectedCoupon.categoryIds?.includes(item.categoryId || '') || false;
+            if (scope === 'CATEGORIES_AND_PRODUCTS') {
+                return (selectedCoupon.productIds?.includes(item.productId || '') || false) ||
+                       (selectedCoupon.categoryIds?.includes(item.categoryId || '') || false);
+            }
+            return true;
+        };
+
+        const eligibleItems = cartItems.filter(isItemInScope);
+        const eligibleSubtotal = eligibleItems.reduce((s, i) => s + i.price * i.quantity, 0);
+
+        if (eligibleSubtotal === 0 && selectedCoupon.discountType !== 'FREE_SHIPPING') return 0;
+
         let discount = 0;
         switch (selectedCoupon.discountType) {
             case 'PERCENTAGE':
-                discount = subTotal * (selectedCoupon.discountValue / 100);
+                discount = eligibleSubtotal * (selectedCoupon.discountValue / 100);
                 break;
             case 'FIXED':
-                discount = selectedCoupon.discountValue;
+                discount = Math.min(selectedCoupon.discountValue, eligibleSubtotal);
                 break;
             case 'FREE_SHIPPING':
-                discount = 0; // Already zeroed out shippingCost
+                discount = 0;
                 break;
             case 'BUY_X_GET_Y':
                 if (selectedCoupon.buyX && selectedCoupon.getY) {
                     const allUnitPrices: number[] = [];
-                    cartItems.forEach(item => {
+                    eligibleItems.forEach(item => {
                         for (let i = 0; i < item.quantity; i++) {
                             allUnitPrices.push(item.price);
                         }
@@ -58,7 +77,7 @@ export default function OnayClient({ address, settings, shippingMethod, last4, b
                 }
                 break;
         }
-        return Math.min(discount, subTotal);
+        return Math.min(discount, eligibleSubtotal);
     };
 
     const discountAmount = isMounted ? calculateCouponDiscount() : 0;

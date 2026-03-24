@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import ProductDetailClient from "./ProductDetailClient";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getActiveCampaigns, getBestDiscountForProduct } from "@/lib/discounts";
 
 // Force dynamic rendering if we want real-time stock updates, or keep cached
 export const dynamic = "force-dynamic";
@@ -42,16 +43,6 @@ export default async function ProductDetailPage({
                     }
                 }
             },
-            discounts: {
-                where: {
-                    isActive: true,
-                    startDate: { lte: new Date() },
-                    OR: [
-                        { endDate: null },
-                        { endDate: { gte: new Date() } }
-                    ]
-                }
-            },
             reviews: {
                 where: { isApproved: true },
                 select: {
@@ -63,7 +54,7 @@ export default async function ProductDetailPage({
                 },
                 orderBy: { createdAt: "desc" }
             }
-        },
+        }
     });
 
     if (!product) {
@@ -71,39 +62,16 @@ export default async function ProductDetailPage({
     }
 
     // Calculate discount
+    const activeCampaigns = await getActiveCampaigns();
+    const discountData = getBestDiscountForProduct(product, activeCampaigns);
     let discountInfo: { type: string; value: number; text: string } | null = null;
-    const activeDiscount = product.discounts[0]; // use first active discount
-    if (activeDiscount) {
+    
+    if (discountData.discountType && discountData.discountValue !== undefined && discountData.discountText) {
         discountInfo = {
-            type: activeDiscount.discountType,
-            value: Number(activeDiscount.value),
-            text: activeDiscount.discountType === "PERCENTAGE"
-                ? `%${Number(activeDiscount.value)} İndirim`
-                : `${Number(activeDiscount.value)}₺ İndirim`
+            type: discountData.discountType,
+            value: discountData.discountValue,
+            text: discountData.discountText
         };
-    } else {
-        // Check category-level discounts
-        const categoryDiscount = await db.discount.findFirst({
-            where: {
-                isActive: true,
-                startDate: { lte: new Date() },
-                OR: [
-                    { endDate: null },
-                    { endDate: { gte: new Date() } }
-                ],
-                categories: { some: { id: product.categoryId } }
-            },
-            orderBy: { value: "desc" }
-        });
-        if (categoryDiscount) {
-            discountInfo = {
-                type: categoryDiscount.discountType,
-                value: Number(categoryDiscount.value),
-                text: categoryDiscount.discountType === "PERCENTAGE"
-                    ? `%${Number(categoryDiscount.value)} İndirim`
-                    : `${Number(categoryDiscount.value)}₺ İndirim`
-            };
-        }
     }
 
     // Calculate average rating
@@ -124,16 +92,6 @@ export default async function ProductDetailPage({
             variants: {
                 where: { isActive: true },
                 select: { image: true }
-            },
-            discounts: {
-                where: {
-                    isActive: true,
-                    startDate: { lte: new Date() },
-                    OR: [
-                        { endDate: null },
-                        { endDate: { gte: new Date() } }
-                    ]
-                }
             }
         },
         take: 8,
@@ -204,18 +162,7 @@ export default async function ProductDetailPage({
     }));
 
     const serializedRecommended = recommendedProducts.map(p => {
-        const disc = p.discounts[0];
-        let discountedPrice: number | null = null;
-        let discountText: string | null = null;
-        if (disc) {
-            if (disc.discountType === "PERCENTAGE") {
-                discountedPrice = Number(p.basePrice) * (1 - Number(disc.value) / 100);
-                discountText = `%${Number(disc.value)} İndirim`;
-            } else {
-                discountedPrice = Number(p.basePrice) - Number(disc.value);
-                discountText = `${Number(disc.value)}₺ İndirim`;
-            }
-        }
+        const pDiscountData = getBestDiscountForProduct(p, activeCampaigns);
         return {
             id: p.id,
             name: p.name,
@@ -223,8 +170,8 @@ export default async function ProductDetailPage({
             basePrice: p.basePrice.toString(),
             images: p.images.length > 0 ? p.images : p.variants.map((v) => v.image).filter(Boolean) as string[],
             category: { name: p.category.name, slug: p.category.slug },
-            discountedPrice: discountedPrice?.toString() || null,
-            discountText,
+            discountedPrice: pDiscountData.discountedPrice?.toString() || null,
+            discountText: pDiscountData.discountText || null,
         };
     });
 

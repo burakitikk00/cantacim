@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import ProductsClient from "./ProductsClient";
 import { Prisma } from "@prisma/client";
+import { getActiveCampaigns, getBestDiscountForProduct } from "@/lib/discounts";
 
 export const dynamic = "force-dynamic";
 
@@ -83,6 +84,7 @@ export default async function ProductsPage({
         }));
     }
 
+    const isDiscountSort = sort === "discount_desc";
     let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: "desc" };
     if (sort === "price_asc") orderBy = { basePrice: "asc" };
     else if (sort === "price_desc") orderBy = { basePrice: "desc" };
@@ -91,23 +93,13 @@ export default async function ProductsPage({
     const totalItems = await db.product.count({ where });
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
+    // For discount sort, we need to fetch all matching products to sort by calculated discount
+    const fetchAll = isDiscountSort;
+
     const products = await db.product.findMany({
         where,
         include: {
-            category: {
-                include: {
-                    discounts: {
-                        where: {
-                            isActive: true,
-                            startDate: { lte: new Date() },
-                            OR: [
-                                { endDate: null },
-                                { endDate: { gte: new Date() } }
-                            ]
-                        }
-                    }
-                }
-            },
+            category: true,
             variants: {
                 include: {
                     attributes: {
@@ -116,50 +108,22 @@ export default async function ProductsPage({
                         }
                     }
                 }
-            },
-            discounts: {
-                where: {
-                    isActive: true,
-                    startDate: { lte: new Date() },
-                    OR: [
-                        { endDate: null },
-                        { endDate: { gte: new Date() } }
-                    ]
-                }
             }
         },
-        orderBy,
-        skip: (currentPage - 1) * itemsPerPage,
-        take: itemsPerPage,
+        orderBy: isDiscountSort ? { createdAt: "desc" } : orderBy,
+        ...(fetchAll ? {} : {
+            skip: (currentPage - 1) * itemsPerPage,
+            take: itemsPerPage,
+        }),
     });
 
-    const serializedProducts = products.map(p => {
-        let discountText: string | undefined = undefined;
-        let discountedPrice: number | undefined = undefined;
+    const activeCampaigns = await getActiveCampaigns();
 
-        // Check product-specific discount first
-        const activeDiscount = p.discounts[0];
-        if (activeDiscount) {
-            if (activeDiscount.discountType === "PERCENTAGE") {
-                discountedPrice = Number(p.basePrice) * (1 - Number(activeDiscount.value) / 100);
-                discountText = `%${Number(activeDiscount.value)} İndirim`;
-            } else {
-                discountedPrice = Number(p.basePrice) - Number(activeDiscount.value);
-                discountText = `${Number(activeDiscount.value)}₺ İndirim`;
-            }
-        } else {
-            // Fallback to category discount
-            const categoryDiscount = p.category.discounts[0];
-            if (categoryDiscount) {
-                if (categoryDiscount.discountType === "PERCENTAGE") {
-                    discountedPrice = Number(p.basePrice) * (1 - Number(categoryDiscount.value) / 100);
-                    discountText = `%${Number(categoryDiscount.value)} İndirim`;
-                } else {
-                    discountedPrice = Number(p.basePrice) - Number(categoryDiscount.value);
-                    discountText = `${Number(categoryDiscount.value)}₺ İndirim`;
-                }
-            }
-        }
+    const serializedProducts = products.map(p => {
+        const discountData = getBestDiscountForProduct(p, activeCampaigns);
+        let discountText = discountData.discountText;
+        let discountedPrice = discountData.discountedPrice;
+        let discountPercent = discountData.discountPercent;
 
         return {
             ...p,
@@ -168,6 +132,7 @@ export default async function ProductsPage({
             updatedAt: p.updatedAt.toISOString(),
             discountText,
             discountedPrice: discountedPrice?.toString() || undefined,
+            discountPercent,
             category: {
                 ...p.category,
                 createdAt: p.category.createdAt.toISOString(),
@@ -182,6 +147,14 @@ export default async function ProductsPage({
         };
     });
 
+    // If discount sort, sort by discount percent descending, then paginate in JS
+    let finalProducts = serializedProducts;
+    if (isDiscountSort) {
+        finalProducts = serializedProducts
+            .sort((a, b) => b.discountPercent - a.discountPercent)
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    }
+
     const categories = await db.category.findMany({
         where: { isActive: true },
         orderBy: { sortOrder: "asc" },
@@ -189,7 +162,7 @@ export default async function ProductsPage({
 
     return (
         <ProductsClient
-            products={serializedProducts}
+            products={finalProducts}
             categories={categories}
             attributes={attributes}
             totalItems={totalItems}
@@ -198,3 +171,4 @@ export default async function ProductsPage({
         />
     );
 }
+

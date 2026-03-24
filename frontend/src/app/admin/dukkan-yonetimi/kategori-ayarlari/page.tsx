@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
     getCategories,
     createCategory,
     updateCategory,
     deleteCategory,
+    updateCategoryImage,
 } from "./actions";
 
 interface Category {
     id: string;
     name: string;
     slug: string;
+    image: string | null;
     isActive: boolean;
     productCount: number;
     createdAt: string;
@@ -24,10 +26,18 @@ export default function KategoriAyarlariPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
+    // Image state for add form
+    const [newCategoryImage, setNewCategoryImage] = useState<string | null>(null);
+    const [uploadingNew, setUploadingNew] = useState(false);
+    const newImageInputRef = useRef<HTMLInputElement>(null);
+
     // Edit state
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editIsActive, setEditIsActive] = useState(true);
+    const [editImage, setEditImage] = useState<string | null>(null);
+    const [uploadingEdit, setUploadingEdit] = useState(false);
+    const editImageInputRef = useRef<HTMLInputElement>(null);
 
     // Search
     const [searchTerm, setSearchTerm] = useState("");
@@ -46,13 +56,37 @@ export default function KategoriAyarlariPage() {
         setTimeout(() => setToast(null), 3000);
     };
 
+    // ─── IMAGE UPLOAD ─────────────────────────────
+
+    const handleImageUpload = async (
+        file: File,
+        setImage: (url: string) => void,
+        setUploading: (v: boolean) => void
+    ) => {
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/upload", { method: "POST", body: formData });
+            const data = await res.json();
+            if (data.success && data.url) {
+                setImage(data.url);
+            } else {
+                showToast(data.error || "Görsel yüklenirken hata oluştu.", "error");
+            }
+        } catch {
+            showToast("Görsel yüklenirken hata oluştu.", "error");
+        }
+        setUploading(false);
+    };
+
     // ─── DATA FETCHING ─────────────────────────────
 
     const fetchCategories = useCallback(async () => {
         setLoading(true);
         const result = await getCategories(searchTerm || undefined);
         if (result.success && result.data) {
-            setCategories(result.data);
+            setCategories(result.data as Category[]);
         }
         setLoading(false);
     }, [searchTerm]);
@@ -74,10 +108,11 @@ export default function KategoriAyarlariPage() {
     const handleAddCategory = async () => {
         if (!categoryName.trim() || saving) return;
         setSaving(true);
-        const result = await createCategory(categoryName);
+        const result = await createCategory(categoryName, newCategoryImage || undefined);
         if (result.success) {
             showToast("Kategori başarıyla eklendi!", "success");
             setCategoryName("");
+            setNewCategoryImage(null);
             await fetchCategories();
         } else {
             showToast(result.error || "Hata oluştu", "error");
@@ -102,16 +137,18 @@ export default function KategoriAyarlariPage() {
         setEditingId(cat.id);
         setEditName(cat.name);
         setEditIsActive(cat.isActive);
+        setEditImage(cat.image);
     };
 
     const handleSaveEdit = async (id: string) => {
         if (!editName.trim() || saving) return;
         setSaving(true);
-        const result = await updateCategory(id, editName, editIsActive);
+        const result = await updateCategory(id, editName, editIsActive, editImage);
         if (result.success) {
             showToast("Kategori başarıyla güncellendi!", "success");
             setEditingId(null);
             setEditName("");
+            setEditImage(null);
             await fetchCategories();
         } else {
             showToast(result.error || "Hata oluştu", "error");
@@ -123,6 +160,31 @@ export default function KategoriAyarlariPage() {
         setEditingId(null);
         setEditName("");
         setEditIsActive(true);
+        setEditImage(null);
+    };
+
+    const handleQuickImageUpload = async (catId: string, file: File) => {
+        setUploadingEdit(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/upload", { method: "POST", body: formData });
+            const data = await res.json();
+            if (data.success && data.url) {
+                const result = await updateCategoryImage(catId, data.url);
+                if (result.success) {
+                    showToast("Görsel güncellendi!", "success");
+                    await fetchCategories();
+                } else {
+                    showToast(result.error || "Hata oluştu", "error");
+                }
+            } else {
+                showToast(data.error || "Görsel yüklenirken hata oluştu.", "error");
+            }
+        } catch {
+            showToast("Görsel yüklenirken hata oluştu.", "error");
+        }
+        setUploadingEdit(false);
     };
 
     // Stats
@@ -282,11 +344,11 @@ export default function KategoriAyarlariPage() {
                             </h2>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-[#374151]">
-                                Kategori Adı
-                            </label>
-                            <div className="flex gap-3">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-[#374151]">
+                                    Kategori Adı
+                                </label>
                                 <input
                                     type="text"
                                     value={categoryName}
@@ -295,17 +357,73 @@ export default function KategoriAyarlariPage() {
                                         e.key === "Enter" && handleAddCategory()
                                     }
                                     placeholder="Örn: Çantalar, Ayakkabılar, Aksesuarlar..."
-                                    className="flex-1 border border-[#E5E7EB] rounded-lg px-4 py-3 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] transition-all outline-none"
+                                    className="w-full border border-[#E5E7EB] rounded-lg px-4 py-3 text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:ring-2 focus:ring-[#FF007F]/20 focus:border-[#FF007F] transition-all outline-none"
                                 />
-                                <button
-                                    onClick={handleAddCategory}
-                                    disabled={!categoryName.trim() || saving}
-                                    className="flex items-center gap-2 bg-[#FF007F] text-white px-6 py-3 rounded-lg font-medium text-sm hover:bg-[#D6006B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <span className="material-icons text-xl">add</span>
-                                    {saving ? "Ekleniyor..." : "Ekle"}
-                                </button>
                             </div>
+
+                            {/* Image Upload */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-[#374151]">
+                                    Kategori Görseli
+                                </label>
+                                <input
+                                    ref={newImageInputRef}
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            handleImageUpload(file, setNewCategoryImage, setUploadingNew);
+                                        }
+                                        e.target.value = "";
+                                    }}
+                                />
+                                {newCategoryImage ? (
+                                    <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-[#E5E7EB] group">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={newCategoryImage} alt="Kategori görseli" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button
+                                                onClick={() => newImageInputRef.current?.click()}
+                                                className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                                            >
+                                                <span className="material-icons text-sm text-[#374151]">edit</span>
+                                            </button>
+                                            <button
+                                                onClick={() => setNewCategoryImage(null)}
+                                                className="p-2 bg-white rounded-lg hover:bg-red-50 transition-colors"
+                                            >
+                                                <span className="material-icons text-sm text-red-500">delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => newImageInputRef.current?.click()}
+                                        disabled={uploadingNew}
+                                        className="w-40 h-40 border-2 border-dashed border-[#D1D5DB] rounded-lg flex flex-col items-center justify-center gap-2 text-[#9CA3AF] hover:border-[#FF007F] hover:text-[#FF007F] transition-colors disabled:opacity-50"
+                                    >
+                                        {uploadingNew ? (
+                                            <div className="w-6 h-6 border-2 border-[#FF007F] border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <>
+                                                <span className="material-icons text-3xl">add_photo_alternate</span>
+                                                <span className="text-xs font-medium">Görsel Yükle</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={handleAddCategory}
+                                disabled={!categoryName.trim() || saving}
+                                className="flex items-center gap-2 bg-[#FF007F] text-white px-6 py-3 rounded-lg font-medium text-sm hover:bg-[#D6006B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span className="material-icons text-xl">add</span>
+                                {saving ? "Ekleniyor..." : "Kategori Ekle"}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -377,6 +495,9 @@ export default function KategoriAyarlariPage() {
                                 <thead>
                                     <tr className="border-b border-[#E5E7EB]">
                                         <th className="text-left text-xs font-bold uppercase tracking-widest text-[#9CA3AF] px-6 py-4">
+                                            Görsel
+                                        </th>
+                                        <th className="text-left text-xs font-bold uppercase tracking-widest text-[#9CA3AF] px-6 py-4">
                                             Kategori Adı
                                         </th>
                                         <th className="text-left text-xs font-bold uppercase tracking-widest text-[#9CA3AF] px-6 py-4">
@@ -397,7 +518,7 @@ export default function KategoriAyarlariPage() {
                                     {loading ? (
                                         <tr>
                                             <td
-                                                colSpan={5}
+                                                colSpan={6}
                                                 className="px-6 py-12 text-center"
                                             >
                                                 <div className="flex flex-col items-center gap-2">
@@ -411,7 +532,7 @@ export default function KategoriAyarlariPage() {
                                     ) : categories.length === 0 ? (
                                         <tr>
                                             <td
-                                                colSpan={5}
+                                                colSpan={6}
                                                 className="px-6 py-12 text-center"
                                             >
                                                 <span className="material-icons text-4xl text-[#D1D5DB] mb-2">
@@ -430,22 +551,105 @@ export default function KategoriAyarlariPage() {
                                                 key={cat.id}
                                                 className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors"
                                             >
+                                                {/* Category Image */}
+                                                <td className="px-6 py-4">
+                                                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#F3F4F6] group cursor-pointer flex-shrink-0">
+                                                        {cat.image ? (
+                                                            <>
+                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                    <label className="cursor-pointer p-1 bg-white rounded-md hover:bg-gray-100 transition-colors">
+                                                                        <span className="material-icons text-xs text-[#374151]">edit</span>
+                                                                        <input
+                                                                            type="file"
+                                                                            accept="image/jpeg,image/png,image/webp"
+                                                                            className="hidden"
+                                                                            onChange={(e) => {
+                                                                                const file = e.target.files?.[0];
+                                                                                if (file) handleQuickImageUpload(cat.id, file);
+                                                                                e.target.value = "";
+                                                                            }}
+                                                                        />
+                                                                    </label>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <label className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-[#E5E7EB] transition-colors">
+                                                                <span className="material-icons text-[#9CA3AF] text-xl">add_photo_alternate</span>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/jpeg,image/png,image/webp"
+                                                                    className="hidden"
+                                                                    onChange={(e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) handleQuickImageUpload(cat.id, file);
+                                                                        e.target.value = "";
+                                                                    }}
+                                                                />
+                                                            </label>
+                                                        )}
+                                                        {uploadingEdit && (
+                                                            <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                                                                <div className="w-5 h-5 border-2 border-[#FF007F] border-t-transparent rounded-full animate-spin" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+
                                                 {/* Category Name */}
                                                 <td className="px-6 py-4">
                                                     {editingId === cat.id ? (
-                                                        <input
-                                                            type="text"
-                                                            value={editName}
-                                                            onChange={(e) =>
-                                                                setEditName(e.target.value)
-                                                            }
-                                                            onKeyDown={(e) =>
-                                                                e.key === "Enter" &&
-                                                                handleSaveEdit(cat.id)
-                                                            }
-                                                            className="border border-[#FF007F] rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-[#FF007F]/20 outline-none"
-                                                            autoFocus
-                                                        />
+                                                        <div className="space-y-2">
+                                                            <input
+                                                                type="text"
+                                                                value={editName}
+                                                                onChange={(e) =>
+                                                                    setEditName(e.target.value)
+                                                                }
+                                                                onKeyDown={(e) =>
+                                                                    e.key === "Enter" &&
+                                                                    handleSaveEdit(cat.id)
+                                                                }
+                                                                className="border border-[#FF007F] rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-[#FF007F]/20 outline-none"
+                                                                autoFocus
+                                                            />
+                                                            {/* Edit image inline */}
+                                                            <div className="flex items-center gap-2">
+                                                                <input
+                                                                    ref={editImageInputRef}
+                                                                    type="file"
+                                                                    accept="image/jpeg,image/png,image/webp"
+                                                                    className="hidden"
+                                                                    onChange={(e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) {
+                                                                            handleImageUpload(file, setEditImage, setUploadingEdit);
+                                                                        }
+                                                                        e.target.value = "";
+                                                                    }}
+                                                                />
+                                                                {editImage ? (
+                                                                    <div className="relative w-10 h-10 rounded overflow-hidden border group">
+                                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                        <img src={editImage} alt="" className="w-full h-full object-cover" />
+                                                                        <button
+                                                                            onClick={() => setEditImage(null)}
+                                                                            className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                        >
+                                                                            <span className="material-icons text-white" style={{ fontSize: 10 }}>close</span>
+                                                                        </button>
+                                                                    </div>
+                                                                ) : null}
+                                                                <button
+                                                                    onClick={() => editImageInputRef.current?.click()}
+                                                                    disabled={uploadingEdit}
+                                                                    className="text-xs text-[#FF007F] hover:underline disabled:opacity-50"
+                                                                >
+                                                                    {uploadingEdit ? "Yükleniyor..." : editImage ? "Görseli Değiştir" : "Görsel Ekle"}
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     ) : (
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-8 h-8 bg-[#FF007F]/10 rounded-lg flex items-center justify-center">

@@ -59,6 +59,10 @@ export async function getMyVisibleCoupons() {
                     },
                 ],
             },
+            include: {
+                products: { select: { id: true } },
+                categories: { select: { id: true } },
+            },
             orderBy: { createdAt: "desc" },
         });
 
@@ -94,6 +98,10 @@ export async function getMyVisibleCoupons() {
                     id: { in: activeCoupons.map((c) => c.id) },
                 },
             },
+            include: {
+                products: { select: { id: true } },
+                categories: { select: { id: true } },
+            },
             orderBy: { createdAt: "desc" },
         });
 
@@ -106,6 +114,9 @@ export async function getMyVisibleCoupons() {
             discountValue: Number(c.discountValue),
             buyX: c.buyX,
             getY: c.getY,
+            scope: c.scope,
+            productIds: c.products.map(p => p.id),
+            categoryIds: c.categories.map(cat => cat.id),
             validUntil: c.validUntil?.toISOString() || null,
             maxUses: c.maxUses,
             usedCount: c.usedCount,
@@ -144,6 +155,10 @@ export async function applyCouponCode(code: string) {
         // Find coupon by code
         const coupon = await db.coupon.findUnique({
             where: { code: trimmedCode },
+            include: {
+                products: { select: { id: true } },
+                categories: { select: { id: true } },
+            },
         });
 
         if (!coupon) {
@@ -234,6 +249,9 @@ export async function applyCouponCode(code: string) {
                 discountValue: Number(coupon.discountValue),
                 buyX: coupon.buyX,
                 getY: coupon.getY,
+                scope: coupon.scope,
+                productIds: coupon.products.map(p => p.id),
+                categoryIds: coupon.categories.map(cat => cat.id),
                 validUntil: coupon.validUntil?.toISOString() || null,
                 maxUses: coupon.maxUses,
                 usedCount: coupon.usedCount,

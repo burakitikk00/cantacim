@@ -110,15 +110,34 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                                     </Link>
                                                     <p className="text-sm text-zinc-500">{item.variant}</p>
                                                 </div>
-                                                <p className="font-semibold text-zinc-900 dark:text-white text-lg">
-                                                    {item.totalPrice}
-                                                </p>
+                                                <div className="text-right">
+                                                    {item.originalUnitPrice ? (
+                                                        <div className="flex flex-col items-end">
+                                                            <span className="text-sm text-zinc-400 line-through decoration-zinc-400/50">
+                                                                {item.originalUnitPrice}
+                                                            </span>
+                                                            <p className="font-semibold text-zinc-900 dark:text-white text-lg">
+                                                                {item.unitPrice}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="font-semibold text-zinc-900 dark:text-white text-lg">
+                                                            {item.totalPrice}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             <div className="flex items-center text-sm text-zinc-500">
                                                 <span>Birim Fiyat: {item.unitPrice}</span>
                                                 <span className="mx-2">•</span>
                                                 <span>Adet: {item.quantity}</span>
+                                                {item.quantity > 1 && (
+                                                    <>
+                                                        <span className="mx-2">•</span>
+                                                        <span>Toplam: {item.totalPrice}</span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -198,10 +217,16 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                     <span>Kargo</span>
                                     <span>{order.shipping}</span>
                                 </div>
-                                {order.discount && (
+                                {order.autoDiscount && (
                                     <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                                        <span>İndirim {order.couponCode ? `(${order.couponCode})` : ""}</span>
-                                        <span>{order.discount}</span>
+                                        <span>Ürün İndirimleri</span>
+                                        <span>{order.autoDiscount}</span>
+                                    </div>
+                                )}
+                                {order.couponDiscount && (
+                                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                                        <span>Kupon İndirimi {order.couponDisplay ? `(${order.couponDisplay.code} — ${order.couponDisplay.discountText})` : order.couponCode ? `(${order.couponCode})` : ""}</span>
+                                        <span>{order.couponDiscount}</span>
                                     </div>
                                 )}
                                 <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700 mt-2 flex justify-between items-center">
@@ -282,10 +307,16 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                             <span className="text-zinc-600">Kargo:</span>
                             <span className="font-medium">{order.shipping}</span>
                         </div>
-                        {order.discount && (
+                        {order.autoDiscount && (
                             <div className="flex justify-between text-zinc-600">
-                                <span>İndirim:</span>
-                                <span>{order.discount}</span>
+                                <span>Ürün İndirimleri:</span>
+                                <span>{order.autoDiscount}</span>
+                            </div>
+                        )}
+                        {order.couponDiscount && (
+                            <div className="flex justify-between text-zinc-600">
+                                <span>Kupon İndirimi:</span>
+                                <span>{order.couponDiscount}</span>
                             </div>
                         )}
                         <div className="flex justify-between items-center border-t border-zinc-800 pt-1 mt-1 text-xs">

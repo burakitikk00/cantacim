@@ -3,9 +3,13 @@ import { persist } from "zustand/middleware";
 
 export interface CartItemState {
     variantId: string;
+    productId?: string;
+    categoryId?: string;
     productName: string;
     variantLabel: string;
     price: number;
+    originalPrice?: number;
+    isDiscounted?: boolean;
     image?: string;
     quantity: number;
     sku: string;
@@ -20,6 +24,9 @@ export interface SelectedCoupon {
     discountValue: number;
     buyX: number | null;
     getY: number | null;
+    scope: string; // ALL | CATEGORIES | PRODUCTS | CATEGORIES_AND_PRODUCTS
+    productIds: string[];
+    categoryIds: string[];
 }
 
 interface CartStore {

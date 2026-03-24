@@ -57,6 +57,7 @@ export async function getCategories(search?: string) {
                 id: c.id,
                 name: c.name,
                 slug: c.slug,
+                image: c.image,
                 isActive: c.isActive,
                 productCount: c._count.products,
                 createdAt: c.createdAt.toISOString().split("T")[0],
@@ -70,7 +71,7 @@ export async function getCategories(search?: string) {
 
 // ─── CREATE ───────────────────────────────────────────
 
-export async function createCategory(name: string) {
+export async function createCategory(name: string, image?: string) {
     try {
         const trimmed = name.trim();
         if (!trimmed) return { success: false, error: "Kategori adı boş olamaz." };
@@ -87,6 +88,7 @@ export async function createCategory(name: string) {
             data: {
                 name: trimmed,
                 slug,
+                image: image || null,
                 isActive: true,
             },
         });
@@ -104,7 +106,8 @@ export async function createCategory(name: string) {
 export async function updateCategory(
     id: string,
     name: string,
-    isActive: boolean
+    isActive: boolean,
+    image?: string | null
 ) {
     try {
         const trimmed = name.trim();
@@ -156,9 +159,21 @@ export async function updateCategory(
             });
         }
 
+        // Build update data
+        const updateData: { name: string; slug: string; isActive: boolean; image?: string | null } = {
+            name: trimmed,
+            slug,
+            isActive,
+        };
+
+        // Only update image if it was explicitly provided (including null to clear)
+        if (image !== undefined) {
+            updateData.image = image;
+        }
+
         await db.category.update({
             where: { id },
-            data: { name: trimmed, slug, isActive },
+            data: updateData,
         });
 
         revalidatePath("/admin/dukkan-yonetimi/kategori-ayarlari");
@@ -205,5 +220,22 @@ export async function deleteCategory(id: string) {
     } catch (error) {
         console.error("Failed to delete category:", error);
         return { success: false, error: "Kategori silinirken hata oluştu." };
+    }
+}
+
+// ─── UPDATE IMAGE ONLY ───────────────────────────────
+
+export async function updateCategoryImage(id: string, image: string | null) {
+    try {
+        await db.category.update({
+            where: { id },
+            data: { image },
+        });
+
+        revalidatePath("/admin/dukkan-yonetimi/kategori-ayarlari");
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to update category image:", error);
+        return { success: false, error: "Görsel güncellenirken hata oluştu." };
     }
 }

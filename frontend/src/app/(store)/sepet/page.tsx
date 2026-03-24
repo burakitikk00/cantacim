@@ -17,6 +17,9 @@ interface Coupon {
     discountValue: number;
     buyX: number | null;
     getY: number | null;
+    scope: string; // ALL | CATEGORIES | PRODUCTS | CATEGORIES_AND_PRODUCTS
+    productIds: string[];
+    categoryIds: string[];
     validUntil: string | null;
     maxUses: number | null;
     usedCount: number;
@@ -124,6 +127,9 @@ export default function CartPage() {
                 discountValue: coupon.discountValue,
                 buyX: coupon.buyX,
                 getY: coupon.getY,
+                scope: coupon.scope,
+                productIds: coupon.productIds,
+                categoryIds: coupon.categoryIds,
             });
         } else {
             setStoredCoupon(null);
@@ -192,38 +198,50 @@ export default function CartPage() {
 
         let discount = 0;
 
+        // Check scope: filter cart items that the coupon applies to
+        const isItemInScope = (item: typeof cartItems[0]) => {
+            const scope = selectedCoupon.scope || 'ALL';
+            if (scope === 'ALL') return true;
+            if (scope === 'PRODUCTS') return selectedCoupon.productIds?.includes(item.productId || '') || false;
+            if (scope === 'CATEGORIES') return selectedCoupon.categoryIds?.includes(item.categoryId || '') || false;
+            if (scope === 'CATEGORIES_AND_PRODUCTS') {
+                return (selectedCoupon.productIds?.includes(item.productId || '') || false) ||
+                       (selectedCoupon.categoryIds?.includes(item.categoryId || '') || false);
+            }
+            return true;
+        };
+
+        const eligibleItems = cartItems.filter(isItemInScope);
+        const eligibleSubtotal = eligibleItems.reduce((s, i) => s + i.price * i.quantity, 0);
+
+        if (eligibleSubtotal === 0 && selectedCoupon.discountType !== 'FREE_SHIPPING') return 0;
+
         switch (selectedCoupon.discountType) {
             case 'PERCENTAGE':
-                discount = subtotal * (selectedCoupon.discountValue / 100);
+                discount = eligibleSubtotal * (selectedCoupon.discountValue / 100);
                 break;
 
             case 'FIXED':
-                discount = selectedCoupon.discountValue;
+                discount = Math.min(selectedCoupon.discountValue, eligibleSubtotal);
                 break;
 
             case 'FREE_SHIPPING':
-                discount = 0; // Kargo zaten ücretsiz, gerektiğinde kargo tutarını buradan düşün
+                discount = 0;
                 break;
 
             case 'BUY_X_GET_Y':
                 if (selectedCoupon.buyX && selectedCoupon.getY) {
-                    // Flatten all items to find individual unit prices
                     const allUnitPrices: number[] = [];
-                    cartItems.forEach(item => {
+                    eligibleItems.forEach(item => {
                         for (let i = 0; i < item.quantity; i++) {
                             allUnitPrices.push(item.price);
                         }
                     });
-
-                    // Sort ascending (cheapest first)
                     allUnitPrices.sort((a, b) => a - b);
-
                     const totalQty = allUnitPrices.length;
                     const freeCountPerSet = selectedCoupon.buyX - selectedCoupon.getY;
                     const sets = Math.floor(totalQty / selectedCoupon.buyX);
                     const totalFreeCount = sets * freeCountPerSet;
-
-                    // Take the first 'totalFreeCount' items (cheapest ones) as free
                     for (let i = 0; i < totalFreeCount; i++) {
                         discount += allUnitPrices[i];
                     }
@@ -231,7 +249,7 @@ export default function CartPage() {
                 break;
         }
 
-        return Math.min(discount, subtotal); // Discount cannot exceed subtotal
+        return Math.min(discount, eligibleSubtotal);
     };
 
     const discountAmount = calculateDiscount();

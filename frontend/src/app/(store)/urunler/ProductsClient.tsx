@@ -52,6 +52,7 @@ const SORT_OPTIONS = [
     { label: "En Yeniler", value: "newest" },
     { label: "Fiyat: Artan", value: "price_asc" },
     { label: "Fiyat: Azalan", value: "price_desc" },
+    { label: "İndirim Oranı", value: "discount_desc" },
 ];
 
 export default function ProductsClient({

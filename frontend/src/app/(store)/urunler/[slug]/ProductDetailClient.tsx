@@ -26,6 +26,7 @@ interface Product {
     description: string | null;
     basePrice: string;
     images: string[];
+    categoryId: string;
     category: { name: string; slug: string };
     variants: ProductVariant[];
 }
@@ -175,8 +176,8 @@ export default function ProductDetailClient({
     if (discount) {
         if (discount.type === "PERCENTAGE") {
             discountedPrice = Number(currentPrice) * (1 - discount.value / 100);
-        } else {
-            discountedPrice = Number(currentPrice) - discount.value;
+        } else if (discount.type === "FIXED") {
+            discountedPrice = Math.max(0, Number(currentPrice) - discount.value);
         }
     }
 
@@ -206,9 +207,13 @@ export default function ProductDetailClient({
                 const variantLabel = selectedVariant.attributes.map(a => a.attributeValue.value).join(" / ");
                 cartStore.addItem({
                     variantId: selectedVariant.id,
+                    productId: product.id,
+                    categoryId: product.categoryId,
                     productName: product.name,
                     variantLabel,
                     price: discountedPrice || Number(selectedVariant.price),
+                    originalPrice: Number(selectedVariant.price),
+                    isDiscounted: !!discountedPrice,
                     image: selectedVariant.image || product.images[0],
                     sku: selectedVariant.sku,
                 });
@@ -217,9 +222,13 @@ export default function ProductDetailClient({
                 const v = product.variants[0];
                 cartStore.addItem({
                     variantId: v.id,
+                    productId: product.id,
+                    categoryId: product.categoryId,
                     productName: product.name,
                     variantLabel: "",
                     price: discountedPrice || Number(v.price),
+                    originalPrice: Number(v.price),
+                    isDiscounted: !!discountedPrice,
                     image: v.image || product.images[0],
                     sku: v.sku,
                 });

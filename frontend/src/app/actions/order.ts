@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { getStoreSettings } from "./settings";
 import { calculateShippingCost, StoreSettingsParams } from "@/utils/shipping";
 import { OrderStatus } from "@prisma/client";
+import { getActiveCampaigns, getBestDiscountForProduct } from "@/lib/discounts";
 
 export async function createOrder(data: {
     items: { variantId: string; quantity: number }[];
@@ -51,15 +52,34 @@ export async function createOrder(data: {
             return { success: false, error: "Bazı ürünler bulunamadı." };
         }
 
+        const activeCampaigns = await getActiveCampaigns();
+        
         let subtotal = 0;
+
         const enrichedItems = data.items.map(item => {
             const variant = variants.find(v => v.id === item.variantId)!;
-            const price = Number(variant.price);
+            const discountData = getBestDiscountForProduct(variant.product, activeCampaigns);
+            
+            let price = Number(variant.price);
+            let isDiscountedThisItem = false;
+
+            if (discountData.discountType === "PERCENTAGE" || discountData.discountType === "FIXED") {
+                if (discountData.discountedPrice !== undefined) {
+                    price = discountData.discountedPrice;
+                    isDiscountedThisItem = true;
+                }
+            }
+
             subtotal += price * item.quantity;
+
             return {
                 ...item,
                 price,
+                originalPrice: Number(variant.price),
+                isDiscounted: isDiscountedThisItem,
                 productName: variant.product.name,
+                productId: variant.product.id,
+                categoryId: variant.product.categoryId,
             };
         });
 
@@ -71,6 +91,7 @@ export async function createOrder(data: {
         if (data.couponCode) {
             const coupon = await prisma.coupon.findUnique({
                 where: { code: data.couponCode },
+                include: { products: { select: { id: true } }, categories: { select: { id: true } } },
             });
 
             if (coupon) {
@@ -90,16 +111,39 @@ export async function createOrder(data: {
 
                     couponToUse = coupon;
 
+                    // Check scope: filter enriched items that the coupon applies to
+                    const isItemInScope = (item: typeof enrichedItems[0]) => {
+                        const scope = coupon.scope || 'ALL';
+                        if (scope === 'ALL') return true;
+                        
+                        const productIds = coupon.products.map(p => p.id);
+                        const categoryIds = coupon.categories.map(c => c.id);
+
+                        if (scope === 'PRODUCTS') return productIds.includes(item.productId);
+                        if (scope === 'CATEGORIES') return categoryIds.includes(item.categoryId);
+                        if (scope === 'CATEGORIES_AND_PRODUCTS') {
+                            return productIds.includes(item.productId) || categoryIds.includes(item.categoryId);
+                        }
+                        return true;
+                    };
+
+                    const eligibleItems = enrichedItems.filter(isItemInScope);
+                    const eligibleSubtotal = eligibleItems.reduce((s, i) => s + i.price * i.quantity, 0);
+
+                    if (eligibleSubtotal === 0 && coupon.discountType !== 'FREE_SHIPPING') {
+                        return { success: false, error: "Kupon sepetinizdeki ürünler için geçerli değil." };
+                    }
+
                     if (coupon.discountType === 'PERCENTAGE') {
-                        discountAmount = subtotal * (Number(coupon.discountValue) / 100);
+                        discountAmount = eligibleSubtotal * (Number(coupon.discountValue) / 100);
                     } else if (coupon.discountType === 'FIXED') {
-                        discountAmount = Number(coupon.discountValue);
+                        discountAmount = Math.min(Number(coupon.discountValue), eligibleSubtotal);
                     } else if (coupon.discountType === 'FREE_SHIPPING') {
                         isFreeShippingCoupon = true;
                     } else if (coupon.discountType === 'BUY_X_GET_Y') {
                         if (coupon.buyX && coupon.getY) {
                             const allUnitPrices: number[] = [];
-                            enrichedItems.forEach(item => {
+                            eligibleItems.forEach(item => {
                                 for (let i = 0; i < item.quantity; i++) {
                                     allUnitPrices.push(item.price);
                                 }
@@ -115,7 +159,7 @@ export async function createOrder(data: {
                         }
                     }
 
-                    discountAmount = Math.min(discountAmount, subtotal);
+                    discountAmount = Math.min(discountAmount, eligibleSubtotal);
                 } else {
                     return { success: false, error: "Kupon süresi dolmuş, tükenmiş veya pasif." };
                 }

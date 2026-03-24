@@ -117,12 +117,23 @@ export default async function OrdersPage() {
                                                     </div>
 
                                                     <div className="text-left sm:text-right mt-2 sm:mt-0">
-                                                        <p className="font-semibold text-zinc-900 dark:text-white text-base sm:text-lg">
-                                                            {item.totalPrice}
-                                                        </p>
-                                                        {item.unitPrice !== item.totalPrice && (
+                                                        {item.originalUnitPrice ? (
+                                                            <div className="flex flex-col items-start sm:items-end">
+                                                                <span className="text-sm text-zinc-400 line-through decoration-zinc-400/50">
+                                                                    {item.originalUnitPrice}
+                                                                </span>
+                                                                <p className="font-semibold text-zinc-900 dark:text-white text-base sm:text-lg">
+                                                                    {item.unitPrice}
+                                                                </p>
+                                                            </div>
+                                                        ) : (
+                                                            <p className="font-semibold text-zinc-900 dark:text-white text-base sm:text-lg">
+                                                                {item.totalPrice}
+                                                            </p>
+                                                        )}
+                                                        {item.quantity > 1 && (
                                                             <span className="text-xs text-zinc-400 mt-0.5">
-                                                                (Birim: {item.unitPrice})
+                                                                (Toplam: {item.totalPrice})
                                                             </span>
                                                         )}
                                                         {order.status === "Teslim Edildi" && (
@@ -151,15 +162,30 @@ export default async function OrdersPage() {
                                     </div>
                                 )}
 
+                                {/* Discount Summary */}
+                                {(order.autoDiscountTotal || order.couponDiscountAmount) && (
+                                    <div className="mt-6 p-4 bg-green-50/50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-800/50 space-y-2">
+                                        <h4 className="text-xs font-semibold uppercase tracking-wider text-green-700 dark:text-green-400 mb-2">İndirim Detayları</h4>
+                                        {order.autoDiscountTotal && (
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-zinc-600 dark:text-zinc-400">Ürün İndirimleri</span>
+                                                <span className="font-medium text-green-600 dark:text-green-400">{order.autoDiscountTotal}</span>
+                                            </div>
+                                        )}
+                                        {order.coupon && (
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
+                                                    <Tag className="w-3.5 h-3.5" />
+                                                    Kupon ({order.coupon.code}) — {order.coupon.discountText}
+                                                </span>
+                                                <span className="font-medium text-green-600 dark:text-green-400">{order.coupon.discountAmount}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Footer Info & Actions */}
                                 <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-                                    {order.coupon && (
-                                        <div className="mb-6 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/30 p-3 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700">
-                                            <Tag className="w-4 h-4 text-green-500" />
-                                            <span>&quot;<span className="font-medium text-zinc-700 dark:text-zinc-300">{order.coupon.code}</span>&quot; kupon kodu ile <span className="text-green-600 dark:text-green-400 font-medium">{order.coupon.discount}</span> indirim uygulandı.</span>
-                                        </div>
-                                    )}
-
                                     <div className="flex flex-wrap gap-3 justify-end">
                                         <Link
                                             href={`/hesap/siparisler/${order.dbId}`}
