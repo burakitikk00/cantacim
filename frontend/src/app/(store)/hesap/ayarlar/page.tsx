@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useTransition } from "react";
 import { getUserProfile, changePassword, deactivateAccount } from "@/actions/user";
 import { signOut } from "next-auth/react";
+import SuccessModal from "@/components/shared/SuccessModal";
 
 interface UserData {
     name: string | null;
@@ -12,12 +13,36 @@ interface UserData {
     tier: "STANDARD" | "ELITE" | "PLATINUM";
     emailVerified: Date | null;
     isActive: boolean;
+    hasPassword?: boolean;
 }
 
 export default function SettingsPage() {
     const [user, setUser] = useState<UserData | null>(null);
     const [isPending, startTransition] = useTransition();
     const [isDeactivating, setIsDeactivating] = useState(false);
+    
+    // Modal State
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({ title: "", message: "", icon: "check_circle" });
+
+    const openModal = (title: string, message: string, icon = "check_circle") => {
+        setModalConfig({ title, message, icon });
+        setModalOpen(true);
+    };
+
+    const handleSendVerificationEmail = async () => {
+        try {
+            const res = await fetch("/api/auth/verify-email/send", { method: "POST" });
+            const data = await res.json();
+            if (res.ok) {
+                openModal("E-posta Gönderildi", data.message, "mark_email_read");
+            } else {
+                openModal("Hata", data.error || "Göderim başarısız.", "error");
+            }
+        } catch (error) {
+            openModal("Hata", "Beklenmeyen bir hata oluştu.", "error");
+        }
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -38,9 +63,9 @@ export default function SettingsPage() {
         startTransition(async () => {
             const res = await changePassword(formData);
             if (res.error) {
-                alert(res.error);
+                openModal("Hata", res.error, "error");
             } else {
-                alert(res.message);
+                openModal("Başarılı", res.message || "Şifreniz güncellendi.", "lock_reset");
                 const form = document.getElementById("password-form") as HTMLFormElement;
                 if (form) form.reset();
             }
@@ -56,10 +81,12 @@ export default function SettingsPage() {
         try {
             const res = await deactivateAccount();
             if (res.error) {
-                alert(res.error);
+                openModal("Hata", res.error, "error");
             } else {
-                alert(res.message);
-                signOut({ callbackUrl: "/" });
+                openModal("Başarılı", res.message || "Hesabınız donduruldu.", "no_accounts");
+                setTimeout(() => {
+                    signOut({ callbackUrl: "/" });
+                }, 2000);
             }
         } catch (err) {
             console.error(err);
@@ -81,6 +108,13 @@ export default function SettingsPage() {
 
     return (
         <div className="w-full max-w-5xl mx-auto">
+            <SuccessModal 
+                isOpen={modalOpen} 
+                onClose={() => setModalOpen(false)} 
+                title={modalConfig.title} 
+                message={modalConfig.message} 
+                icon={modalConfig.icon} 
+            />
             {/* Header Section */}
             <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
@@ -119,29 +153,61 @@ export default function SettingsPage() {
                             <h3 className="text-lg font-bold">Güvenlik</h3>
                         </div>
 
-                        <form id="password-form" action={handlePasswordChange} className="space-y-6">
-                            <h4 className="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-4">Şifre Değiştir</h4>
-                            <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Mevcut Şifre</label>
-                                <input name="currentPassword" required className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="password" placeholder="••••••••" />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {user?.hasPassword ? (
+                            <form id="password-form" action={handlePasswordChange} className="space-y-6">
+                                <h4 className="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-4">Şifre Değiştir</h4>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Yeni Şifre</label>
-                                    <input name="newPassword" required className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="password" placeholder="••••••••" />
+                                    <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Mevcut Şifre</label>
+                                    <input name="currentPassword" required className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="password" placeholder="••••••••" />
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Yeni Şifre (Tekrar)</label>
-                                    <input name="confirmPassword" required className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="password" placeholder="••••••••" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Yeni Şifre</label>
+                                        <input name="newPassword" required className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="password" placeholder="••••••••" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Yeni Şifre (Tekrar)</label>
+                                        <input name="confirmPassword" required className="w-full rounded-lg border-zinc-200 focus:border-primary focus:ring-0 py-3 px-4 text-sm bg-zinc-50/50 dark:bg-zinc-800/20" type="password" placeholder="••••••••" />
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="pt-4 flex justify-end">
-                                <button disabled={isPending} className="bg-primary text-white px-8 py-3 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg disabled:opacity-70">
-                                    {isPending ? "Güncelleniyor..." : "Şifreyi Güncelle"}
+                                <div className="pt-4 flex justify-end">
+                                    <button disabled={isPending} className="bg-primary text-white px-8 py-3 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-lg disabled:opacity-70">
+                                        {isPending ? "Güncelleniyor..." : "Şifreyi Güncelle"}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="space-y-4">
+                                <h4 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Şifre Oluştur</h4>
+                                <p className="text-sm text-zinc-500">
+                                    Google hesabınızla kayıt olduğunuz için henüz bir şifreniz bulunmuyor. E-posta adresinize bir bağlantı göndererek şifrenizi oluşturabilirsiniz.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        try {
+                                            const res = await fetch("/api/auth/forgot-password", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ email: user?.email }),
+                                            });
+                                            const data = await res.json();
+                                            if (res.ok) {
+                                                openModal("E-posta Gönderildi", "Şifre oluşturma bağlantısı e-posta adresinize gönderildi.", "mark_email_read");
+                                            } else {
+                                                openModal("Hata", data.error || "Bir hata oluştu.", "error");
+                                            }
+                                        } catch (error) {
+                                            openModal("Hata", "Beklenmeyen bir hata oluştu.", "error");
+                                        }
+                                    }}
+                                    className="bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-opacity"
+                                >
+                                    E-postaya Şifre Linki Gönder
                                 </button>
                             </div>
-                        </form>
+                        )}
                     </section>
 
                     {/* Notification Settings */}
@@ -226,7 +292,19 @@ export default function SettingsPage() {
                                 <span className="opacity-70">E-posta Doğrulama</span>
                                 <span className={`font-bold ${user?.emailVerified ? "text-emerald-400" : "opacity-50"}`}>{user?.emailVerified ? "Doğrulandı" : "Bekliyor"}</span>
                             </div>
-                            <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                            
+                            {!user?.emailVerified && (
+                                <div className="pt-2">
+                                    <button 
+                                        onClick={handleSendVerificationEmail}
+                                        className="w-full text-center bg-white/20 hover:bg-white/30 transition-colors text-white py-2 rounded-lg text-xs font-bold uppercase tracking-wider"
+                                    >
+                                        Doğrulama Gönder
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="flex justify-between items-center border-b border-white/10 pb-2 mt-4">
                                 <span className="opacity-70">2FA Güvenliği</span>
                                 <span className="text-white/50 italic">Pasif</span>
                             </div>

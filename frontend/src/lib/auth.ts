@@ -18,6 +18,23 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            allowDangerousEmailAccountLinking: true,
+            profile(profile) {
+                // `name` alanını ad ve soyad olarak ayır
+                const nameParts = (profile.name || "").trim().split(" ");
+                const surname = nameParts.length > 1 ? nameParts.pop() : "";
+                const name = nameParts.join(" ") || profile.name;
+
+                return {
+                    id: profile.sub,
+                    name: name,
+                    surname: surname, // Custom field
+                    email: profile.email,
+                    image: profile.picture,
+                    role: "USER", // Varsayılan rol
+                    isActive: true,
+                };
+            },
         }),
         CredentialsProvider({
             name: "credentials",
@@ -131,13 +148,41 @@ export const authOptions: NextAuthOptions = {
     ],
 
     callbacks: {
-        async jwt({ token, user }) {
+        async signIn({ user, account }) {
+            // Google girişi için ek işlemler
+            if (account?.provider === "google" && user.email) {
+                const existingUser = await db.user.findUnique({
+                    where: { email: user.email },
+                });
+
+                // Kullanıcı deaktif edilmişse girişi engelle
+                if (existingUser && !existingUser.isActive) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        async jwt({ token, user, account }) {
             if (user) {
                 token.id = user.id;
                 // @ts-ignore
                 token.role = user.role;
-                // @ts-ignore - rememberMe gelen kullanıcıdan
-                token.rememberMe = user.rememberMe ?? false;
+
+                // Google ile giriş yapıyorsa, DB'den role bilgisini al
+                if (account?.provider === "google") {
+                    const dbUser = await db.user.findUnique({
+                        where: { email: user.email! },
+                        select: { role: true, id: true },
+                    });
+                    if (dbUser) {
+                        token.role = dbUser.role;
+                        token.id = dbUser.id;
+                    }
+                    token.rememberMe = true; // Google giriş her zaman hatırla
+                } else {
+                    // @ts-ignore - rememberMe gelen kullanıcıdan
+                    token.rememberMe = user.rememberMe ?? false;
+                }
                 // Token oluşturma zamanı
                 token.iat = Math.floor(Date.now() / 1000);
             }
@@ -170,3 +215,4 @@ export const authOptions: NextAuthOptions = {
         },
     },
 };
+

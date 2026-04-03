@@ -48,6 +48,7 @@ export async function getUserProfile() {
             totalSpent: true,
             emailVerified: true,
             isActive: true,
+            hashedPassword: true,
             customerGroup: {
                 select: {
                     name: true,
@@ -59,6 +60,10 @@ export async function getUserProfile() {
     if (!user) {
         return { error: "Kullanıcı bulunamadı" };
     }
+
+    const hasPassword = !!user.hashedPassword;
+    // Don't leak the hash to the client
+    const { hashedPassword, ...userWithoutHash } = user;
 
     // Calculate next tier progress
     let nextTier = null;
@@ -82,8 +87,9 @@ export async function getUserProfile() {
 
     // Convert Decimal to number for serialization
     const safeUser = {
-        ...user,
+        ...userWithoutHash,
         totalSpent: Number(user.totalSpent),
+        hasPassword,
     };
 
     return {

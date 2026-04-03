@@ -5,10 +5,19 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const PASSWORD_RULES = [
+    { regex: /.{8,}/, label: "En az 8 karakter" },
+    { regex: /[A-Z]/, label: "En az bir büyük harf" },
+    { regex: /[a-z]/, label: "En az bir küçük harf" },
+    { regex: /[0-9]/, label: "En az bir rakam" },
+    { regex: /[^A-Za-z0-9]/, label: "En az bir özel karakter" },
+];
+
 function AuthForm() {
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -17,7 +26,8 @@ function AuthForm() {
         name: "",
         surname: "",
         email: "",
-        password: ""
+        password: "",
+        rememberMe: false
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,12 +38,14 @@ function AuthForm() {
         e.preventDefault();
         setLoading(true);
         setError("");
+        setSuccess("");
 
         try {
             if (isLogin) {
                 const res = await signIn("credentials", {
                     email: formData.email,
                     password: formData.password,
+                    rememberMe: String(formData.rememberMe),
                     redirect: false,
                 });
 
@@ -48,7 +60,39 @@ function AuthForm() {
                     router.refresh();
                 }
             } else {
-                setError("Kayıt özelliği şu an pasif. Lütfen mevcut bir hesapla giriş yapın.");
+                // Kayıt ol
+                const res = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: formData.name,
+                        surname: formData.surname,
+                        email: formData.email,
+                        password: formData.password,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    setError(data.error || "Kayıt sırasında bir hata oluştu.");
+                    return;
+                }
+
+                // Kayıt başarılı, otomatik giriş yap
+                const loginRes = await signIn("credentials", {
+                    email: formData.email,
+                    password: formData.password,
+                    redirect: false,
+                });
+
+                if (loginRes?.error) {
+                    setSuccess("Hesabınız oluşturuldu! Şimdi giriş yapabilirsiniz.");
+                    setIsLogin(true);
+                } else {
+                    router.push(callbackUrl);
+                    router.refresh();
+                }
             }
         } catch (err) {
             setError("Bir hata oluştu. Lütfen tekrar deneyin.");
@@ -56,6 +100,8 @@ function AuthForm() {
             setLoading(false);
         }
     };
+
+    const showPasswordHints = !isLogin && formData.password.length > 0;
 
     return (
         <main className="min-h-screen flex">
@@ -89,6 +135,12 @@ function AuthForm() {
                         </div>
                     )}
 
+                    {success && (
+                        <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm font-medium">
+                            {success}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {!isLogin && (
                             <div className="grid grid-cols-2 gap-4">
@@ -109,14 +161,32 @@ function AuthForm() {
                         <div>
                             <label className="text-xs font-bold uppercase tracking-widest text-primary/60 block mb-2">Şifre</label>
                             <input name="password" type="password" value={formData.password} onChange={handleChange} required className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary" placeholder="••••••••" />
+                            {showPasswordHints && (
+                                <div className="mt-2 space-y-1">
+                                    {PASSWORD_RULES.map((rule) => {
+                                        const passed = rule.regex.test(formData.password);
+                                        return (
+                                            <div key={rule.label} className={`flex items-center gap-1.5 text-xs ${passed ? "text-green-600" : "text-primary/40"}`}>
+                                                <span className="material-symbols-outlined text-sm">{passed ? "check_circle" : "circle"}</span>
+                                                {rule.label}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                         {isLogin && (
                             <div className="flex justify-between items-center">
                                 <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" className="w-4 h-4 border-gray-300 rounded focus:ring-primary text-primary" />
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.rememberMe}
+                                        onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
+                                        className="w-4 h-4 border-gray-300 rounded focus:ring-primary text-primary"
+                                    />
                                     <span className="text-sm text-primary/60">Beni hatırla</span>
                                 </label>
-                                <a href="#" className="text-sm font-medium text-primary hover:text-primary/60 transition-colors">Şifremi unuttum</a>
+                                <Link href="/auth/sifre-sifirla" className="text-sm font-medium text-primary hover:text-primary/60 transition-colors">Şifremi unuttum</Link>
                             </div>
                         )}
                         <button disabled={loading} type="submit" className="w-full bg-primary text-white py-4 rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors disabled:opacity-50">
@@ -136,7 +206,7 @@ function AuthForm() {
 
                     <p className="text-center text-sm text-primary/50">
                         {isLogin ? "Hesabınız yok mu?" : "Zaten bir hesabınız var mı?"}{" "}
-                        <button type="button" onClick={() => setIsLogin(!isLogin)} className="font-bold text-primary hover:text-primary/60 transition-colors">
+                        <button type="button" onClick={() => { setIsLogin(!isLogin); setError(""); setSuccess(""); }} className="font-bold text-primary hover:text-primary/60 transition-colors">
                             {isLogin ? "Kayıt Olun" : "Giriş Yapın"}
                         </button>
                     </p>
@@ -153,3 +223,4 @@ export default function AuthPage() {
         </Suspense>
     );
 }
+
