@@ -135,8 +135,8 @@ export async function updateUserProfile(formData: FormData) {
     }
 
     try {
-        // Simple validation or use Zod
-        // const validated = userProfileSchema.parse(rawData);
+        // Zod doğrulama — Mass Assignment koruması
+        const validated = userProfileSchema.parse(rawData);
 
         const user = await prisma.user.findFirst({
             where: {
@@ -155,12 +155,12 @@ export async function updateUserProfile(formData: FormData) {
         await prisma.user.update({
             where: { id: user.id },
             data: {
-                name: rawData.name as string,
-                surname: rawData.surname as string,
-                phone: rawData.phone as string,
+                name: validated.name,
+                surname: validated.surname,
+                phone: validated.phone || null,
                 email: emailChanged ? newEmail : undefined,
                 emailVerified: emailChanged ? null : undefined,
-                birthday: rawData.birthday ? new Date(rawData.birthday as string) : null,
+                birthday: validated.birthday ? new Date(validated.birthday) : null,
             },
         });
 

@@ -49,6 +49,8 @@ export function getBestDiscountForProduct(
     let bestDiscountPercent: number = 0;
     let bestDiscountType: string | undefined = undefined;
     let bestDiscountValue: number | undefined = undefined;
+    // Net TL cinsinden indirim tutarı üzerinden karşılaştırma yapmak için
+    let bestNetSaving: number = 0;
     
     const basePriceNum = Number(product.basePrice);
 
@@ -70,44 +72,51 @@ export function getBestDiscountForProduct(
         let currentDiscountedPrice: number | undefined = undefined;
         let currentDiscountText: string | undefined = undefined;
         let currentPercent: number = 0;
+        let currentNetSaving: number = 0;
         
         const valueNum = Number(c.discountValue);
 
         if (c.discountType === "PERCENTAGE") {
             currentDiscountedPrice = basePriceNum * (1 - valueNum / 100);
             currentPercent = valueNum;
+            currentNetSaving = basePriceNum - currentDiscountedPrice;
             currentDiscountText = `%${valueNum} İndirim`;
         } else if (c.discountType === "FIXED") {
             currentDiscountedPrice = Math.max(0, basePriceNum - valueNum);
             currentPercent = basePriceNum > 0 ? (valueNum / basePriceNum) * 100 : 0;
+            currentNetSaving = Math.min(valueNum, basePriceNum);
             currentDiscountText = `${valueNum}₺ İndirim`;
         } else if (c.discountType === "BUY_X_GET_Y" && c.buyX && c.getY) {
             currentDiscountText = `${c.buyX} Al ${c.getY} Öde`;
             // BUY X GET Y doesn't drop the unit price directly on the card
             currentDiscountedPrice = undefined;
-            // Fake a small percent so it gets picked over "no discount" but less than actual price drops
-            currentPercent = 1; 
+            // Tahmini birim başına tasarruf: (buyX - getY) / buyX * birim fiyat
+            const freeItems = c.buyX - c.getY;
+            currentNetSaving = (freeItems / c.buyX) * basePriceNum;
+            currentPercent = (freeItems / c.buyX) * 100;
         } else if (c.discountType === "FREE_SHIPPING") {
             currentDiscountText = `Ücretsiz Kargo`;
             currentDiscountedPrice = undefined;
-            currentPercent = 0.5;
+            // Tahmini kargo bedeli tasarrufu (sabit değer)
+            currentNetSaving = 50;
+            currentPercent = 0;
         }
 
         if (currentDiscountText && c.discountMethod === "CODE") {
              currentDiscountText += ` (Kod: ${c.code})`;
         }
 
-        // We want to pick the discount that gives the lowest price (highest percent)
-        // If it's the first applicable coupon, we take it. Or if it's better than the previous one.
+        // Net TL tasarrufu üzerinden en iyi indirimi seç
         if (
             bestDiscountText === undefined || 
-            currentPercent > bestDiscountPercent
+            currentNetSaving > bestNetSaving
         ) {
             bestDiscountedPrice = currentDiscountedPrice;
             bestDiscountText = currentDiscountText;
             bestDiscountPercent = currentPercent;
             bestDiscountType = c.discountType;
             bestDiscountValue = valueNum;
+            bestNetSaving = currentNetSaving;
         }
     }
 

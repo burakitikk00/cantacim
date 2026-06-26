@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { db as prisma } from "../lib/db";
 import { authOptions } from "../lib/auth";
+import { sanitizeString } from "../lib/sanitize";
 
 export async function createAddress(formData: FormData) {
     const session = await getServerSession(authOptions);
@@ -20,13 +21,13 @@ export async function createAddress(formData: FormData) {
     }
 
     try {
-        const title = formData.get("title") as string;
-        const fullName = formData.get("fullName") as string;
+        const title = sanitizeString(formData.get("title") as string);
+        const fullName = sanitizeString(formData.get("fullName") as string);
         const phone = (formData.get("phone") as string || "").replace(/\s+/g, "");
         const city = formData.get("city") as string;
         const district = formData.get("district") as string;
-        const neighborhood = formData.get("neighborhood") as string;
-        const fullAddress = formData.get("fullAddress") as string;
+        const neighborhood = sanitizeString(formData.get("neighborhood") as string);
+        const fullAddress = sanitizeString(formData.get("fullAddress") as string);
         let isDefault = formData.get("isDefault") === "on";
 
         const addressCount = await prisma.address.count({
@@ -89,13 +90,13 @@ export async function updateAddress(id: string, formData: FormData) {
             return { error: "Adres bulunamadı veya yetkiniz yok" };
         }
 
-        const title = formData.get("title") as string;
-        const fullName = formData.get("fullName") as string;
+        const title = sanitizeString(formData.get("title") as string);
+        const fullName = sanitizeString(formData.get("fullName") as string);
         const phone = (formData.get("phone") as string || "").replace(/\s+/g, "");
         const city = formData.get("city") as string;
         const district = formData.get("district") as string;
-        const neighborhood = formData.get("neighborhood") as string;
-        const fullAddress = formData.get("fullAddress") as string;
+        const neighborhood = sanitizeString(formData.get("neighborhood") as string);
+        const fullAddress = sanitizeString(formData.get("fullAddress") as string);
         const isDefault = formData.get("isDefault") === "on";
 
         if (isDefault && !existingAddress.isDefault) {
@@ -106,7 +107,7 @@ export async function updateAddress(id: string, formData: FormData) {
         }
 
         await prisma.address.update({
-            where: { id },
+            where: { id: existingAddress.id },
             data: {
                 title,
                 fullName,
@@ -152,7 +153,7 @@ export async function deleteAddress(id: string) {
         }
 
         await prisma.address.delete({
-            where: { id }
+            where: { id: existingAddress.id }
         });
 
         revalidatePath("/hesap/adreslerim");
@@ -192,7 +193,7 @@ export async function setDefaultAddress(id: string) {
         });
 
         await prisma.address.update({
-            where: { id },
+            where: { id: existingAddress.id },
             data: { isDefault: true }
         });
 

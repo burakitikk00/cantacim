@@ -2,13 +2,24 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+async function requireAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        throw new Error("Yetkisiz erişim");
+    }
+    return session;
+}
 
 // ─── SINGLE PRODUCT OPERATIONS ─────────────────────────────
 
 export async function deleteProduct(id: string) {
     try {
+        await requireAdmin();
         await db.product.delete({
             where: { id },
         });
@@ -22,6 +33,7 @@ export async function deleteProduct(id: string) {
 
 export async function createProduct(data: any) {
     try {
+        await requireAdmin();
         const { name, description, price, status, categoryId, brandId, images, variants, sku } = data;
 
         const slug = name.toLowerCase()
@@ -80,6 +92,7 @@ export async function createProduct(data: any) {
 
 export async function updateProduct(id: string, data: any) {
     try {
+        await requireAdmin();
         const { name, description, price, status, categoryId, brandId, images, variants } = data;
 
         await db.product.update({
@@ -163,6 +176,7 @@ export async function updateProduct(id: string, data: any) {
 
 export async function getAllProductIds(filters?: any): Promise<string[]> {
     try {
+        await requireAdmin();
         const where: any = {};
 
         if (filters) {
@@ -236,6 +250,7 @@ export async function getAllProductIds(filters?: any): Promise<string[]> {
 
 export async function bulkUpdateStock(ids: string[], stock: number): Promise<{ success: boolean; error?: string; count?: number }> {
     try {
+        await requireAdmin();
         if (ids.length === 0) return { success: false, error: "Hiç ürün seçilmedi." };
 
         // Update all variants of selected products
@@ -254,6 +269,7 @@ export async function bulkUpdateStock(ids: string[], stock: number): Promise<{ s
 
 export async function bulkUpdateStatus(ids: string[], isActive: boolean): Promise<{ success: boolean; error?: string; count?: number }> {
     try {
+        await requireAdmin();
         if (ids.length === 0) return { success: false, error: "Hiç ürün seçilmedi." };
 
         const result = await db.product.updateMany({
@@ -275,6 +291,7 @@ export async function bulkApplyDiscount(
     cancelExisting: boolean
 ): Promise<{ success: boolean; error?: string; count?: number }> {
     try {
+        await requireAdmin();
         if (ids.length === 0) return { success: false, error: "Hiç ürün seçilmedi." };
 
         if (cancelExisting) {
@@ -337,6 +354,7 @@ export async function bulkPriceIncreasePercent(
     percent: number
 ): Promise<{ success: boolean; error?: string; count?: number }> {
     try {
+        await requireAdmin();
         if (ids.length === 0) return { success: false, error: "Hiç ürün seçilmedi." };
 
         const multiplier = 1 + (percent / 100);
@@ -378,6 +396,7 @@ export async function bulkPriceIncreaseFlat(
     amount: number
 ): Promise<{ success: boolean; error?: string; count?: number }> {
     try {
+        await requireAdmin();
         if (ids.length === 0) return { success: false, error: "Hiç ürün seçilmedi." };
 
         const products = await db.product.findMany({
@@ -415,6 +434,7 @@ export async function bulkPriceIncreaseFlat(
 
 export async function bulkDeleteProducts(ids: string[]): Promise<{ success: boolean; error?: string; count?: number }> {
     try {
+        await requireAdmin();
         if (ids.length === 0) return { success: false, error: "Hiç ürün seçilmedi." };
 
         // Products have cascade delete on variants, so just delete products

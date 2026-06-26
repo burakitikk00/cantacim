@@ -63,6 +63,28 @@ export async function validateBody<T>(req: Request, schema: ZodSchema<T>): Promi
 }
 
 /* ─── Audit Log ───────────────────────────────────── */
+// İzin verilen audit log action'ları — log injection koruması
+const ALLOWED_ACTIONS = new Set([
+    "LOGIN", "LOGOUT", "PASSWORD_CHANGE", "ACCOUNT_DEACTIVATE",
+    "CREATE", "UPDATE", "DELETE", "APPROVE", "REJECT",
+    "ORDER_STATUS_CHANGE", "ADMIN_ACTION", "SETTINGS_CHANGE",
+    "PROFILE_UPDATE", "ADDRESS_CHANGE",
+]);
+
+const ALLOWED_ENTITIES = new Set([
+    "User", "Product", "Order", "Address", "Coupon",
+    "Review", "Category", "Brand", "Settings", "Variant",
+]);
+
+/**
+ * Log parametrelerinden kontrol karakterlerini temizler (log injection koruması)
+ */
+function sanitizeLogParam(value: string | undefined): string | undefined {
+    if (!value) return value;
+    // Satır sonu, tab ve kontrol karakterlerini kaldır
+    return value.replace(/[\x00-\x1F\x7F\r\n\t]/g, "").substring(0, 500);
+}
+
 export async function auditLog(
     userId: string,
     action: string,
@@ -72,15 +94,19 @@ export async function auditLog(
     newValue?: unknown,
     ipAddress?: string
 ) {
+    // Action ve entity Enum doğrulaması
+    const safeAction = ALLOWED_ACTIONS.has(action) ? action : `UNKNOWN_${action.substring(0, 30).replace(/[^A-Z_]/g, "")}`;
+    const safeEntity = ALLOWED_ENTITIES.has(entity) ? entity : `Unknown_${entity.substring(0, 30).replace(/[^A-Za-z]/g, "")}`;
+
     await db.auditLog.create({
         data: {
             userId,
-            action,
-            entity,
-            entityId,
+            action: safeAction,
+            entity: safeEntity,
+            entityId: sanitizeLogParam(entityId),
             oldValue: oldValue ? JSON.parse(JSON.stringify(oldValue)) : undefined,
             newValue: newValue ? JSON.parse(JSON.stringify(newValue)) : undefined,
-            ipAddress,
+            ipAddress: sanitizeLogParam(ipAddress),
         },
     });
 }

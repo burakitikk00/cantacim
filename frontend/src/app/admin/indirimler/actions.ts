@@ -3,6 +3,16 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+async function requireAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        throw new Error("Yetkisiz erişim");
+    }
+    return session;
+}
 
 // ─── VALIDATION ───────────────────────────────────────
 
@@ -40,6 +50,7 @@ function sanitizeDecimal(val: number | null | undefined): number | undefined {
 
 export async function getCoupons() {
     try {
+        await requireAdmin();
         const coupons = await db.coupon.findMany({
             include: {
                 categories: { select: { id: true, name: true } },
@@ -88,6 +99,7 @@ export async function getCoupons() {
 
 export async function createCoupon(input: z.infer<typeof couponCreateSchema>) {
     try {
+        await requireAdmin();
         const parsed = couponCreateSchema.safeParse(input);
         if (!parsed.success) {
             const firstErr = parsed.error.issues[0];
@@ -172,6 +184,7 @@ export async function createCoupon(input: z.infer<typeof couponCreateSchema>) {
 
 export async function updateCoupon(id: string, input: z.infer<typeof couponCreateSchema>) {
     try {
+        await requireAdmin();
         if (!id) return { success: false, error: "ID gerekli." };
 
         const parsed = couponCreateSchema.safeParse(input);
@@ -263,6 +276,7 @@ export async function updateCoupon(id: string, input: z.infer<typeof couponCreat
 
 export async function toggleCouponStatus(id: string) {
     try {
+        await requireAdmin();
         const coupon = await db.coupon.findUnique({ where: { id } });
         if (!coupon) return { success: false, error: "Kupon bulunamadı." };
 
@@ -283,6 +297,7 @@ export async function toggleCouponStatus(id: string) {
 
 export async function deleteCoupon(id: string) {
     try {
+        await requireAdmin();
         const coupon = await db.coupon.findUnique({ where: { id } });
         if (!coupon) return { success: false, error: "Kupon bulunamadı." };
 
@@ -309,6 +324,7 @@ export async function deleteCoupon(id: string) {
 
 export async function getCategoriesForSelect() {
     try {
+        await requireAdmin();
         const categories = await db.category.findMany({
             where: { isActive: true },
             select: { id: true, name: true },
@@ -323,6 +339,7 @@ export async function getCategoriesForSelect() {
 
 export async function getProductsForSelect(search?: string) {
     try {
+        await requireAdmin();
         const products = await db.product.findMany({
             where: {
                 isActive: true,
@@ -357,6 +374,7 @@ export async function getProductsForSelect(search?: string) {
 
 export async function getUsersForSelect(search?: string) {
     try {
+        await requireAdmin();
         const users = await db.user.findMany({
             where: {
                 role: "USER",

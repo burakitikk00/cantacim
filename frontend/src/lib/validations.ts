@@ -1,4 +1,11 @@
 import { z } from "zod";
+import { sanitizeString } from "./sanitize";
+
+/* ─── Güvenli URL doğrulayıcı ──────────────────────── */
+const safeUrlRule = z.string().url().refine(
+    (url) => url.startsWith("https://") || url.startsWith("http://") || url.startsWith("/uploads/"),
+    { message: "URL sadece https://, http:// veya /uploads/ ile başlayabilir" }
+);
 
 /* ─── AUTH ──────────────────────────────────────────── */
 const passwordRule = z
@@ -27,7 +34,7 @@ export const productSchema = z.object({
     description: z.string().optional(),
     categoryId: z.string().cuid(),
     basePrice: z.number().positive("Fiyat pozitif olmalı"),
-    images: z.array(z.string().url()).optional(),
+    images: z.array(safeUrlRule).optional(),
     isActive: z.boolean().optional(),
     isFeatured: z.boolean().optional(),
 });
@@ -36,19 +43,19 @@ export const variantSchema = z.object({
     sku: z.string().min(3).max(50),
     price: z.number().positive(),
     stock: z.number().int().min(0),
-    image: z.string().url().optional().nullable(),
+    image: safeUrlRule.optional().nullable(),
     isActive: z.boolean().optional(),
     attributeValueIds: z.array(z.string().cuid()),
 });
 
 /* ─── ADDRESS ───────────────────────────────────────── */
 export const addressSchema = z.object({
-    title: z.string().min(2).max(50),
-    fullName: z.string().min(3).max(100),
+    title: z.string().min(2).max(50).transform(sanitizeString),
+    fullName: z.string().min(3).max(100).transform(sanitizeString),
     phone: z.string().min(10).max(15),
-    city: z.string().min(2),
-    district: z.string().min(2),
-    address: z.string().min(5).max(500),
+    city: z.string().min(2).transform(sanitizeString),
+    district: z.string().min(2).transform(sanitizeString),
+    address: z.string().min(5).max(500).transform(sanitizeString),
     zipCode: z.string().optional(),
     isDefault: z.boolean().optional(),
 });
@@ -57,7 +64,7 @@ export const addressSchema = z.object({
 export const orderSchema = z.object({
     addressId: z.string().cuid(),
     couponCode: z.string().optional(),
-    customerNote: z.string().max(500).optional(),
+    customerNote: z.string().max(500).optional().transform((v) => v ? sanitizeString(v) : v),
     idempotencyKey: z.string().uuid(),
 });
 
@@ -71,7 +78,7 @@ export const couponSchema = z.object({
     code: z.string().min(2).max(30).toUpperCase(),
     description: z.string().optional(),
     discountType: z.enum(["PERCENTAGE", "FIXED", "BUY_X_GET_Y", "FREE_SHIPPING"]),
-    discountValue: z.number().min(0),
+    discountValue: z.number().min(0).max(100_000, "İndirim değeri çok yüksek"),
     discountMethod: z.enum(["AUTO", "CODE", "TIER", "USER"]),
     scope: z.enum(["ALL", "CATEGORIES", "PRODUCTS", "CATEGORIES_AND_PRODUCTS"]),
     minOrderTotal: z.number().positive().optional(),
@@ -84,7 +91,16 @@ export const couponSchema = z.object({
     targetUserId: z.string().optional(),
     minRequirement: z.enum(["MIN_TOTAL", "MIN_QUANTITY"]).optional(),
     minReqValue: z.number().min(0).optional(),
-});
+}).refine(
+    (data) => {
+        // Yüzdesel indirim %100'den fazla olamaz
+        if (data.discountType === "PERCENTAGE" && data.discountValue > 100) {
+            return false;
+        }
+        return true;
+    },
+    { message: "Yüzdesel indirim %100'den fazla olamaz", path: ["discountValue"] }
+);
 
 /* ─── ATTRIBUTE ─────────────────────────────────────── */
 export const attributeSchema = z.object({
@@ -94,3 +110,4 @@ export const attributeSchema = z.object({
 export const attributeValueSchema = z.object({
     value: z.string().min(1).max(50),
 });
+

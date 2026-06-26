@@ -185,6 +185,8 @@ export const authOptions: NextAuthOptions = {
                 }
                 // Token oluşturma zamanı
                 token.iat = Math.floor(Date.now() / 1000);
+                // Son DB doğrulama zamanı
+                token.lastDbCheck = Math.floor(Date.now() / 1000);
             }
 
             /* ── Token süre kontrolü ── */
@@ -195,6 +197,37 @@ export const authOptions: NextAuthOptions = {
             if (now - issuedAt > maxAge) {
                 // Token süresi dolmuş, null döndürerek oturum sonlandır
                 return { ...token, expired: true };
+            }
+
+            /* ── Periyodik DB doğrulama (her 5 dakikada bir) ── */
+            /* Kullanıcı hesabı deaktif edilmişse veya şifresi değişmişse
+               mevcut JWT oturumunu iptal et */
+            const DB_CHECK_INTERVAL = 5 * 60; // 5 dakika
+            const lastCheck = (token.lastDbCheck as number) || 0;
+
+            if (now - lastCheck > DB_CHECK_INTERVAL && token.id) {
+                try {
+                    const dbUser = await db.user.findUnique({
+                        where: { id: token.id as string },
+                        select: {
+                            isActive: true,
+                            role: true,
+                            hashedPassword: true,
+                        },
+                    });
+
+                    // Kullanıcı bulunamadı veya deaktif edilmiş
+                    if (!dbUser || !dbUser.isActive) {
+                        return { ...token, expired: true };
+                    }
+
+                    // Rol değişikliğini yansıt (ADMIN → USER vb.)
+                    token.role = dbUser.role;
+                    token.lastDbCheck = now;
+                } catch {
+                    // DB hatası durumunda mevcut token'ı geçerli say
+                    // Bir sonraki check'te tekrar denenecek
+                }
             }
 
             return token;

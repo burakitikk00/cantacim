@@ -2,9 +2,20 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+async function requireAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user as any).role !== "ADMIN") {
+        throw new Error("Yetkisiz erişim");
+    }
+    return session;
+}
 
 export async function getReviews(page = 1, limit = 20) {
     try {
+        await requireAdmin();
         const skip = (page - 1) * limit;
 
         const [reviews, total] = await Promise.all([
@@ -49,6 +60,7 @@ export async function getReviews(page = 1, limit = 20) {
 
 export async function approveReview(id: string) {
     try {
+        await requireAdmin();
         await db.productReview.update({
             where: { id },
             data: { isApproved: true }
@@ -74,6 +86,7 @@ export async function approveReview(id: string) {
 
 export async function unapproveReview(id: string) {
     try {
+        await requireAdmin();
         await db.productReview.update({
             where: { id },
             data: { isApproved: false }
@@ -98,6 +111,7 @@ export async function unapproveReview(id: string) {
 
 export async function deleteReview(id: string) {
     try {
+        await requireAdmin();
         const review = await db.productReview.findUnique({
             where: { id },
             select: { product: { select: { slug: true } } }

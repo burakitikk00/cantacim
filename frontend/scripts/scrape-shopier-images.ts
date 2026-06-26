@@ -23,7 +23,7 @@ const prisma = new PrismaClient({ adapter });
 // Using Absolute Path because process.cwd() might be relative inside npx environment or subtle issue
 const EXCEL_FILE = 'C:\\Users\\burak\\OneDrive\\Belgeler\\Cantam_Butik\\Shopier-Urunler-20260217.xlsx';
 const STATE_FILE = path.join(process.cwd(), 'shopier-image-scraping-state.json');
-const CDN_BASE = 'https://cdn.shopier.app/pictures_mid/';
+const CDN_BASE = 'https://cdn.shopier.app/pictures/';
 const DELAY_MS = 2000; // 2 seconds delay between requests
 
 interface ScrapingState {
@@ -51,6 +51,42 @@ function normalize(str: string) {
         .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
         .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
         .replace(/\s+/g, ' ').trim();
+}
+
+async function checkUrl(url: string): Promise<boolean> {
+    try {
+        const res = await axios.head(url, { validateStatus: () => true, timeout: 5000 });
+        return res.status === 200;
+    } catch {
+        return false;
+    }
+}
+
+async function getBestValidImageUrl(originalSrc: string): Promise<string | null> {
+    let url = originalSrc;
+    if (!url.startsWith('http')) {
+        if (url.startsWith('//')) url = `https:${url}`;
+        else url = `https://shopier.com${url}`;
+    }
+
+    const filenameMatch = url.match(/\/([^\/]+\.(jpg|jpeg|png|gif|webp))/i);
+    if (filenameMatch) {
+        const filename = filenameMatch[1];
+        const prefixes = [
+            'https://cdn.shopier.app/pictures_large/',
+            'https://cdn.shopier.app/pictures/',
+            'https://cdn.shopier.app/pictures_mid/',
+            'https://cdn.shopier.app/pictures_small/'
+        ];
+        
+        for (const prefix of prefixes) {
+            const testUrl = prefix + filename;
+            if (await checkUrl(testUrl)) return testUrl;
+        }
+    }
+    
+    if (await checkUrl(url)) return url;
+    return null;
 }
 
 async function main() {
@@ -153,28 +189,43 @@ async function main() {
                 }
             }
 
+            let allImagesUrl: string[] = [];
+            let domSources: string[] = [];
+
+            // 1. Gather all raw sources from DOM
+            $('img[src*="pictures"]').each((_, img) => {
+                let src = $(img).attr('src');
+                if (src) domSources.push(src);
+            });
+
+            // 2. Also ensure variation images are in the array
+            for (const imgFile of idToImageMap.values()) {
+                domSources.push(`${CDN_BASE}${imgFile}`);
+            }
+
+            domSources = Array.from(new Set(domSources));
+            
+            // 3. Verify and find best resolution
+            for (const src of domSources) {
+                const validUrl = await getBestValidImageUrl(src);
+                if (validUrl) {
+                    allImagesUrl.push(validUrl);
+                }
+            }
+
+            allImagesUrl = Array.from(new Set(allImagesUrl));
+            let mainImageUrl = allImagesUrl.length > 0 ? allImagesUrl[0] : null;
+
+            // Update Product images array
+            await prisma.product.update({
+                where: { id: dbProduct.id },
+                data: { images: allImagesUrl }
+            });
+            console.log(`Saved ${allImagesUrl.length} images to product ${dbProduct.id}`);
+
             let updatedCount = 0;
 
             if (nameToIdMap.size === 0) {
-                let mainImageUrl = '';
-                if (idToImageMap.size === 1) {
-                    const img = idToImageMap.values().next().value;
-                    if (img) mainImageUrl = `${CDN_BASE}${img}`;
-                }
-                if (!mainImageUrl) {
-                    let domImg = $('.media-container img, .product-media img').first().attr('src'); // Try strict first
-                    if (!domImg) {
-                        // Aggressive fallback: any image with pictures_mid
-                        domImg = $('img[src*="pictures_mid"]').first().attr('src');
-                    }
-
-                    if (domImg) {
-                        if (domImg.startsWith('http')) mainImageUrl = domImg;
-                        else if (domImg.startsWith('//')) mainImageUrl = `https:${domImg}`;
-                        else mainImageUrl = `https://shopier.com${domImg}`;
-                    }
-                }
-
                 if (mainImageUrl) {
                     if (dbProduct.variants.length === 1) {
                         await prisma.productVariant.update({
@@ -192,9 +243,12 @@ async function main() {
                         console.log(`assigned main image to ALL ${updatedCount} variants (fallback): ${mainImageUrl}`);
                     }
                 } else {
-                    console.log('No main image found for fallback (even aggressive).');
+                    await prisma.productVariant.updateMany({
+                        where: { productId: dbProduct.id },
+                        data: { image: null }
+                    });
+                    console.log('No main image found for fallback, cleared variants image.');
                 }
-
             } else {
                 for (const variant of dbProduct.variants) {
                     const variantName = variant.attributes.map(a => a.attributeValue.value).join(' ');
@@ -208,17 +262,27 @@ async function main() {
                         }
                     }
 
+                    let assignedUrl: string | null = null;
+
                     if (matchedId) {
                         const imageFile = idToImageMap.get(matchedId);
                         if (imageFile) {
-                            const fullUrl = `${CDN_BASE}${imageFile}`;
-                            await prisma.productVariant.update({
-                                where: { id: variant.id },
-                                data: { image: fullUrl }
-                            });
-                            updatedCount++;
+                            const matchedValidUrl = allImagesUrl.find(u => u.includes(imageFile));
+                            if (matchedValidUrl) {
+                                assignedUrl = matchedValidUrl;
+                            } else if (mainImageUrl) {
+                                assignedUrl = mainImageUrl;
+                            }
                         }
+                    } else if (mainImageUrl) {
+                        assignedUrl = mainImageUrl;
                     }
+
+                    await prisma.productVariant.update({
+                        where: { id: variant.id },
+                        data: { image: assignedUrl }
+                    });
+                    if (assignedUrl) updatedCount++;
                 }
             }
 

@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { sanitizeString } from "@/lib/sanitize";
 
 // ─── Helpers ─────────────────────────────────────────
 async function requireAdmin() {
@@ -263,8 +264,8 @@ export async function updateOrderStatus(input: z.infer<typeof updateStatusSchema
     };
 
     if (parsed.status === "SHIPPED") {
-        data.cargoCompany = parsed.cargoCompany!.trim();
-        data.cargoTracking = parsed.cargoTracking!.trim();
+        data.cargoCompany = sanitizeString(parsed.cargoCompany!.trim());
+        data.cargoTracking = sanitizeString(parsed.cargoTracking!.trim());
         data.cargoUpdatedAt = new Date();
     }
 
@@ -279,31 +280,53 @@ export async function updateOrderStatus(input: z.infer<typeof updateStatusSchema
         const statusMapKey = parsed.status;
         const mappedStatus = STATUS_MAP[statusMapKey] || statusMapKey;
 
-        // Generic status update notification
-        await db.notification.create({
-            data: {
-                userId: currentOrder.userId,
-                title: "Sipariş Durumu Güncellendi",
-                message: `#${currentOrder.orderNumber} numaralı siparişinizin durumu "${mappedStatus}" olarak güncellendi.`,
-                type: "ORDER_STATUS_CHANGED",
-                link: `/hesap/siparisler`,
+        // Bildirim spam koruması: Son 5 dakika içinde aynı entityId + type ile bildirim var mı kontrol et
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        const recentNotification = await db.notification.findFirst({
+            where: {
                 entityId: currentOrder.id,
-            }
+                type: "ORDER_STATUS_CHANGED",
+                createdAt: { gte: fiveMinutesAgo },
+            },
         });
 
-        // Review notification if DELIVERED
-        if (parsed.status === "DELIVERED") {
+        if (!recentNotification) {
+            // Generic status update notification
             await db.notification.create({
                 data: {
                     userId: currentOrder.userId,
-                    title: "Siparişiniz Teslim Edildi!",
-                    message: `#${currentOrder.orderNumber} numaralı siparişiniz teslim edildi. Satın aldığınız ürünleri değerlendirebilir misiniz?`,
-                    type: "ORDER_DELIVERED",
+                    title: "Sipariş Durumu Güncellendi",
+                    message: `#${currentOrder.orderNumber} numaralı siparişinizin durumu "${mappedStatus}" olarak güncellendi.`,
+                    type: "ORDER_STATUS_CHANGED",
                     link: `/hesap/siparisler`,
                     entityId: currentOrder.id,
-                    isModalShown: false,
                 }
             });
+        }
+
+        // Review notification if DELIVERED
+        if (parsed.status === "DELIVERED") {
+            const recentDeliveryNotif = await db.notification.findFirst({
+                where: {
+                    entityId: currentOrder.id,
+                    type: "ORDER_DELIVERED",
+                    createdAt: { gte: fiveMinutesAgo },
+                },
+            });
+
+            if (!recentDeliveryNotif) {
+                await db.notification.create({
+                    data: {
+                        userId: currentOrder.userId,
+                        title: "Siparişiniz Teslim Edildi!",
+                        message: `#${currentOrder.orderNumber} numaralı siparişiniz teslim edildi. Satın aldığınız ürünleri değerlendirebilir misiniz?`,
+                        type: "ORDER_DELIVERED",
+                        link: `/hesap/siparisler`,
+                        entityId: currentOrder.id,
+                        isModalShown: false,
+                    }
+                });
+            }
         }
     }
 

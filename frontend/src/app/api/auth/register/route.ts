@@ -5,10 +5,11 @@ import { registerSchema } from "@/lib/validations";
 import { apiHandler, validateBody, ApiError } from "@/lib/api-helpers";
 
 export const POST = apiHandler(async (req) => {
+    const clonedReq = req.clone();
     const data = await validateBody(req, registerSchema);
 
     /* Honeypot check */
-    const body = await req.clone().json();
+    const body = await clonedReq.json();
     if (body.website) throw new ApiError("Bot algılandı", 400);
 
     const existing = await db.user.findUnique({ where: { email: data.email.toLowerCase().trim() } });
