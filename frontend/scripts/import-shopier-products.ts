@@ -49,9 +49,10 @@ async function main() {
     const workbook = XLSX.readFile(FILE_PATH);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+    const allData: any[] = XLSX.utils.sheet_to_json(worksheet);
+    const jsonData = allData.slice(0, 50);
 
-    console.log(`Found ${jsonData.length} rows in Excel file.`);
+    console.log(`Found ${allData.length} rows in Excel file. Processing only the first 50 rows.`);
 
     // Cleanup option
     const CLEAN_SHOPIER_PRODUCTS = true;
