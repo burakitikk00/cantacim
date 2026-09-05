@@ -2,6 +2,9 @@ import Link from "next/link";
 import { getCustomerDetail } from "../actions";
 import { notFound } from "next/navigation";
 
+
+export const dynamic = "force-dynamic";
+
 const statusColors: Record<string, string> = {
     "Kargoda": "bg-blue-50 text-blue-700",
     "Hazırlanıyor": "bg-yellow-50 text-yellow-700",

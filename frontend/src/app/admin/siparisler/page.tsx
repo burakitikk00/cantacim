@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { getOrders } from "./actions";
 
+
+export const dynamic = "force-dynamic";
+
 const statusColors: Record<string, string> = {
     "Kargoda": "bg-blue-50 text-blue-700",
     "Hazırlanıyor": "bg-yellow-50 text-yellow-700",

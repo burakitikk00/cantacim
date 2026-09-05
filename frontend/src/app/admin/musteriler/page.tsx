@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { getCustomers, getCustomerStats } from "./actions";
 
+
+export const dynamic = "force-dynamic";
+
 const levelColors: Record<string, string> = {
     VIP: "bg-[#FF007F]/10 text-[#FF007F]",
     Premium: "bg-purple-50 text-purple-700",

@@ -1,6 +1,9 @@
 import ProductForm from "@/components/admin/ProductForm";
 import { db } from "@/lib/db";
 
+
+export const dynamic = "force-dynamic";
+
 export default async function NewProductPage() {
     const [categories, brands, attributes] = await Promise.all([
         db.category.findMany({

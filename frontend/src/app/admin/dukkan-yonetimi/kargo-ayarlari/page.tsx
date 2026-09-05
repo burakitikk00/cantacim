@@ -1,6 +1,9 @@
 import KargoAyarlariClient from "./KargoAyarlariClient";
 import { getStoreSettings } from "@/app/actions/settings";
 
+
+export const dynamic = "force-dynamic";
+
 export const metadata = {
     title: "Kargo Ayarları | Dükkan Yönetimi",
 };
