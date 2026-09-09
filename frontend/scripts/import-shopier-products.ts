@@ -50,9 +50,9 @@ async function main() {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const allData: any[] = XLSX.utils.sheet_to_json(worksheet);
-    const jsonData = allData.slice(0, 50);
+    const jsonData = allData;
 
-    console.log(`Found ${allData.length} rows in Excel file. Processing only the first 50 rows.`);
+    console.log(`Found ${allData.length} rows in Excel file. Processing all rows.`);
 
     // Cleanup option
     const CLEAN_SHOPIER_PRODUCTS = true;
@@ -123,8 +123,8 @@ async function main() {
             }
 
             // 2. Create Product
-            // Since we cleaned up, we can just create (or findUnique just in case duplication within excel)
-            let product = await prisma.product.findUnique({ where: { shopierId: shopierId } });
+            // We search by name to merge duplicate listings of the same product
+            let product = await prisma.product.findFirst({ where: { name: productName } });
             if (!product) {
                 product = await prisma.product.create({
                     data: {
